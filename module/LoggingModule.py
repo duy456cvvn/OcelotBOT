@@ -1,6 +1,7 @@
-from . import ModuleBase, Util
+from . import ModuleBase, Util, UtilityModule
 from constants import *
 import warnings
+import MySQLdb
 
 class LoggingModule(ModuleBase):
     def accessLevel(self):
@@ -18,12 +19,16 @@ class LoggingModule(ModuleBase):
     def logger(self, channel, username, message, time):
         db = BotConstants.database
         channel = channel.rstrip()
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            db.execute("CREATE TABLE IF NOT EXISTS `{0}` (ID int NOT NULL AUTO_INCREMENT, Time text,Username text,Message text, PRIMARY KEY (ID))".format(channel))
-        BotConstants.connection.commit()
-        db.execute("INSERT INTO `{0}` (`Time`, `Username`, `Message`) VALUES (%s, %s, %s)".format(channel), [time, username, message])
-        BotConstants.connection.commit()
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                db.execute("CREATE TABLE IF NOT EXISTS `{0}` (ID int NOT NULL AUTO_INCREMENT, Time text,Username text,Message text, PRIMARY KEY (ID))".format(channel))
+            BotConstants.connection.commit()
+            db.execute("INSERT INTO `{0}` (`Time`, `Username`, `Message`) VALUES (%s, %s, %s)".format(channel), [time, username, message])
+            BotConstants.connection.commit()
+        except MySQLdb.OperationalError:
+            UtilityModule().reconnect()
+            self.logger(channel, username, message, time)
 
     def checkAccessLevel(self, channel, args):
         return

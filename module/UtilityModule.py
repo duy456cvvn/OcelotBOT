@@ -4,6 +4,7 @@ from constants import *
 import re
 import json
 import traceback
+import MySQLdb
 
 #utility module for miscellaneous things such as @command
 class UtilityModule(ModuleBase):
@@ -75,6 +76,11 @@ class UtilityModule(ModuleBase):
         except:
             traceback.print_exc()
             pass
+
+    def reconnect(self):
+        config = BotConstants.config
+        BotConstants.connection = MySQLdb.connect(host=config["mysql"]["host"], user=config["mysql"]["user"], passwd=config["mysql"]["password"], db=config["mysql"]["database"])
+        BotConstants.database = BotConstants.connection.cusor()
 
     def tooltip(self, channel, args):
         Util().sendMessage(channel, "Usage: @commands")

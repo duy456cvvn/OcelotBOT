@@ -3,6 +3,7 @@ from module import *
 from constants import *
 import time
 import thread
+import MySQLdb
 
 zncPass = BotConstants.config["irc"]["zncPass"]
 nickname = "OcelotBOT"
@@ -46,7 +47,11 @@ def processMessage(chanMessage, userMessage, channel, data):
     chanMessage = chanMessage.split("@")[1]
     if BotConstants.moduleCommands.has_key(chanMessage) == 1:
         #get the function object from the command name entry in moduleCommands, then run it with the arguments (everything after the command separated by spaces)
-        thread.start_new_thread(getattr(BotConstants.moduleCommands[chanMessage]["class"], chanMessage), (channel, userMessage.split()[1:]))
+        try:
+            thread.start_new_thread(getattr(BotConstants.moduleCommands[chanMessage]["class"], chanMessage), (channel, userMessage.split()[1:]))
+        except MySQLdb.OperationalError:
+            UtilityModule().reconnect()
+            thread.start_new_thread(getattr(BotConstants.moduleCommands[chanMessage]["class"], chanMessage), (channel, userMessage.split()[1:]))
     else:
         #command not found
         Util().sendMessage(channel, "Command \"%s\" not found." % chanMessage)
