@@ -50,7 +50,7 @@ def processMessage(chanMessage, userMessage, channel, data):
         try:
             thread.start_new_thread(getattr(BotConstants.moduleCommands[chanMessage]["class"], chanMessage), (channel, userMessage.split()[1:]))
         except MySQLdb.OperationalError:
-            UtilityModule().reconnect()
+            BotConstants().reconnect()
             thread.start_new_thread(getattr(BotConstants.moduleCommands[chanMessage]["class"], chanMessage), (channel, userMessage.split()[1:]))
     else:
         #command not found

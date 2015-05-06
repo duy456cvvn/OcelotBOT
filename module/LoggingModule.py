@@ -27,7 +27,7 @@ class LoggingModule(ModuleBase):
             db.execute("INSERT INTO `{0}` (`Time`, `Username`, `Message`) VALUES (%s, %s, %s)".format(channel), [time, username, message])
             BotConstants.connection.commit()
         except MySQLdb.OperationalError:
-            UtilityModule().reconnect()
+            BotConstants().reconnect()
             self.logger(channel, username, message, time)
 
     def checkAccessLevel(self, channel, args):

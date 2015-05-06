@@ -18,3 +18,8 @@ class BotConstants:
     currentTopicID = 1
     totalTopics = 0
     messageCount = 0
+
+    def reconnect(self):
+        config = self.config
+        self.connection = MySQLdb.connect(host=config["mysql"]["host"], user=config["mysql"]["user"], passwd=config["mysql"]["password"], db=config["mysql"]["database"])
+        self.database = self.connection.cursor()
