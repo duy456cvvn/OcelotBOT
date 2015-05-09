@@ -27,7 +27,7 @@ class DictionaryModule(ModuleBase):
                 partOfSpeech = definitionJSON["partOfSpeech"]
                 Util().sendMessage(channel, "{0} ({1}): {2}".format(word, partOfSpeech, definition))
             else:
-                Util().sendMessage(channel, "No standard definition found for \"{0\". Please check Urban Dictionary with @defineud".format(self.wordToDefine))
+                Util().sendMessage(channel, "No standard definition found for \"{0}\". Please check Urban Dictionary with @defineud".format(self.wordToDefine))
         else:
             self.tooltip(channel, args = {"command": "define"})
 
