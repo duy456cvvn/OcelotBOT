@@ -2,6 +2,7 @@ import socket
 import ssl
 import MySQLdb
 import json
+import time
 
 class BotConstants:
     ircSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -21,5 +22,8 @@ class BotConstants:
 
     def reconnect(self):
         config = self.config
+        self.connection = None
         self.connection = MySQLdb.connect(host=config["mysql"]["host"], user=config["mysql"]["user"], passwd=config["mysql"]["password"], db=config["mysql"]["database"])
+        self.database = None
         self.database = self.connection.cursor()
+        time.sleep(3)
