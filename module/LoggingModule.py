@@ -29,7 +29,7 @@ class LoggingModule(ModuleBase):
         except MySQLdb.OperationalError:
             BotConstants().reconnect()
             self.logger(channel, username, message, time)
-
+            
     def checkAccessLevel(self, channel, args):
         return
 

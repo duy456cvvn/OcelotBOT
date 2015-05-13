@@ -21,9 +21,4 @@ class BotConstants:
     messageCount = 0
 
     def reconnect(self):
-        config = self.config
-        self.connection = None
-        self.connection = MySQLdb.connect(host=config["mysql"]["host"], user=config["mysql"]["user"], passwd=config["mysql"]["password"], db=config["mysql"]["database"])
-        self.database = None
-        self.database = self.connection.cursor()
-        time.sleep(3)
+        self.connection.ping(True)
