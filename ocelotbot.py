@@ -44,7 +44,7 @@ def loadModules():
 #process commands
 def processMessage(chanMessage, userMessage, channel, data):
     #get the name of the command without @
-    chanMessage = chanMessage.split("@")[1]
+    chanMessage = chanMessage.split("@")[1].lower()
     if BotConstants.moduleCommands.has_key(chanMessage) == 1:
         #get the function object from the command name entry in moduleCommands, then run it with the arguments (everything after the command separated by spaces)
         try:

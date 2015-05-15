@@ -15,17 +15,18 @@ class BotConstants:
 
     connection = MySQLdb.connect(host=config["mysql"]["host"], user=config["mysql"]["user"], passwd=config["mysql"]["password"], db=config["mysql"]["database"])
     database = connection.cursor()
+
+    tables = []
+    currentTopicID = 1
+    totalTopics = 0
+    messageCount = 0
+
     database.execute("SHOW TABLES")
     connection.commit()
     result = database.fetchall()
 
-    tables = []
     for table in result:
         tables.append(table[0])
-
-    currentTopicID = 1
-    totalTopics = 0
-    messageCount = 0
 
     def reconnect(self):
         self.connection.ping(True)
