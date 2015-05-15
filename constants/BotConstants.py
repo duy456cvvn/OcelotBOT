@@ -15,6 +15,13 @@ class BotConstants:
 
     connection = MySQLdb.connect(host=config["mysql"]["host"], user=config["mysql"]["user"], passwd=config["mysql"]["password"], db=config["mysql"]["database"])
     database = connection.cursor()
+    database.execute("SHOW TABLES")
+    connection.commit()
+    result = database.fetchall()
+
+    tables = []
+    for table in result:
+        tables.append(table[0])
 
     currentTopicID = 1
     totalTopics = 0

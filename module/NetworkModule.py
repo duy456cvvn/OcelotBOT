@@ -6,41 +6,7 @@ import re
 class NetworkModule(ModuleBase):
     recordNames = {
         "A": "IPv4 Address",
-        "AAAA": "IPv6 Address",
-        "AFSDB": "AFS Database",
-        "APL": "Address Prefix List",
-        "CAA": "Certification Authority Authorization",
-        "CDNSKEY": "Child DNSKEY",
-        "CDS": "Child DS",
-        "CERT": "Certificate",
-        "CNAME": "Canonical Name",
-        "DHCID": "DHCP Identifier",
-        "DLV": "DNSSEC Lookaside Validation",
-        "DNAME": "Delegation Name",
-        "DS": "Delegation Signer",
-        "HIP": "Host Identity Protocol",
-        "IPSECKEY": "IPsec Key",
-        "KEY": "Key",
-        "KX": "Key eXchange",
-        "LOC": "Location",
-        "MX": "Mail Exchange",
-        "NAPTR": "Naming Authority Pointer",
-        "NS": "Name Server",
-        "NSEC": "Next-Secure",
-        "NSEC3": "NSEC Record (v3)",
-        "NSEC3PARAM": "NSEC3 Parameters",
-        "PTR": "Pointer",
-        "RRSIG": "DNSSEC Signature",
-        "RP": "Reponsible Person",
-        "SIG": "Signature",
-        "SOA": "Start of Authority",
-        "SRV": "Service Locator",
-        "SSHFP": "SSH Public Key Fingerprint",
-        "TA": "DNSSEC Trust Authorities",
-        "TKEY": "Secret Key",
-        "TLSA": "TLSA Ceriticate Association",
-        "TSIG": "Transaction Signature",
-        "TXT": "Text"
+        "AAAA": "IPv6 Address"
     }
 
     def accessLevel(self):
@@ -94,9 +60,9 @@ class NetworkModule(ModuleBase):
                 if line != ";{0}. IN ANY".format(args[0]) and not line.startswith("."):
                     line = line.split()[3:]
                     recordType = line[0]
-                    recordType = NetworkModule().recordNames[recordType] if NetworkModule().recordNames.has_key(recordType) else recordType
-                    line = " ".join(line[1:])
-                    message += "{0}: {1} || ".format(recordType, line)
+                    if self.recordNames.has_key(recordType):
+                        line = " ".join(line[1:])
+                        message += "{0}: {1} || ".format(self.recordNames[recordType], line)
 
             message = message.rstrip(" || ")
             if message == "":

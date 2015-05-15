@@ -113,5 +113,5 @@ while True:
             time.sleep(1)
 
         username = data.split(":")[1].split("!")[0]
-        timeString = time.strftime("%d %b, %H:%M")
+        timeString = time.strftime("%d %b, %H:%M:%S")
         LoggingModule().logger(channel, username, userMessage, timeString)
