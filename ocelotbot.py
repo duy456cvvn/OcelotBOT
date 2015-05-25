@@ -75,6 +75,9 @@ while True:
             else:
                 BotConstants.currentTopicID = 1
 
+    if data.split()[1] == "402" or data.split()[1] == "317" and not TrackingModule.stopFlag.isSet():
+        TrackingModule().handleTrackingData(data)
+
     #whole thing
     userMessage = ":".join(data.split(":")[2:]).strip()
 
