@@ -47,11 +47,7 @@ def processMessage(chanMessage, userMessage, channel, data):
     chanMessage = chanMessage.split("@")[1].lower()
     if BotConstants.moduleCommands.has_key(chanMessage) == 1:
         #get the function object from the command name entry in moduleCommands, then run it with the arguments (everything after the command separated by spaces)
-        try:
-            thread.start_new_thread(getattr(BotConstants.moduleCommands[chanMessage]["class"], chanMessage), (channel, userMessage.split()[1:]))
-        except MySQLdb.OperationalError:
-            BotConstants().reconnect()
-            thread.start_new_thread(getattr(BotConstants.moduleCommands[chanMessage]["class"], chanMessage), (channel, userMessage.split()[1:]))
+        thread.start_new_thread(getattr(BotConstants.moduleCommands[chanMessage]["class"], chanMessage), (channel, userMessage.split()[1:]))
     else:
         #command not found
         Util().sendMessage(channel, "Command \"%s\" not found." % chanMessage)
@@ -68,16 +64,16 @@ while True:
     if data.find("332") != -1:
         topicData = data.split("##Ocelotworks :")
         if len(topicData) >= 2:
-            db = BotConstants.database
-            LoggingModule().updateTopicCounts(db)
+            LoggingModule().updateTopicCounts()
 
             #get current topic ID from
             currentTopic = topicData[1].rstrip("\r\n")
-            db.execute("SELECT id FROM `Topics` WHERE topic = %s", [currentTopic])
-            BotConstants.connection.commit()
-            topicIDResult = db.fetchall()
+            BotConstants().runQuery("SELECT id FROM `Topics` WHERE topic = %s", currentTopic)
+            topicIDResult = BotConstants.db.fetchall()
             if len(topicIDResult) == 1 and len(topicIDResult[0]) == 1:
-                BotConstants.currentTopicID = topicIDResult[0][0]
+                BotConstants.currentTopicID = topicIDResult[0]["id"]
+            else:
+                BotConstants.currentTopicID = 1
 
     #whole thing
     userMessage = ":".join(data.split(":")[2:]).strip()

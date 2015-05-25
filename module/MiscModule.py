@@ -16,12 +16,9 @@ class MiscModule(ModuleBase):
             Util().sendMessage(channel, "Usage: @meme [add/remove] <name> [url]")
 
     def meme(self, channel, args):
-        db = BotConstants.database
-
         def checkMemeExists(name):
-            db.execute("SELECT url FROM `Memes` WHERE name = %s", [name])
-            BotConstants.connection.commit()
-            memes = db.fetchall()
+            BotConstants().runQuery("SELECT url FROM `Memes` WHERE name = %s", name)
+            memes = BotConstants.db.fetchall()
             if len(memes) == 0:
                 return False
             else:
@@ -32,9 +29,12 @@ class MiscModule(ModuleBase):
                 if len(args) >= 3:
                     memeName = args[1]
                     memeURL = args[2]
-                    db.execute("INSERT INTO `Memes` (name, url) VALUES (%s, %s)", [memeName, memeURL])
-                    BotConstants.connection.commit()
-                    Util().sendMessage(channel, "Meme \"{0}\" added.".format(memeName))
+                    meme = checkMemeExists(memeName)
+                    if not meme:
+                        BotConstants().runQuery("INSERT INTO `Memes` (name, url) VALUES (%s, %s)", memeName, memeURL)
+                        Util().sendMessage(channel, "Meme \"{0}\" added.".format(memeName))
+                    else:
+                        Util().sendMessage(channel, "Meme \"{0}\" already exists".format(memeName))
                 else:
                     Util().sendMessage(channel, "You must provide a name and URL when adding a meme.")
             elif args[0] == "remove":
@@ -43,8 +43,7 @@ class MiscModule(ModuleBase):
                     if not meme:
                         Util().sendMessage(channel, "No meme called \"{0}\" found. Please try again.".format(args[1]))
                     else:
-                        db.execute("DELETE FROM `Memes` WHERE name = %s", [args[1]])
-                        BotConstants.connection.commit()
+                        BotConstants().runQuery("DELETE FROM `Memes` WHERE name = %s", args[1])
                         Util().sendMessage(channel, "Meme \"{0}\" deleted.".format(args[1]))
                 else:
                     Util().sendMessage(channel, "You must provide a name when deleting a meme.")

@@ -1,10 +1,7 @@
 from . import ModuleBase, Util, RedditModule
 from RedditModule import RedditURLOpener
 from constants import *
-import re
-import json
-import traceback
-import MySQLdb
+import re, json, traceback
 
 #utility module for miscellaneous things such as @command
 class UtilityModule(ModuleBase):
