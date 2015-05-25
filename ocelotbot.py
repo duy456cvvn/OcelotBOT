@@ -112,6 +112,7 @@ while True:
         if chanMessage.startswith("@"):
             time.sleep(1)
 
-        username = data.split(":")[1].split("!")[0]
-        timeString = time.strftime("%d %b, %H:%M:%S")
-        LoggingModule().logger(channel, username, userMessage, timeString)
+        userWhoSent = data.split(":")[1].split("!")[0]
+        if userWhoSent != "ChanServ" and userWhoSent != username:
+            timeString = time.strftime("%d %b, %H:%M:%S")
+            LoggingModule().logger(channel, userWhoSent, userMessage, timeString)
