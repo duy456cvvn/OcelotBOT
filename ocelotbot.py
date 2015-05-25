@@ -113,6 +113,6 @@ while True:
             time.sleep(1)
 
         userWhoSent = data.split(":")[1].split("!")[0]
-        if userWhoSent != "ChanServ" and userWhoSent != username:
+        if userWhoSent != "ChanServ" and userWhoSent != nickname:
             timeString = time.strftime("%d %b, %H:%M:%S")
             LoggingModule().logger(channel, userWhoSent, userMessage, timeString)
