@@ -98,7 +98,7 @@ while True:
     if channel == "##Ocelotworks":
         BotConstants.messageCount += 1
         if BotConstants.messageCount > 100:
-            LoggingModule().updateTopic(args = ["up"])
+            LoggingModule().updateTopic(channel, args = ["up"])
             BotConstants.messageCount = 0
 
     #starts with an @ so process it as a command
