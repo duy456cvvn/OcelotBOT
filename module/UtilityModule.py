@@ -29,6 +29,18 @@ class UtilityModule(ModuleBase):
         #send result to request source
         Util().sendMessage(channel, "Commands: {0}".format(commandList))
 
+    def binaryToString(self, channel, userMessage):
+        userMessage = userMessage.replace(" ", "")
+        binarySplit = [userMessage[start:start+8].zfill(8) for start in range(0, len(userMessage), 8)]
+        try:
+            for index, octet in enumerate(binarySplit):
+                binarySplit[index] = int(octet, 2)
+
+            message = "".join(map(chr, binarySplit))
+            Util().sendMessage(channel, "Converted: \"{0}\"".format(message))
+        except ValueError:
+            pass
+
     def snarf(self, channel, userMessage):
         try:
             #r/thing

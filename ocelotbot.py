@@ -107,6 +107,9 @@ while True:
     else:
         UtilityModule().snarf(channel, userMessage)
 
+    if userMessage.startswith("0") or userMessage.startswith("1"):
+        UtilityModule().binaryToString(channel, userMessage)
+
     if channel.startswith("#"):
         if chanMessage.startswith("@"):
             time.sleep(1)
