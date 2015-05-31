@@ -5,14 +5,21 @@ import re, json, traceback
 
 #utility module for miscellaneous things such as @command
 class UtilityModule(ModuleBase):
-    def accessLevel(self):
-        return AccessLevels.ADMIN
+    def accessLevel(self, commandName):
+        if commandName == "setaccesslevel":
+            return AccessLevels.GOD
+        else:
+            return AccessLevels.USER
 
     def moduleName(self):
         return "YouTube-DL Module"
 
     def getCommands(self):
-        return ["commands"]
+        return ["commands", "setaccesslevel"]
+
+    def tooltip(self, channel, args):
+        if args["command"] == "setaccesslevel":
+            Util().sendMessage(channel, "Usage: @setaccesslevel <username> <accesslevel>")
 
     def commands(self, channel, args):
         #init string
@@ -28,6 +35,31 @@ class UtilityModule(ModuleBase):
 
         #send result to request source
         Util().sendMessage(channel, "Commands: {0}".format(commandList))
+
+    def getAccesslevel(self, username):
+        BotConstants().runQuery("SELECT Level FROM `Access_Levels` WHERE Username = %s", username)
+        result = BotConstants().db.fetchall()
+        if len(result) >= 1:
+            return result[0]["Level"]
+        else:
+            return 0
+
+    def setaccesslevel(self, channel, args):
+        if len(args) >= 2:
+            validLevels = [-1, 0, 2, 69]
+            username = args[0]
+            accessLevel = args[1]
+            try:
+                accessLevel = int(accessLevel)
+                if accessLevel in validLevels:
+                    BotConstants().runQuery("INSERT INTO `Access_Levels` (Username, Level) VALUES (%s, %s) ON DUPLICATE KEY UPDATE Level = VALUES(Level)", username, accessLevel)
+                    Util().sendMessage(channel, "Level set successfully")
+                else:
+                    raise Exception()
+            except:
+                Util().sendMessage(channel, "{0} is not a valid level. Only {1}".format(accessLevel, ", ".join(str(level) for level in validLevels)))
+        else:
+            self.tooltip(channel, args = {"command": "setaccesslevel"})
 
     def binaryToString(self, channel, userMessage):
         userMessage = userMessage.replace(" ", "")
@@ -85,6 +117,3 @@ class UtilityModule(ModuleBase):
         except:
             traceback.print_exc()
             pass
-
-    def tooltip(self, channel, args):
-        Util().sendMessage(channel, "Usage: @commands")

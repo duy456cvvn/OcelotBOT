@@ -45,9 +45,15 @@ def loadModules():
 def processMessage(chanMessage, userMessage, channel, data):
     #get the name of the command without @
     chanMessage = chanMessage.split("@")[1].lower()
+    userWhoSent = data.split(":")[1].split("!")[0]
     if BotConstants.moduleCommands.has_key(chanMessage) == 1:
-        #get the function object from the command name entry in moduleCommands, then run it with the arguments (everything after the command separated by spaces)
-        thread.start_new_thread(getattr(BotConstants.moduleCommands[chanMessage]["class"], chanMessage), (channel, userMessage.split()[1:]))
+        accessLevel = UtilityModule().getAccesslevel(userWhoSent)
+        commandLevel = getattr(BotConstants.moduleCommands[chanMessage]["class"], "accessLevel")(chanMessage)
+        if accessLevel >= commandLevel:
+            #get the function object from the command name entry in moduleCommands, then run it with the arguments (everything after the command separated by spaces)
+            thread.start_new_thread(getattr(BotConstants.moduleCommands[chanMessage]["class"], chanMessage), (channel, userMessage.split()[1:]))
+        else:
+            Util().sendMessage(channel, "You aren't a high enough level to run that command!")
     else:
         #command not found
         Util().sendMessage(channel, "Command \"%s\" not found." % chanMessage)

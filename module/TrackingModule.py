@@ -7,8 +7,8 @@ class TrackingModule(ModuleBase):
     usersToTrack = []
     stopFlag = Event()
 
-    def accessLevel(self):
-        return AccessLevels.ADMIN
+    def accessLevel(self, commandName):
+        return AccessLevels.GOD
 
     def moduleName(self):
         return "Tracking Module"

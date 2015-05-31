@@ -2,8 +2,8 @@ from . import ModuleBase, Util
 from constants import *
 
 class MiscModule(ModuleBase):
-    def accessLevel(self):
-        return AccessLevels.ADMIN
+    def accessLevel(self, commandName):
+        return AccessLevels.USER
 
     def moduleName(self):
         return "Miscellaneous Module"

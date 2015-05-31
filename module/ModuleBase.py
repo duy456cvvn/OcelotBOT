@@ -7,7 +7,7 @@ class ModuleBase(object):
 
     #sets access level for module
     @abstractmethod
-    def accessLevel(self):
+    def accessLevel(self, commandName):
         return
 
     #sets the name of the module

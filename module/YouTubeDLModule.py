@@ -8,8 +8,8 @@ import hashlib
 import json
 
 class YouTubeDLModule(ModuleBase):
-    def accessLevel(self):
-        return AccessLevels.ADMIN
+    def accessLevel(self, commandName):
+        return AccessLevels.USER
 
     def moduleName(self):
         return "YouTube-DL Module"

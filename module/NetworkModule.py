@@ -9,8 +9,8 @@ class NetworkModule(ModuleBase):
         "AAAA": "IPv6 Address"
     }
 
-    def accessLevel(self):
-        return AccessLevels.ADMIN
+    def accessLevel(self, commandName):
+        return AccessLevels.USER
 
     def moduleName(self):
         return "Network Module"

@@ -7,8 +7,8 @@ import re
 import traceback
 
 class RedditModule(ModuleBase):
-    def accessLevel(self):
-        return AccessLevels.ADMIN
+    def accessLevel(self, commandName):
+        return AccessLevels.USER
 
     def moduleName(self):
         return "Reddit Module"
