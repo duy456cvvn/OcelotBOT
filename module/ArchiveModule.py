@@ -21,15 +21,16 @@ class ArchiveModule(ModuleBase):
             archiveURL = self.checkURLRegex(args[0])
             youtubeURL = self.checkYoutubeRegex(archiveURL)
             if archiveURL:
-                req = requests.head(archiveURL)
+                req = requests.head(archiveURL, allow_redirects=True)
                 if req.status_code == 200 or youtubeURL:
-                    contentType = req.headers["content-type"]
+                    contentType = req.headers["content-type"] if "content-type" in req.headers else ""
                     if not youtubeURL and "text/html" in contentType:
                         Util().sendMessage(channel, "Not archiving because it is a website.")
                     else:
                         if youtubeURL:
                             YouTubeDLModule().youtube(channel, args=["https://youtube.com/{0}".format(youtubeURL)])
                         else:
+                            Util().sendMessage(channel, "Archiving...")
                             fileInfo = self.download(archiveURL)
                             fileURLString = "http://mirrors.boywanders.us/{0}/{1}".format(fileInfo["extension"], fileInfo["filename"])
                             fileURL = UtilityModule().getShortURL(fileURLString)
@@ -41,21 +42,9 @@ class ArchiveModule(ModuleBase):
         else:
             self.tooltip(channel, args = {"command": "archive"})
 
-    def getExtension(self, link):
-        if link is None or link == "":
-            return ""
-        else:
-            paths = os.path.splitext(link)
-            ext = paths[1]
-            new_link = paths[0]
-            if ext != "":
-                return self.getExtension(new_link) + ext
-            else:
-                return ""
-
     def download(self, url):
         filename = url.split("/")[-1]
-        fileExtension = ".".join(self.getExtension(filename).split(".")[1:])
+        fileExtension = filename.split(".")[-1]
         filePath = "{0}/{1}".format("/home/mirror/mirrors", fileExtension)
         r = requests.get(url)
         if not os.path.exists(filePath):

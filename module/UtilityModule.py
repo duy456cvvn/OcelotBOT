@@ -81,7 +81,7 @@ class UtilityModule(ModuleBase):
         md5.update("{0}{1}".format(timestamp, BotConstants.config["misc"]["urlShortKey"]))
         signature = md5.hexdigest()
 
-        #request short URL for the mp3 url
+        #request short URL
         shortURL = urllib2.urlopen("https://boywanders.us/short/yourls-api.php?signature={0}&timestamp={1}&action=shorturl&url={2}&format=json".format(signature, timestamp, url)).read()
         shortURL = json.loads(shortURL)
         shortURL = shortURL["shorturl"]
