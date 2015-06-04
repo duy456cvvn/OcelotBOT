@@ -27,6 +27,8 @@ class ModuleBase(object):
 
 #Util class
 class Util:
+    def _u8(self, t):
+        return t.encode("UTF-8", "replace") if isinstance(t, unicode) else t
+
     def sendMessage(self, channel, message):
-        _u8 = lambda t: t.encode("UTF-8", "replace") if isinstance(t, unicode) else t
-        BotConstants.irc.send("PRIVMSG {0} :{1}\r\n".format(channel, _u8(message)))
+        BotConstants.irc.send("PRIVMSG {0} :{1}\r\n".format(channel, self._u8(message)))

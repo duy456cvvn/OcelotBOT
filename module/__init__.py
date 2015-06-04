@@ -7,6 +7,7 @@ __all__ = [
     "LoggingModule",
     "MiscModule",
     "TrackingModule",
+    "ArchiveModule",
     "ModuleBase",
     "Util"
 ]
@@ -16,3 +17,4 @@ from ModuleBase import Util
 from UtilityModule import UtilityModule
 from LoggingModule import LoggingModule
 from TrackingModule import TrackingModule
+from YouTubeDLModule import YouTubeDLModule

@@ -77,17 +77,7 @@ class YouTubeDLModule(ModuleBase):
             if self.shouldFinish:
                 #put together the mp3 url by url encoding the mp3 name
                 urlString = "http://files.unacceptableuse.com/{0}".format(urllib2.quote(self.fileName.encode("utf8")))
-
-                #generate the timestamp and signature by md5-ing the timestamp + the api secret key
-                timestamp = int(time.time())
-                md5 = hashlib.md5()
-                md5.update("{0}{1}".format(timestamp, BotConstants.config["misc"]["urlShortKey"]))
-                signature = md5.hexdigest()
-
-                #request short URL for the mp3 url
-                shortURL = urllib2.urlopen("https://boywanders.us/short/yourls-api.php?signature={0}&timestamp={1}&action=shorturl&url={2}&format=json".format(signature, timestamp, urlString)).read()
-                shortURL = json.loads(shortURL)
-                shortURL = shortURL["shorturl"]
+                shortURL = self.getShortURL(urlString)
 
                 #send short url
                 Util().sendMessage(channel, "\x033The requested MP3 can be found at: {0}".format(shortURL))
@@ -95,8 +85,23 @@ class YouTubeDLModule(ModuleBase):
             #send tooltip with command set in args to the command executed by user
             self.tooltip(channel, args = {"command": args[1]})
 
+    def getShortURL(self, url):
+        #generate the timestamp and signature by md5-ing the timestamp + the api secret key
+        timestamp = int(time.time())
+        md5 = hashlib.md5()
+        md5.update("{0}{1}".format(timestamp, BotConstants.config["misc"]["urlShortKey"]))
+        signature = md5.hexdigest()
+
+        #request short URL for the mp3 url
+        shortURL = urllib2.urlopen("https://boywanders.us/short/yourls-api.php?signature={0}&timestamp={1}&action=shorturl&url={2}&format=json".format(signature, timestamp, url)).read()
+        shortURL = json.loads(shortURL)
+        shortURL = shortURL["shorturl"]
+
+        return shortURL
+
     #youtube command
     def youtube(self, channel, args):
+        print args
         #create argument array with only information needed
         args = [
             #if the args from the IRC message didn't have anything, set to None. otherwise use the argument provided
