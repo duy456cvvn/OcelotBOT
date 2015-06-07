@@ -21,7 +21,7 @@ class ArchiveModule(ModuleBase):
             archiveURL = self.checkURLRegex(args[0])
             youtubeURL = self.checkYoutubeRegex(archiveURL)
             if archiveURL:
-                req = requests.head(archiveURL, allow_redirects=True)
+                req = requests.head(archiveURL, allow_redirects = True, headers = {"Accept-Encoding": "identity"})
                 if req.status_code == 200 or youtubeURL:
                     contentType = req.headers["content-type"] if "content-type" in req.headers else ""
                     if not youtubeURL and "text/html" in contentType:
@@ -30,7 +30,7 @@ class ArchiveModule(ModuleBase):
                         if youtubeURL:
                             YouTubeDLModule().youtube(channel, args=["https://youtube.com/{0}".format(youtubeURL)])
                         else:
-                            Util().sendMessage(channel, "Archiving...")
+                            Util().sendMessage(channel, "Archiving ({0})...".format(self.sizeof_fmt(req.headers["content-length"])))
                             fileInfo = self.download(archiveURL)
                             fileURLString = "http://mirrors.boywanders.us/{0}/{1}".format(fileInfo["extension"], fileInfo["filename"])
                             fileURL = UtilityModule().getShortURL(fileURLString)
@@ -46,17 +46,25 @@ class ArchiveModule(ModuleBase):
         filename = url.split("/")[-1]
         fileExtension = filename.split(".")[-1]
         filePath = "{0}/{1}".format("/home/mirror/mirrors", fileExtension)
-        r = requests.get(url)
+        r = requests.get(url, stream = True)
         if not os.path.exists(filePath):
             os.makedirs(filePath)
 
         with open("{0}/{1}".format(filePath, filename), "wb") as f:
-            for chunk in r.iter_content(chunk_size=1024):
+            for chunk in r.iter_content(chunk_size = 1024):
                 if chunk: #filter out keep-alive new chunks
                     f.write(chunk)
                     f.flush()
 
         return {"extension": fileExtension, "filename": filename}
+
+    def sizeof_fmt(self, num, suffix='B'):
+        for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+            if abs(num) < 1024.0:
+                return "%3.1f%s%s" % (num, unit, suffix)
+            num /= 1024.0
+
+        return "%.1f%s%s" % (num, 'Yi', suffix)
 
     def checkURLRegex(self, str):
         pattern = re.compile(ur'^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\xa1-\xff0-9]+-?)*[a-z\xa1-\xff0-9]+)(?:\.(?:[a-z\xa1-\xff0-9]+-?)*[a-z\xa1-\xff0-9]+)*(?:\.(?:[a-z\xa1-\xff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$', re.IGNORECASE | re.UNICODE | re.DOTALL)
