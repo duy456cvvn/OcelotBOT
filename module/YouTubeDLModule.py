@@ -1,6 +1,6 @@
 from . import ModuleBase, Util, UtilityModule
 from constants import *
-import youtube_dl, thread, urllib2
+import youtube_dl, thread, urllib2, os
 
 class YouTubeDLModule(ModuleBase):
     def accessLevel(self, commandName):
@@ -70,6 +70,11 @@ class YouTubeDLModule(ModuleBase):
             pass
 
             if self.shouldFinish:
+                #replace _'s in name with spaces and rename
+                newFileName = self.fileName.replace("_", " ")
+                os.rename("/home/peter/mp3/{0}".format(self.fileName), "/home/peter/mp3/{0}".format(newFileName))
+                self.fileName = newFileName
+
                 #put together the mp3 url by url encoding the mp3 name
                 urlString = "http://files.unacceptableuse.com/{0}".format(urllib2.quote(self.fileName.encode("utf8")))
                 shortURL = UtilityModule().getShortURL(urlString)
@@ -82,7 +87,6 @@ class YouTubeDLModule(ModuleBase):
 
     #youtube command
     def youtube(self, channel, args):
-        print args
         #create argument array with only information needed
         args = [
             #if the args from the IRC message didn't have anything, set to None. otherwise use the argument provided
