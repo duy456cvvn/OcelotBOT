@@ -25,8 +25,8 @@ class DictionaryModule(ModuleBase):
 
                 word = definitionJSON["word"]
                 definition = definitionJSON["text"]
-                partOfSpeech = definitionJSON["partOfSpeech"]
-                Util().sendMessage(channel, "{0} ({1}): {2}".format(word, partOfSpeech, definition))
+                partOfSpeech = " ({0})".format(definitionJSON["partOfSpeech"]) if "partOfSpeech" in definitionJSON else ""
+                Util().sendMessage(channel, "{0}{1}: {2}".format(word, partOfSpeech, definition))
             else:
                 Util().sendMessage(channel, "No standard definition found for \"{0}\". Please check Urban Dictionary with @defineud".format(urllib2.unquote(self.wordToDefine)))
         else:

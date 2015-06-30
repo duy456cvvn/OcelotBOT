@@ -9,13 +9,13 @@ class BotConstants:
     with open("constants/bot.config") as file:
         config = json.loads(file.read().replace("\n", ""))
 
-    connection = MySQLdb.connect(host=config["mysql"]["host"],
-                                 user=config["mysql"]["user"],
-                                 passwd=config["mysql"]["password"],
-                                 db=config["mysql"]["database"],
-                                 use_unicode=True,
-                                 charset="utf8mb4",
-                                 cursorclass=MySQLdb.cursors.DictCursor)
+    connection = MySQLdb.connect(host           = config["mysql"]["host"],
+                                 user           = config["mysql"]["user"],
+                                 passwd         = config["mysql"]["password"],
+                                 db             = config["mysql"]["database"],
+                                 use_unicode    = True,
+                                 charset        = "utf8mb4",
+                                 cursorclass    = MySQLdb.cursors.DictCursor)
     db = connection.cursor()
     connection.autocommit(True)
 
