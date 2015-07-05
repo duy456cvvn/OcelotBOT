@@ -1,6 +1,6 @@
 from . import ModuleBase, Util
 from constants import *
-import random, time, math, re
+import random, time, math, re, traceback
 from datetime import datetime
 
 class LoggingModule(ModuleBase):
@@ -126,7 +126,7 @@ class LoggingModule(ModuleBase):
                 if topicResult["Message"].startswith("@topic"):
                     Util().sendMessage(channel, "Ignoring Duplicate request!")
                 else:
-                    newTopic = "<{0}> {1}".format(topicResult["Username"], topicResult["Message"])
+                    newTopic = "<{0}> {1}".format(topicResult["Username"], topicResult["Message"].encode("utf-8"))
                     BotConstants().runQuery("SELECT * FROM `Topics` WHERE topic = %s", newTopic)
                     topicCheck = BotConstants.db.fetchall()
 
@@ -139,6 +139,7 @@ class LoggingModule(ModuleBase):
             else:
                 raise Exception()
         except:
+            traceback.print_exc()
             Util().sendMessage(channel, "Invalid message index.")
 
     def updateTopic(self, channel, args):

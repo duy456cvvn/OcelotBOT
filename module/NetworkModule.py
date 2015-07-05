@@ -29,7 +29,7 @@ class NetworkModule(ModuleBase):
             if not err.startswith("ping: unknown host"):
                 pingRegex = re.compile(ur'(.*) packets transmitted, (.*) received, (.*%) packet loss.*\nrtt min\/avg\/max\/mdev = (.*)\/(.*)\/(.*)\/.* ms')
                 pingResult = re.findall(pingRegex, pingResponse)[0]
-                resultString = "Packets Received: {0}/{1} | Packet Loss: {2} | Min Ping: {3} ms | Max Ping: {4} ms | Average Ping: {5} ms"\
+                resultString = "Packets Received: {1}/{0} | Packet Loss: {2} | Min Ping: {3} ms | Max Ping: {4} ms | Average Ping: {5} ms"\
                     .format(pingResult[0], pingResult[1], pingResult[2], pingResult[3], pingResult[4], pingResult[5])
                 Util().sendMessage(channel, resultString)
             else:
