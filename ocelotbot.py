@@ -101,7 +101,7 @@ while True:
     if channel == nickname:
         channel = data.split(" ")[0].split(":")[1].split("!")[0]
 
-    if channel == "##Ocelotworks":
+    if channel == BotConstants.config["irc"]["topicChannel"]:
         BotConstants.messageCount += 1
         if BotConstants.messageCount > 100:
             LoggingModule().updateTopic(channel, args = ["up"])
