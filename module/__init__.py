@@ -8,6 +8,7 @@ __all__ = [
     "MiscModule",
     "TrackingModule",
     "ArchiveModule",
+    "MinecraftModule",
     "ModuleBase",
     "Util"
 ]

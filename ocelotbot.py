@@ -1,9 +1,7 @@
 #-*- encoding: utf-8 -*-
 from module import *
 from constants import *
-import time
-import thread
-import MySQLdb
+import time, thread
 
 zncPass = BotConstants.config["irc"]["zncPass"]
 nickname = "OcelotBOT"
@@ -32,13 +30,14 @@ def loadModules():
         #class name
         name = moduleClass.__name__
         #all commands from getCommands() in module
-        commands = moduleClass().getCommands()
+        moduleClassObj = moduleClass()
+        commands = moduleClassObj.getCommands()
 
         #add name into moduleCommands with the name and class stored in order to call it as a class object
         for commandName in commands:
             BotConstants.moduleCommands[commandName] = {
                 "name": name,
-                "class": moduleClass()
+                "class": moduleClassObj
             }
 
 #process commands
