@@ -94,7 +94,7 @@ class FTBStatusCheckThread(Thread):
 	def check(self):
 		try:
 			self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			self.sock.settimeout(1)
+			self.sock.settimeout(5)
 			self.sock.connect((self.host, self.port))
 
 			self.sock.send("\xfe")
