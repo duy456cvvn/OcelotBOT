@@ -2,7 +2,8 @@ from . import ModuleBase, Util, RedditModule
 from RedditModule import RedditURLOpener
 from constants import *
 import re, json, traceback
-import time, hashlib, urllib2
+import time, hashlib, urllib2, requests
+from bs4 import BeautifulSoup
 
 #utility module for miscellaneous things such as @command
 class UtilityModule(ModuleBase):
@@ -89,17 +90,18 @@ class UtilityModule(ModuleBase):
         return shortURL
 
     def snarf(self, channel, userMessage):
+        userMessage = userMessage.lower()
         try:
             #r/thing
-            subredditRegex = re.compile(ur' r\/([^\s\/;\-\.,!?]+)')
+            subredditRegex = re.compile(ur' r/([^\s\/;\-\.,!?]+)')
             subredditResult = re.findall(subredditRegex, " " + userMessage)
 
             #u/thing
-            userRegex = re.compile(ur'\bu\/([^\s\/;\-\.,!?]+)\b')
+            userRegex = re.compile(ur'\bu/([^\s\/;\-\.,!?]+)\b')
             userResult = re.findall(userRegex, userMessage)
 
             #reddit.com/anything
-            postRegex = re.compile(ur'http:\/\/(www\.)?reddit.com\/(.*)')
+            postRegex = re.compile(ur'http://(www\.)?reddit.com/(.*)')
             postResult = re.findall(postRegex, userMessage)
 
             if len(subredditResult) == 1:
@@ -129,6 +131,49 @@ class UtilityModule(ModuleBase):
                     Util().sendMessage(channel, message)
                 else:
                     Util().sendMessage(channel, "/{0} does not exist or is banned.".format(subredditResult[0]))
+
+
+            #normal url snarfing
+            urlCheck = re.compile(ur'((http|https)://[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-@?^=%&amp;/~\+#])?)')
+            urlResult = re.findall(urlCheck, userMessage)
+            if len(urlResult) > 0:
+                urls = [u[0] for u in urlResult]
+                for u in urls:
+                    try:
+                        res = requests.get(u)
+                    except:
+                        res = None
+
+                    if res is not None and res.status_code == 200:
+                        html = res.content
+                        soup = BeautifulSoup(html)
+
+                        titleElem = soup.find("meta", attrs = {"property": "og:title"})
+                        if titleElem is not None and "content" in titleElem:
+                            title = titleElem["content"]
+                        else:
+                            try:
+                                title = soup.title.string
+                            except AttributeError:
+                                title = None
+
+                        descElem = soup.find("meta", attrs = {"property": "og:description"})
+                        if descElem is not None:
+                            desc = descElem["content"]
+                            print "desc: {0}".format(desc)
+                        else:
+                            descElem = soup.find("meta", attrs = {"name": "description"})
+                            if descElem is not None:
+                                desc = descElem["content"]
+                            else:
+                                desc = None
+
+                        title = title.replace("\n", "") if title is not None else None
+                        desc = desc.replace("\n", "") if desc is not None else None
+
+                        snarfMsg = "{0}{1}".format(("{0}".format(title) if title is not None and title != "" else ""), (" - {0}".format(desc) if desc is not None and desc != "" else ""))
+                        if snarfMsg.rstrip().lstrip() != "":
+                            Util().sendMessage(channel, snarfMsg)
         except:
             traceback.print_exc()
             pass

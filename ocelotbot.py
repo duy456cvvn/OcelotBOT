@@ -57,6 +57,13 @@ def processMessage(chanMessage, userMessage, channel, data):
         #command not found
         Util().sendMessage(channel, "Command \"%s\" not found." % chanMessage)
 
+def isInt(n):
+    try:
+        int(n)
+        return True
+    except ValueError:
+        return False
+
 #load modules and start loop
 loadModules()
 while True:
@@ -83,11 +90,14 @@ while True:
     if data.split()[1] == "402" or data.split()[1] == "317" and not TrackingModule.stopFlag.isSet():
         TrackingModule().handleTrackingData(data)
 
+    if isInt(data.split()[1]):
+        continue
+
     #whole thing
     userMessage = ":".join(data.split(":")[2:]).strip()
 
     #only first word
-    chanMessage = userMessage.split(" ")[0].strip()
+    commandMessage = userMessage.split(" ")[0].strip()
     channel = data.split(" ")
 
     #check if message is from user PM/channel or from server
@@ -107,16 +117,19 @@ while True:
             BotConstants.messageCount = 0
 
     #starts with an @ so process it as a command
-    if chanMessage.startswith("@"):
-        processMessage(chanMessage, userMessage, channel, data)
+    if commandMessage.startswith("@"):
+        processMessage(commandMessage, userMessage, channel, data)
     else:
         UtilityModule().snarf(channel, userMessage)
 
     if userMessage.startswith("0") or userMessage.startswith("1"):
         UtilityModule().binaryToString(channel, userMessage)
 
+    if userMessage.lower() == "test":
+        Util().sendMessage(channel, "icles")
+
     if channel.startswith("#"):
-        if chanMessage.startswith("@"):
+        if commandMessage.startswith("@"):
             time.sleep(1)
 
         userWhoSent = data.split(":")[1].split("!")[0]

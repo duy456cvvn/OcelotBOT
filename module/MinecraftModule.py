@@ -33,9 +33,9 @@ class MinecraftModule(ModuleBase):
 		checkThread.daemon = True
 		checkThread.start()
 
-		checkThread = FTBStatusCheckThread(self)
-		checkThread.daemon = True
-		checkThread.start()
+		#checkThread = FTBStatusCheckThread(self)
+		#checkThread.daemon = True
+		#checkThread.start()
 
 	def mcstatus(self, channel, args):
 		skinStatus, authStatus, sessionStatus = map(self.parseStatus, [self.statuses["skin"], self.statuses["auth"], self.statuses["session"]])
