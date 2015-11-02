@@ -90,6 +90,7 @@ class UtilityModule(ModuleBase):
         return shortURL
 
     def snarf(self, channel, userMessage):
+        origUserMessage = userMessage
         userMessage = userMessage.lower()
         try:
             #r/thing
@@ -135,7 +136,7 @@ class UtilityModule(ModuleBase):
 
             #normal url snarfing
             urlCheck = re.compile(ur'((http|https)://[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-@?^=%&amp;/~\+#])?)')
-            urlResult = re.findall(urlCheck, userMessage)
+            urlResult = re.findall(urlCheck, origUserMessage)
             if len(urlResult) > 0:
                 urls = [u[0] for u in urlResult]
                 for u in urls:
