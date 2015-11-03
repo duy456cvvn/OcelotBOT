@@ -161,7 +161,6 @@ class UtilityModule(ModuleBase):
                         descElem = soup.find("meta", attrs = {"property": "og:description"})
                         if descElem is not None:
                             desc = descElem["content"]
-                            print "desc: {0}".format(desc)
                         else:
                             descElem = soup.find("meta", attrs = {"name": "description"})
                             if descElem is not None:
@@ -172,7 +171,7 @@ class UtilityModule(ModuleBase):
                         title = title.replace("\n", "") if title is not None else None
                         desc = desc.replace("\n", "") if desc is not None else None
 
-                        snarfMsg = "{0}{1}".format(("{0}".format(title) if title is not None and title != "" else ""), (" - {0}".format(desc) if desc is not None and desc != "" else ""))
+                        snarfMsg = "{0}{1}".format(("{0}".format(Util.u8(title)) if title is not None and title != "" else ""), (" - {0}".format(Util.u8(desc)) if desc is not None and desc != "" else ""))
                         if snarfMsg.rstrip().lstrip() != "":
                             Util().sendMessage(channel, snarfMsg)
         except:

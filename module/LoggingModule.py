@@ -156,7 +156,7 @@ class LoggingModule(ModuleBase):
             BotConstants().runQuery("SELECT topic FROM `Topics` WHERE id = %s", BotConstants.currentTopicID)
             result = BotConstants.db.fetchall()
 
-            BotConstants.irc.send("TOPIC {0} {1}\r\n".format(BotConstants.config["irc"]["topicChannel"], Util()._u8(result[0]["topic"])))
+            BotConstants.irc.send("TOPIC {0} {1}\r\n".format(BotConstants.config["irc"]["topicChannel"], Util.u8(result[0]["topic"])))
         elif args[0] == "removecurrent" or args[0] == "removeindex":
             index = BotConstants.currentTopicID
             if args[0] == "removeindex":

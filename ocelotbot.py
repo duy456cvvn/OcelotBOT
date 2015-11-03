@@ -120,7 +120,7 @@ while True:
     if commandMessage.startswith("@"):
         processMessage(commandMessage, userMessage, channel, data)
     else:
-        UtilityModule().snarf(channel, userMessage)
+        thread.start_new_thread(UtilityModule().snarf, (channel, userMessage))
 
     if userMessage.startswith("0") or userMessage.startswith("1"):
         UtilityModule().binaryToString(channel, userMessage)
