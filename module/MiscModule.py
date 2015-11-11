@@ -1,3 +1,4 @@
+# coding=utf-8
 from . import ModuleBase, Util
 from constants import *
 
@@ -9,11 +10,15 @@ class MiscModule(ModuleBase):
         return "Miscellaneous Module"
 
     def getCommands(self):
-        return ["meme"]
+        return ["meme", "rekt"]
 
     def tooltip(self, channel, args):
         if args["command"] == "meme":
             Util().sendMessage(channel, "Usage: @meme [add/remove] <name> [url]")
+
+    @staticmethod
+    def rekt(channel, args):
+        Util().sendMessage(channel, "☑ rekt      ☐ not rekt")
 
     def meme(self, channel, args):
         def checkMemeExists(name):
