@@ -22,12 +22,13 @@ class LoggingModule(ModuleBase):
         elif args["command"] == "seen":
             Util.sendMessage(channel, "Usage: @seen <nickname>")
 
-    def logger(self, channel, username, message, time):
+    @staticmethod
+    def logger(channel, username, message, timestamp):
         channel = channel.rstrip()
         if channel not in BotConstants.tables:
             BotConstants().runQuery("CREATE TABLE IF NOT EXISTS `{0}` (ID int NOT NULL AUTO_INCREMENT, Time text,Username text,Message text, PRIMARY KEY (ID))".format(channel))
 
-        BotConstants().runQuery("INSERT INTO `{0}` (`Time`, `Username`, `Message`) VALUES (%s, %s, %s)".format(channel), time, username, message)
+        BotConstants().runQuery("INSERT INTO `{0}` (`Time`, `Username`, `Message`) VALUES (%s, %s, %s)".format(channel), timestamp, username, message)
 
     def sentence(self, channel, args):
         if len(args) >= 1:
@@ -181,7 +182,8 @@ class LoggingModule(ModuleBase):
             self.updateTopicCounts()
             Util.sendMessage(channel, "Deleted topic \"{0}\" successfully.".format(deletedTopic))
 
-    def updateTopicCounts(self):
+    @staticmethod
+    def updateTopicCounts():
         #renumber topic IDs just in case there's a break in the middle
         BotConstants().runQuery("SET @count = 0")
         BotConstants().runQuery("UPDATE `Topics` SET `Topics`.`id` = @count:= @count + 1")

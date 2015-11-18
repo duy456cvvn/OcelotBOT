@@ -46,7 +46,7 @@ def processMessage(chanMessage, userMessage, channel, data):
     chanMessage = chanMessage.split("@")[1].lower()
     userWhoSent = data.split(":")[1].split("!")[0]
     if BotConstants.moduleCommands.has_key(chanMessage) == 1:
-        accessLevel = UtilityModule().getAccesslevel(userWhoSent)
+        accessLevel = UtilityModule.getAccessLevel(userWhoSent)
         commandLevel = getattr(BotConstants.moduleCommands[chanMessage]["class"], "accessLevel")(chanMessage)
         if accessLevel >= commandLevel:
             #get the function object from the command name entry in moduleCommands, then run it with the arguments (everything after the command separated by spaces)
@@ -76,7 +76,7 @@ while True:
     if data.find("332") != -1:
         topicData = data.split("##Ocelotworks :")
         if len(topicData) >= 2:
-            LoggingModule().updateTopicCounts()
+            LoggingModule.updateTopicCounts()
 
             #get current topic ID from
             currentTopic = topicData[1].rstrip("\r\n")
@@ -88,7 +88,7 @@ while True:
                 BotConstants.currentTopicID = 1
 
     if data.split()[1] == "402" or data.split()[1] == "317" and not TrackingModule.stopFlag.isSet():
-        TrackingModule().handleTrackingData(data)
+        TrackingModule.handleTrackingData(data)
 
     if isInt(data.split()[1]):
         continue
@@ -120,10 +120,10 @@ while True:
     if commandMessage.startswith("@"):
         processMessage(commandMessage, userMessage, channel, data)
     else:
-        thread.start_new_thread(UtilityModule().snarf, (channel, userMessage))
+        thread.start_new_thread(UtilityModule.snarf, (channel, userMessage))
 
     if userMessage.startswith("0") or userMessage.startswith("1"):
-        UtilityModule().binaryToString(channel, userMessage)
+        UtilityModule.binaryToString(channel, userMessage)
 
     if userMessage.lower() == "test":
         Util.sendMessage(channel, "icles")
@@ -135,4 +135,4 @@ while True:
         userWhoSent = data.split(":")[1].split("!")[0]
         if userWhoSent != "ChanServ" and userWhoSent != nickname:
             timeString = time.strftime("%d %b, %H:%M:%S")
-            LoggingModule().logger(channel, userWhoSent, userMessage, timeString)
+            LoggingModule.logger(channel, userWhoSent, userMessage, timeString)

@@ -37,7 +37,8 @@ class UtilityModule(ModuleBase):
         #send result to request source
         Util.sendMessage(channel, "Commands: {0}".format(commandList))
 
-    def getAccesslevel(self, username):
+    @staticmethod
+    def getAccessLevel(username):
         BotConstants().runQuery("SELECT Level FROM `Access_Levels` WHERE Username = %s", username)
         result = BotConstants().db.fetchall()
         if len(result) >= 1:
@@ -62,7 +63,8 @@ class UtilityModule(ModuleBase):
         else:
             self.tooltip(channel, args = {"command": "setaccesslevel"})
 
-    def binaryToString(self, channel, userMessage):
+    @staticmethod
+    def binaryToString(channel, userMessage):
         userMessage = userMessage.replace(" ", "")
         binarySplit = [userMessage[start:start+8].zfill(8) for start in range(0, len(userMessage), 8)]
         try:
@@ -74,7 +76,8 @@ class UtilityModule(ModuleBase):
         except ValueError:
             pass
 
-    def getShortURL(self, url):
+    @staticmethod
+    def getShortURL(url):
         #generate the timestamp and signature by md5-ing the timestamp + the api secret key
         timestamp = int(time.time())
         md5 = hashlib.md5()
@@ -88,7 +91,8 @@ class UtilityModule(ModuleBase):
 
         return shortURL
 
-    def snarf(self, channel, userMessage):
+    @staticmethod
+    def snarf(channel, userMessage):
         origUserMessage = userMessage
         userMessage = userMessage.lower()
         try:

@@ -77,7 +77,7 @@ class YouTubeDLModule(ModuleBase):
 
                 #put together the mp3 url by url encoding the mp3 name
                 urlString = "http://files.unacceptableuse.com/{0}".format(urllib2.quote(self.fileName.encode("utf8")))
-                shortURL = UtilityModule().getShortURL(urlString)
+                shortURL = UtilityModule.getShortURL(urlString)
 
                 #send short url
                 Util.sendMessage(channel, "\x033The requested MP3 can be found at: {0}".format(shortURL))
@@ -86,7 +86,8 @@ class YouTubeDLModule(ModuleBase):
             self.tooltip(channel, args = {"command": args[1]})
 
     #youtube command
-    def youtube(self, channel, args):
+    @staticmethod
+    def youtube(channel, args):
         #create argument array with only information needed
         args = [
             #if the args from the IRC message didn't have anything, set to None. otherwise use the argument provided

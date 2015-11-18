@@ -28,12 +28,12 @@ class ArchiveModule(ModuleBase):
                         Util.sendMessage(channel, "Not archiving because it is a website.")
                     else:
                         if youtubeURL:
-                            YouTubeDLModule().youtube(channel, args=["https://youtube.com/{0}".format(youtubeURL)])
+                            YouTubeDLModule.youtube(channel, args=["https://youtube.com/{0}".format(youtubeURL)])
                         else:
                             Util.sendMessage(channel, "Archiving ({0})...".format(self.sizeof_fmt(req.headers["content-length"])))
                             fileInfo = self.download(archiveURL)
                             fileURLString = "http://mirrors.boywanders.us/{0}/{1}".format(fileInfo["extension"], fileInfo["filename"])
-                            fileURL = UtilityModule().getShortURL(fileURLString)
+                            fileURL = UtilityModule.getShortURL(fileURLString)
                             Util.sendMessage(channel, "File archived and available here: \x033{0}".format(fileURL))
                 else:
                     Util.sendMessage(channel, "Bad URL or offline.")

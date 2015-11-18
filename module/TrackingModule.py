@@ -51,7 +51,8 @@ class TrackingModule(ModuleBase):
         self.stopFlag.set()
         Util.sendMessage(channel, "Tracking stopped.")
 
-    def handleTrackingData(self, data):
+    @staticmethod
+    def handleTrackingData(data):
         splitData = data.split()
         dataCode = splitData[1]
         nickForData = splitData[3]
