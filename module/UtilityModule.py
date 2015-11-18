@@ -1,9 +1,8 @@
-from . import ModuleBase, Util, RedditModule
+from . import ModuleBase, Util
 from RedditModule import RedditURLOpener
 from constants import *
 import re, json, traceback
 import time, hashlib, urllib2, requests
-from bs4 import BeautifulSoup
 
 #utility module for miscellaneous things such as @command
 class UtilityModule(ModuleBase):
@@ -147,24 +146,25 @@ class UtilityModule(ModuleBase):
 
                     if res is not None and res.status_code == 200:
                         html = res.content
-                        soup = BeautifulSoup(html)
+                        metaFormat = '<meta(?=\s|>)(?=(?:[^>=]|=\'[^\']*\'|="[^"]*"|=[^\'"][^\s>]*)*?\s{1}=(?:\'{0}|"{0}"|{0}))(?=(?:[^>=]|=\'[^\']*\'|="[^"]*"|=[^\'"][^\s>]*)*?\scontent=(\'([^\']*)\'|"([^"]*)"|))(?:[^\'">=]*|=\'[^\']*\'|="[^"]*"|=[^\'"][^\s>]*)*>'
 
-                        titleElem = soup.find("meta", attrs = {"property": "og:title"})
-                        if titleElem is not None and "content" in titleElem:
-                            title = titleElem["content"]
+                        title = re.findall(metaFormat.format("og:title", "property"), html)
+                        if len(title) > 0:
+                            title = title[0][-1]
                         else:
-                            try:
-                                title = soup.title.string
-                            except AttributeError:
+                            title = re.findall("<title>([^<]+)</title>", html)
+                            if len(title) > 0:
+                                title = title[0]
+                            else:
                                 title = None
 
-                        descElem = soup.find("meta", attrs = {"property": "og:description"})
-                        if descElem is not None:
-                            desc = descElem["content"]
+                        descElem = re.findall(metaFormat.format("og:description", "property"), html)
+                        if len(descElem) > 0:
+                            desc = descElem[0][-1]
                         else:
-                            descElem = soup.find("meta", attrs = {"name": "description"})
-                            if descElem is not None:
-                                desc = descElem["content"]
+                            descElem = re.findall(metaFormat.format("og:description", "name"), html)
+                            if len(descElem) > 0:
+                                desc = descElem[0][-1]
                             else:
                                 desc = None
 
