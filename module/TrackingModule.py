@@ -17,7 +17,7 @@ class TrackingModule(ModuleBase):
         return ["track", "stoptrack"]
 
     def tooltip(self, channel, args):
-        Util().sendMessage(channel, "you got this somehow. not sure how, but you did")
+        Util.sendMessage(channel, "you got this somehow. not sure how, but you did")
 
     class TrackThread(Thread):
         def __init__(self, event, usersToTrack):
@@ -45,11 +45,11 @@ class TrackingModule(ModuleBase):
         self.stopFlag.clear()
         thread = self.TrackThread(self.stopFlag, self.usersToTrack)
         thread.start()
-        Util().sendMessage(channel, "Now tracking: {0}".format(", ".join(self.usersToTrack)))
+        Util.sendMessage(channel, "Now tracking: {0}".format(", ".join(self.usersToTrack)))
 
     def stoptrack(self, channel, args):
         self.stopFlag.set()
-        Util().sendMessage(channel, "Tracking stopped.")
+        Util.sendMessage(channel, "Tracking stopped.")
 
     def handleTrackingData(self, data):
         splitData = data.split()

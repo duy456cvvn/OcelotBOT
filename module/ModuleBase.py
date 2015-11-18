@@ -31,5 +31,6 @@ class Util:
     def u8(t):
         return t.encode("UTF-8", "replace") if isinstance(t, unicode) else t
 
-    def sendMessage(self, channel, message):
-        BotConstants.irc.send("PRIVMSG {0} :{1}\r\n".format(channel, self.u8(message)))
+    @staticmethod
+    def sendMessage(channel, message):
+        BotConstants.irc.send("PRIVMSG {0} :{1}\r\n".format(channel, Util.u8(message)))

@@ -13,12 +13,12 @@ class YouTubeDLModule(ModuleBase):
         return ["youtube", "mixcloud", "soundcloud", "bandcamp"]
 
     def tooltip(self, channel, args):
-        Util().sendMessage(self.channel, "Usage: @{0} <{0} url>".format(args["command"]))
+        Util.sendMessage(self.channel, "Usage: @{0} <{0} url>".format(args["command"]))
 
     def downloadHook(self, download):
         if download["status"] == "finished":
             self.shouldFinish = True
-            Util().sendMessage(self.channel, "Done downloading, converting if needed...")
+            Util.sendMessage(self.channel, "Done downloading, converting if needed...")
 
     def debug(self, msg):
         print(msg)
@@ -36,7 +36,7 @@ class YouTubeDLModule(ModuleBase):
         #remove the bash color from the error string
         msg = msg.split("[0;31mERROR:[0m ")[1]
         #add IRC coloring to error message and send
-        Util().sendMessage(self.channel, "\x034ERROR:\x03 {0}".format(msg))
+        Util.sendMessage(self.channel, "\x034ERROR:\x03 {0}".format(msg))
         #stop the output of the file URL
         self.shouldFinish = False
 
@@ -61,7 +61,7 @@ class YouTubeDLModule(ModuleBase):
                 youtubeDownloaderOptions["proxy"] = BotConstants.config["misc"]["proxyURL"]
 
             try:
-                Util().sendMessage(channel, "Downloading, please wait...")
+                Util.sendMessage(channel, "Downloading, please wait...")
                 with youtube_dl.YoutubeDL(youtubeDownloaderOptions) as ydl:
                     ydl.download([args[0]])
             except Exception:
@@ -80,7 +80,7 @@ class YouTubeDLModule(ModuleBase):
                 shortURL = UtilityModule().getShortURL(urlString)
 
                 #send short url
-                Util().sendMessage(channel, "\x033The requested MP3 can be found at: {0}".format(shortURL))
+                Util.sendMessage(channel, "\x033The requested MP3 can be found at: {0}".format(shortURL))
         else:
             #send tooltip with command set in args to the command executed by user
             self.tooltip(channel, args = {"command": args[1]})

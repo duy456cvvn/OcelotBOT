@@ -18,9 +18,9 @@ class LoggingModule(ModuleBase):
 
     def tooltip(self, channel, args):
         if args["command"] == "sentence":
-            Util().sendMessage(channel, "Usage: @sentence <word(s)> [-context #]")
+            Util.sendMessage(channel, "Usage: @sentence <word(s)> [-context #]")
         elif args["command"] == "seen":
-            Util().sendMessage(channel, "Usage: @seen <nickname>")
+            Util.sendMessage(channel, "Usage: @seen <nickname>")
 
     def logger(self, channel, username, message, time):
         channel = channel.rstrip()
@@ -42,7 +42,7 @@ class LoggingModule(ModuleBase):
                         ctx = int(args[index + 1])
                         ctx = abs(ctx)
                     except:
-                        Util().sendMessage(channel, "Invalid context amount")
+                        Util.sendMessage(channel, "Invalid context amount")
                         return
                     fCtx = math.ceil(ctx / 2)
                     bCtx = ctx - fCtx
@@ -75,10 +75,10 @@ class LoggingModule(ModuleBase):
                             search = re.compile(r"({0})".format(searchTerm), re.I)
                             messageString = search.sub("\x02\x034\\1\x03\x02", messageString)
                         
-                        Util().sendMessage(channel, "<{0}> {1}".format(message["Username"], messageString))
+                        Util.sendMessage(channel, "<{0}> {1}".format(message["Username"], messageString))
                         index += 1
             else:
-                Util().sendMessage(channel, "No messages containing \"{0}\"".format(searchTerm))
+                Util.sendMessage(channel, "No messages containing \"{0}\"".format(searchTerm))
         else:
             self.tooltip(channel, args = {"command": "sentence"})
 
@@ -97,9 +97,9 @@ class LoggingModule(ModuleBase):
                 now = datetime.strptime(time.strftime("%d %b, %H:%M:%S"), "%d %b, %H:%M:%S")
                 timeDelta = now - messageTime
 
-                Util().sendMessage(channel, "{0} was last seen at {1} ({2} ago) with the message: {3}".format(args[0], result["Time"], timeDelta, result["Message"]))
+                Util.sendMessage(channel, "{0} was last seen at {1} ({2} ago) with the message: {3}".format(args[0], result["Time"], timeDelta, result["Message"]))
             else:
-                Util().sendMessage(channel, "User \"{0}\" has never been logged in this channel".format(args[0]))
+                Util.sendMessage(channel, "User \"{0}\" has never been logged in this channel".format(args[0]))
         else:
             self.tooltip(channel, args = {"command": "seen"})
 
@@ -124,7 +124,7 @@ class LoggingModule(ModuleBase):
             if len(topicResult) != 0:
                 topicResult = topicResult[0]
                 if topicResult["Message"].startswith("@topic"):
-                    Util().sendMessage(channel, "Ignoring Duplicate request!")
+                    Util.sendMessage(channel, "Ignoring Duplicate request!")
                 else:
                     newTopic = "<{0}> {1}".format(topicResult["Username"], topicResult["Message"].encode("utf-8"))
                     BotConstants().runQuery("SELECT * FROM `Topics` WHERE topic = %s", newTopic)
@@ -132,15 +132,15 @@ class LoggingModule(ModuleBase):
 
                     if len(topicCheck) == 0:
                         BotConstants().runQuery("INSERT INTO `Topics` (topic) VALUES (%s)", newTopic)
-                        Util().sendMessage(channel, "Added topic: {0}".format(newTopic))
+                        Util.sendMessage(channel, "Added topic: {0}".format(newTopic))
                         self.updateTopicCounts()
                     else:
-                        Util().sendMessage(channel, "The topic \"{0}\" already exists!".format(newTopic))
+                        Util.sendMessage(channel, "The topic \"{0}\" already exists!".format(newTopic))
             else:
                 raise Exception()
         except:
             traceback.print_exc()
-            Util().sendMessage(channel, "Invalid message index.")
+            Util.sendMessage(channel, "Invalid message index.")
 
     def updateTopic(self, channel, args):
         if args[0] == "up" or args[0] == "down":
@@ -166,12 +166,12 @@ class LoggingModule(ModuleBase):
                     index = abs(index)
 
                     if index > BotConstants.totalTopics:
-                        Util().sendMessage(channel, "Index out of range.")
+                        Util.sendMessage(channel, "Index out of range.")
                         return
                 except ValueError:
-                    Util().sendMessage(channel, "Invalid message index/id to remove.")
+                    Util.sendMessage(channel, "Invalid message index/id to remove.")
                 except IndexError:
-                    Util().sendMessage(channel, "You must provide the index/id of the topic to remove.")
+                    Util.sendMessage(channel, "You must provide the index/id of the topic to remove.")
 
             BotConstants().runQuery("SELECT topic FROM `Topics` WHERE id = %s", index)
             deletedTopic = BotConstants.db.fetchall()[0]["topic"]
@@ -179,7 +179,7 @@ class LoggingModule(ModuleBase):
             if index == BotConstants.currentTopicID:
                 self.updateTopic(channel, ["up"])
             self.updateTopicCounts()
-            Util().sendMessage(channel, "Deleted topic \"{0}\" successfully.".format(deletedTopic))
+            Util.sendMessage(channel, "Deleted topic \"{0}\" successfully.".format(deletedTopic))
 
     def updateTopicCounts(self):
         #renumber topic IDs just in case there's a break in the middle

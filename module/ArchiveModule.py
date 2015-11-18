@@ -14,7 +14,7 @@ class ArchiveModule(ModuleBase):
 
     def tooltip(self, channel, args):
         if args["command"] == "archive":
-            Util().sendMessage(channel, "Usage: @archive [url]")
+            Util.sendMessage(channel, "Usage: @archive [url]")
 
     def archive(self, channel, args):
         if len(args) >= 1:
@@ -25,20 +25,20 @@ class ArchiveModule(ModuleBase):
                 if req.status_code == 200 or youtubeURL:
                     contentType = req.headers["content-type"] if "content-type" in req.headers else ""
                     if not youtubeURL and "text/html" in contentType:
-                        Util().sendMessage(channel, "Not archiving because it is a website.")
+                        Util.sendMessage(channel, "Not archiving because it is a website.")
                     else:
                         if youtubeURL:
                             YouTubeDLModule().youtube(channel, args=["https://youtube.com/{0}".format(youtubeURL)])
                         else:
-                            Util().sendMessage(channel, "Archiving ({0})...".format(self.sizeof_fmt(req.headers["content-length"])))
+                            Util.sendMessage(channel, "Archiving ({0})...".format(self.sizeof_fmt(req.headers["content-length"])))
                             fileInfo = self.download(archiveURL)
                             fileURLString = "http://mirrors.boywanders.us/{0}/{1}".format(fileInfo["extension"], fileInfo["filename"])
                             fileURL = UtilityModule().getShortURL(fileURLString)
-                            Util().sendMessage(channel, "File archived and available here: \x033{0}".format(fileURL))
+                            Util.sendMessage(channel, "File archived and available here: \x033{0}".format(fileURL))
                 else:
-                    Util().sendMessage(channel, "Bad URL or offline.")
+                    Util.sendMessage(channel, "Bad URL or offline.")
             else:
-                Util().sendMessage(channel, "Invalid URL to archive.")
+                Util.sendMessage(channel, "Invalid URL to archive.")
         else:
             self.tooltip(channel, args = {"command": "archive"})
 

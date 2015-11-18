@@ -20,7 +20,7 @@ class UtilityModule(ModuleBase):
 
     def tooltip(self, channel, args):
         if args["command"] == "setaccesslevel":
-            Util().sendMessage(channel, "Usage: @setaccesslevel <username> <accesslevel>")
+            Util.sendMessage(channel, "Usage: @setaccesslevel <username> <accesslevel>")
 
     def commands(self, channel, args):
         #init string
@@ -35,7 +35,7 @@ class UtilityModule(ModuleBase):
         commandList = commandList.rstrip(", ")
 
         #send result to request source
-        Util().sendMessage(channel, "Commands: {0}".format(commandList))
+        Util.sendMessage(channel, "Commands: {0}".format(commandList))
 
     def getAccesslevel(self, username):
         BotConstants().runQuery("SELECT Level FROM `Access_Levels` WHERE Username = %s", username)
@@ -54,11 +54,11 @@ class UtilityModule(ModuleBase):
                 accessLevel = int(accessLevel)
                 if accessLevel in validLevels:
                     BotConstants().runQuery("INSERT INTO `Access_Levels` (Username, Level) VALUES (%s, %s) ON DUPLICATE KEY UPDATE Level = VALUES(Level)", username, accessLevel)
-                    Util().sendMessage(channel, "Level set successfully")
+                    Util.sendMessage(channel, "Level set successfully")
                 else:
                     raise Exception()
             except:
-                Util().sendMessage(channel, "{0} is not a valid level. Only {1}".format(accessLevel, ", ".join(str(level) for level in validLevels)))
+                Util.sendMessage(channel, "{0} is not a valid level. Only {1}".format(accessLevel, ", ".join(str(level) for level in validLevels)))
         else:
             self.tooltip(channel, args = {"command": "setaccesslevel"})
 
@@ -70,7 +70,7 @@ class UtilityModule(ModuleBase):
                 binarySplit[index] = int(octet, 2)
 
             message = "".join(map(chr, binarySplit))
-            Util().sendMessage(channel, "Converted: \"{0}\"".format(message))
+            Util.sendMessage(channel, "Converted: \"{0}\"".format(message))
         except ValueError:
             pass
 
@@ -108,17 +108,17 @@ class UtilityModule(ModuleBase):
                 subredditJSON = RedditURLOpener().open("http://api.reddit.com/r/{0}/about".format(subredditResult[0])).read()
                 subredditJSON = json.loads(subredditJSON)
                 if subredditJSON.has_key("error") != 1:
-                    Util().sendMessage(channel, "\x02http://reddit.com/r/{0} - {1}".format(subredditJSON["data"]["display_name"], subredditJSON["data"]["title"]))
+                    Util.sendMessage(channel, "\x02http://reddit.com/r/{0} - {1}".format(subredditJSON["data"]["display_name"], subredditJSON["data"]["title"]))
                 else:
-                    Util().sendMessage(channel, "/r/{0} does not exist or is banned.".format(subredditResult[0]))
+                    Util.sendMessage(channel, "/r/{0} does not exist or is banned.".format(subredditResult[0]))
 
             if len(userResult) == 1:
                 userJSON = RedditURLOpener().open("http://api.reddit.com/user/{0}/about".format(userResult[0])).read()
                 userJSON = json.loads(userJSON)
                 if userJSON.has_key("error") != 1:
-                    Util().sendMessage(channel, "http://reddit.com/u/{0} - {1} link karma | {2} comment karma".format(userJSON["data"]["name"], str(userJSON["data"]["link_karma"]), str(userJSON["data"]["comment_karma"])))
+                    Util.sendMessage(channel, "http://reddit.com/u/{0} - {1} link karma | {2} comment karma".format(userJSON["data"]["name"], str(userJSON["data"]["link_karma"]), str(userJSON["data"]["comment_karma"])))
                 else:
-                    Util().sendMessage(channel, "/u/{0} does not exist or is banned.".format(subredditResult[0]))
+                    Util.sendMessage(channel, "/u/{0} does not exist or is banned.".format(subredditResult[0]))
 
             if len(postResult) >= 1 and len(userResult) == 0 and len(subredditResult) == 0:
                 postJSON = RedditURLOpener().open("http://api.reddit.com/{0}".format(postResult[0][1])).read()
@@ -128,19 +128,19 @@ class UtilityModule(ModuleBase):
                     message = "\x02{0} ({1})".format(postJSON["title"], postJSON["domain"])
                     message += " \x034NSFW\x03" if bool(postJSON["over_18"]) else ""
 
-                    Util().sendMessage(channel, message)
+                    Util.sendMessage(channel, message)
                 else:
-                    Util().sendMessage(channel, "/{0} does not exist or is banned.".format(subredditResult[0]))
+                    Util.sendMessage(channel, "/{0} does not exist or is banned.".format(subredditResult[0]))
 
 
             #normal url snarfing
-            urlCheck = re.compile(ur'((http|https)://[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-@?^=%&amp;/~\+#])?)')
+            urlCheck = re.compile(ur'((http|https)://[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&;:/~\+#]*[\w\-@?^=%&;/~\+#])?)')
             urlResult = re.findall(urlCheck, origUserMessage)
             if len(urlResult) > 0:
                 urls = [u[0] for u in urlResult]
                 for u in urls:
                     try:
-                        res = requests.get(u)
+                        res = requests.get(u, headers = {"User-Agent": "OcelotBOT/1.0.0"})
                     except:
                         res = None
 
@@ -163,6 +163,7 @@ class UtilityModule(ModuleBase):
                             desc = descElem[0][-1]
                         else:
                             descElem = re.findall(metaFormat.format("og:description", "name"), html)
+                            print descElem
                             if len(descElem) > 0:
                                 desc = descElem[0][-1]
                             else:
@@ -173,7 +174,7 @@ class UtilityModule(ModuleBase):
 
                         snarfMsg = "{0}{1}".format(("{0}".format(Util.u8(title)) if title is not None and title != "" else ""), (" - {0}".format(Util.u8(desc)) if desc is not None and desc != "" else ""))
                         if snarfMsg.rstrip().lstrip() != "":
-                            Util().sendMessage(channel, snarfMsg)
+                            Util.sendMessage(channel, snarfMsg)
         except:
             traceback.print_exc()
             pass

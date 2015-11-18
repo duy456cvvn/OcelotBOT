@@ -14,11 +14,11 @@ class MiscModule(ModuleBase):
 
     def tooltip(self, channel, args):
         if args["command"] == "meme":
-            Util().sendMessage(channel, "Usage: @meme [add/remove] <name> [url]")
+            Util.sendMessage(channel, "Usage: @meme [add/remove] <name> [url]")
 
     @staticmethod
     def rekt(channel, args):
-        Util().sendMessage(channel, "☑ rekt      ☐ not rekt")
+        Util.sendMessage(channel, "☑ rekt      ☐ not rekt")
 
     def meme(self, channel, args):
         def checkMemeExists(name):
@@ -38,35 +38,35 @@ class MiscModule(ModuleBase):
                     if memeName != "add" and memeName != "remove" and memeName != "list":
                         if not meme:
                             BotConstants().runQuery("INSERT INTO `Memes` (name, url) VALUES (%s, %s)", memeName, memeURL)
-                            Util().sendMessage(channel, "Meme \"{0}\" added.".format(memeName))
+                            Util.sendMessage(channel, "Meme \"{0}\" added.".format(memeName))
                         else:
-                            Util().sendMessage(channel, "Meme \"{0}\" already exists".format(memeName))
+                            Util.sendMessage(channel, "Meme \"{0}\" already exists".format(memeName))
                     else:
-                        Util().sendMessage(channel, "Meme cannot be named \"add\", \"remove\", or \"list\"")
+                        Util.sendMessage(channel, "Meme cannot be named \"add\", \"remove\", or \"list\"")
                 else:
-                    Util().sendMessage(channel, "You must provide a name and URL when adding a meme.")
+                    Util.sendMessage(channel, "You must provide a name and URL when adding a meme.")
             elif args[0] == "remove":
                 if len(args) >= 2:
                     meme = checkMemeExists(args[1])
                     if not meme:
-                        Util().sendMessage(channel, "No meme called \"{0}\" found. Please try again.".format(args[1]))
+                        Util.sendMessage(channel, "No meme called \"{0}\" found. Please try again.".format(args[1]))
                     else:
                         BotConstants().runQuery("DELETE FROM `Memes` WHERE name = %s", args[1])
-                        Util().sendMessage(channel, "Meme \"{0}\" deleted.".format(args[1]))
+                        Util.sendMessage(channel, "Meme \"{0}\" deleted.".format(args[1]))
                 else:
-                    Util().sendMessage(channel, "You must provide a name when deleting a meme.")
+                    Util.sendMessage(channel, "You must provide a name when deleting a meme.")
             elif args[0] == "list":
                 BotConstants().runQuery("SELECT group_concat(name SEPARATOR ', ') as memes FROM `Memes`")
                 result = BotConstants.db.fetchall()
                 if len(result) >= 1:
-                    Util().sendMessage(channel,"Available Memes: {0}".format(result[0]["memes"]))
+                    Util.sendMessage(channel,"Available Memes: {0}".format(result[0]["memes"]))
                 else:
-                    Util().sendMessage(channel, "No memes in the DB :(")
+                    Util.sendMessage(channel, "No memes in the DB :(")
             else:
                 meme = checkMemeExists(args[0])
                 if not meme:
-                    Util().sendMessage(channel, "No meme called \"{0}\" found. Please try again.".format(args[0]))
+                    Util.sendMessage(channel, "No meme called \"{0}\" found. Please try again.".format(args[0]))
                 else:
-                    Util().sendMessage(channel, meme[0]["url"])
+                    Util.sendMessage(channel, meme[0]["url"])
         else:
             self.tooltip(channel, args = {"command": "meme"})

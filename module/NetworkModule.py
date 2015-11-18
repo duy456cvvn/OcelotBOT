@@ -19,7 +19,7 @@ class NetworkModule(ModuleBase):
         return ["ping", "host"]
 
     def tooltip(self, channel, args):
-        Util().sendMessage(channel, "Usage: @{0} <domain name>".format(args["command"]))
+        Util.sendMessage(channel, "Usage: @{0} <domain name>".format(args["command"]))
 
     def ping(self, channel, args):
         if len(args) >= 1:
@@ -31,9 +31,9 @@ class NetworkModule(ModuleBase):
                 pingResult = re.findall(pingRegex, pingResponse)[0]
                 resultString = "Packets Received: {1}/{0} | Packet Loss: {2} | Min Ping: {3} ms | Max Ping: {4} ms | Average Ping: {5} ms"\
                     .format(pingResult[0], pingResult[1], pingResult[2], pingResult[3], pingResult[4], pingResult[5])
-                Util().sendMessage(channel, resultString)
+                Util.sendMessage(channel, resultString)
             else:
-                Util().sendMessage(channel, "Unknown host \"{0}\"".format(args[0]))
+                Util.sendMessage(channel, "Unknown host \"{0}\"".format(args[0]))
         else:
             self.tooltip(channel, args = {"command": "ping"})
 
@@ -66,8 +66,8 @@ class NetworkModule(ModuleBase):
 
             message = message.rstrip(" || ")
             if message == "":
-                Util().sendMessage(channel, "Bad hostname \"{0}\"".format(args[0]))
+                Util.sendMessage(channel, "Bad hostname \"{0}\"".format(args[0]))
             else:
-                Util().sendMessage(channel, message)
+                Util.sendMessage(channel, message)
         else:
             self.tooltip(channel, args = {"command": "host"})

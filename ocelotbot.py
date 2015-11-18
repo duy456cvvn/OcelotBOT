@@ -52,10 +52,10 @@ def processMessage(chanMessage, userMessage, channel, data):
             #get the function object from the command name entry in moduleCommands, then run it with the arguments (everything after the command separated by spaces)
             thread.start_new_thread(getattr(BotConstants.moduleCommands[chanMessage]["class"], chanMessage), (channel, userMessage.split()[1:]))
         else:
-            Util().sendMessage(channel, "You aren't a high enough level to run that command!")
+            Util.sendMessage(channel, "You aren't a high enough level to run that command!")
     else:
         #command not found
-        Util().sendMessage(channel, "Command \"%s\" not found." % chanMessage)
+        Util.sendMessage(channel, "Command \"%s\" not found." % chanMessage)
 
 def isInt(n):
     try:
@@ -126,7 +126,7 @@ while True:
         UtilityModule().binaryToString(channel, userMessage)
 
     if userMessage.lower() == "test":
-        Util().sendMessage(channel, "icles")
+        Util.sendMessage(channel, "icles")
 
     if channel.startswith("#"):
         if commandMessage.startswith("@"):

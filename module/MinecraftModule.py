@@ -41,7 +41,7 @@ class MinecraftModule(ModuleBase):
 		skinStatus, authStatus, sessionStatus = map(self.parseStatus, [self.statuses["skin"], self.statuses["auth"], self.statuses["session"]])
 		ftbStatus = "\x033Online\x03" if self.gameStatus else "\x034Offline\x03" if self.gameStatus == False else "\x0315Unknown\x03"
 		statusMessage = "Mojang Server Status: [Skins: {0}] | [Auth: {1}] | [Session: {2}]  ||  FTB Server Status: [{3}]".format(skinStatus, authStatus, sessionStatus, ftbStatus)
-		Util().sendMessage(channel, statusMessage)
+		Util.sendMessage(channel, statusMessage)
 
 class StatusCheckThread(Thread):
 	def __init__(self, parent):
@@ -68,9 +68,9 @@ class StatusCheckThread(Thread):
 
 				skinStatus, authStatus, sessionStatus = servers["skins.minecraft.net"], servers["auth.mojang.com"], servers["session.minecraft.net"]
 				currSkin, currAuth, currSession = self.parent.statuses["skin"], self.parent.statuses["auth"], self.parent.statuses["session"]
-				if skinStatus != currSkin and currSkin != "": Util().sendMessage("##ftbwanders", "Skin Server Status Change: {0}".format(self.parent.parseStatus(skinStatus)))
-				if authStatus != currAuth and currAuth != "": Util().sendMessage("##ftbwanders", "Auth Server Status Change: {0}".format(self.parent.parseStatus(authStatus)))
-				if sessionStatus != currSession and currSession != "": Util().sendMessage(self.outChan, "Session Server Status Change: {0}".format(self.parent.parseStatus(sessionStatus)))
+				if skinStatus != currSkin and currSkin != "": Util.sendMessage("##ftbwanders", "Skin Server Status Change: {0}".format(self.parent.parseStatus(skinStatus)))
+				if authStatus != currAuth and currAuth != "": Util.sendMessage("##ftbwanders", "Auth Server Status Change: {0}".format(self.parent.parseStatus(authStatus)))
+				if sessionStatus != currSession and currSession != "": Util.sendMessage(self.outChan, "Session Server Status Change: {0}".format(self.parent.parseStatus(sessionStatus)))
 				self.parent.statuses["skin"], self.parent.statuses["auth"], self.parent.statuses["session"] = skinStatus, authStatus, sessionStatus
 			except:
 				pass
@@ -101,10 +101,10 @@ class FTBStatusCheckThread(Thread):
 			data = self.sock.recv(2048)
 			info = data.replace("\x00", "")[2:].split("\xa7")
 
-			if not self.parent.gameStatus and self.parent.gameStatus is not None: Util().sendMessage(self.outChan, "FTB Server Status Change: [\x033Online\x03]")
+			if not self.parent.gameStatus and self.parent.gameStatus is not None: Util.sendMessage(self.outChan, "FTB Server Status Change: [\x033Online\x03]")
 			self.parent.gameStatus = True
 
 			self.sock.close()
 		except socket.error:
-			if self.parent.gameStatus is not None and self.parent.gameStatus == True: Util().sendMessage(self.outChan, "FTB Server Status Change: [\x034Offline\x03]")
+			if self.parent.gameStatus is not None and self.parent.gameStatus == True: Util.sendMessage(self.outChan, "FTB Server Status Change: [\x034Offline\x03]")
 			self.parent.gameStatus = False

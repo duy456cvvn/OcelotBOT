@@ -27,9 +27,9 @@ class RedditModule(ModuleBase):
 
                 message = "{0}: {1}".format(post["data"]["title"], post["data"]["url"])
                 message += " \x02\x034[NSFW]\x03\x02" if bool(post["data"]["over_18"]) else ""
-                Util().sendMessage(channel, message)
+                Util.sendMessage(channel, message)
             else:
-                Util().sendMessage(channel, "No images from imgur on /r/{0}".format(args[0]))
+                Util.sendMessage(channel, "No images from imgur on /r/{0}".format(args[0]))
         else:
             self.tooltip(channel, args = {"command": "image"})
 
@@ -43,16 +43,16 @@ class RedditModule(ModuleBase):
 
                 message = "{0}: http://redd.it/{1}".format(post["data"]["title"], post["data"]["id"])
                 message += " \x02\x034[NSFW]\x03\x02" if bool(post["data"]["over_18"]) else ""
-                Util().sendMessage(channel, message)
+                Util.sendMessage(channel, message)
             else:
-                Util().sendMessage(channel, "No posts on /r/{0} or /r/{0} doesnt exist".format(args[0]))
+                Util.sendMessage(channel, "No posts on /r/{0} or /r/{0} doesnt exist".format(args[0]))
         else:
             self.tooltip(channel, args = {"command": "randpost"})
         return
 
     def tooltip(self, channel, args):
         if args["command"] == "image" or args["command"] == "randpost":
-            Util().sendMessage(channel, "Usage: @{0} <subreddit name>".format(args["command"]))
+            Util.sendMessage(channel, "Usage: @{0} <subreddit name>".format(args["command"]))
 
 
 #custom url opener wrapper around urllib to help reddit not to flag us as a shitty bot ;)

@@ -26,9 +26,9 @@ class DictionaryModule(ModuleBase):
                 word = definitionJSON["word"]
                 definition = definitionJSON["text"]
                 partOfSpeech = " ({0})".format(definitionJSON["partOfSpeech"]) if "partOfSpeech" in definitionJSON else ""
-                Util().sendMessage(channel, "{0}{1}: {2}".format(word, partOfSpeech, definition))
+                Util.sendMessage(channel, "{0}{1}: {2}".format(word, partOfSpeech, definition))
             else:
-                Util().sendMessage(channel, "No standard definition found for \"{0}\". Please check Urban Dictionary with @defineud".format(urllib2.unquote(self.wordToDefine)))
+                Util.sendMessage(channel, "No standard definition found for \"{0}\". Please check Urban Dictionary with @defineud".format(urllib2.unquote(self.wordToDefine)))
         else:
             self.tooltip(channel, args = {"command": "define"})
 
@@ -43,11 +43,11 @@ class DictionaryModule(ModuleBase):
 
                 word = definitionJSON["word"]
                 definition = definitionJSON["definition"]
-                Util().sendMessage(channel, "%s: %s" % (word, definition))
+                Util.sendMessage(channel, "%s: %s" % (word, definition))
             else:
-                Util().sendMessage(channel, "No urban dictionary definition found for \"{0}\". Wow.".format(urllib2.unquote(self.wordToDefine)))
+                Util.sendMessage(channel, "No urban dictionary definition found for \"{0}\". Wow.".format(urllib2.unquote(self.wordToDefine)))
         else:
             self.tooltip(channel, args = {"command": "defineud"})
 
     def tooltip(self, channel, args):
-        Util().sendMessage(channel, "Usage: @{0} <word(s)>".format(args["command"]))
+        Util.sendMessage(channel, "Usage: @{0} <word(s)>".format(args["command"]))
