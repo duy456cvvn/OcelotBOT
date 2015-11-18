@@ -42,7 +42,8 @@ class ArchiveModule(ModuleBase):
         else:
             self.tooltip(channel, args = {"command": "archive"})
 
-    def download(self, url):
+    @staticmethod
+    def download(url):
         filename = url.split("/")[-1]
         fileExtension = filename.split(".")[-1]
         filePath = "{0}/{1}".format("/home/mirror/mirrors", fileExtension)
@@ -66,16 +67,18 @@ class ArchiveModule(ModuleBase):
 
         return "%.1f%s%s" % (num, 'Yi', suffix)
 
-    def checkURLRegex(self, str):
-        pattern = re.compile(ur'^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\xa1-\xff0-9]+-?)*[a-z\xa1-\xff0-9]+)(?:\.(?:[a-z\xa1-\xff0-9]+-?)*[a-z\xa1-\xff0-9]+)*(?:\.(?:[a-z\xa1-\xff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$', re.IGNORECASE | re.UNICODE | re.DOTALL)
-        searchResult = re.match(pattern, str)
+    @staticmethod
+    def checkURLRegex(string):
+        pattern = re.compile(ur'^(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\xa1-\xff0-9]+-?)*[a-z\xa1-\xff0-9]+)(?:\.(?:[a-z\xa1-\xff0-9]+-?)*[a-z\xa1-\xff0-9]+)*(?:\.(?:[a-z\xa1-\xff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$', re.IGNORECASE | re.UNICODE | re.DOTALL)
+        searchResult = re.match(pattern, string)
         if searchResult:
             return searchResult.group()
         else:
             return False
 
-    def checkYoutubeRegex(self, str):
-        pattern = re.compile(ur'^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/(.+)$')
+    @staticmethod
+    def checkYoutubeRegex(str):
+        pattern = re.compile(ur'^(https?://)?(www\.)?(youtube\.com|youtu\.?be)\/(.+)$')
         searchResult = re.search(pattern, str)
         if searchResult:
             return searchResult.groups()[-1]

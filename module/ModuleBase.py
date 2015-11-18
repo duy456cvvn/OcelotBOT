@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from constants import *
+from HTMLParser import HTMLParser
 
 #abstract ModuleBase class using abc package. all modules base off this one
 class ModuleBase(object):
@@ -33,4 +34,4 @@ class Util:
 
     @staticmethod
     def sendMessage(channel, message):
-        BotConstants.irc.send("PRIVMSG {0} :{1}\r\n".format(channel, Util.u8(message)))
+        BotConstants.irc.send("PRIVMSG {0} :{1}\r\n".format(channel, HTMLParser().unescape(Util.u8(message))))

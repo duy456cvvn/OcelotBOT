@@ -1,6 +1,6 @@
 from . import ModuleBase, Util
 from constants import *
-import re, json, traceback
+import re, json
 import time, hashlib, urllib2, requests
 
 #utility module for miscellaneous things such as @command
