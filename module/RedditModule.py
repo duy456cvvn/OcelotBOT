@@ -22,7 +22,7 @@ class RedditModule(ModuleBase):
                     Util.sendMessage(channel, "Error parsing /r/{0} JSON response".format(args[0]))
                     return
 
-                allPosts = [post for post in rJSON if "imgur" in post["data"]["domain"]]
+                allPosts = [post for post in rJSON["data"]["children"] if "imgur" in post["data"]["domain"]]
                 if len(rJSON) >= 1:
                     post = random.choice(allPosts)
 
