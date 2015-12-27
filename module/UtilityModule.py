@@ -114,19 +114,20 @@ class UtilityModule(ModuleBase):
         }
 
         #r/thing
-        subResult = re.findall(ur"\b^(?!{0}).*r/([^\s/;\-\.,!?]+)\b".format(redditURLRegex), userMessage)
+        subResult, badSub = re.findall(ur"(?<![/])\br/([^\s/;\-\.,!?]+)\b", userMessage), True
         if len(subResult) > 0:
-            subName = subResult[0][-1]
+            subName = subResult[-1]
             res = session.get("http://api.reddit.com/r/{0}/about".format(subName))
             if res.status_code == 200:
                 rJSON = UtilityModule.getJSON(res)
-                if "error" not in rJSON:
+                if "error" not in rJSON and not ("kind" in rJSON and rJSON["kind"] == "Listing"):
                     Util.sendMessage(channel, "\x02http://reddit.com/r/{0} - {1}".format(rJSON["data"]["display_name"], rJSON["data"]["title"]))
-            else:
-                Util.sendMessage(channel, "/r/{0} does not exist or is banned.".format(subName))
+                    badSub = False
+
+            if badSub: Util.sendMessage(channel, "/r/{0} does not exist or is banned.".format(subName))
 
         #u/thing
-        userResult = re.findall(ur"\bu/([^\s/;\-\.,!?]+)\b", userMessage)
+        userResult = re.findall(ur"(?<![/])\bu/([^\s/;\-\.,!?]+)\b", userMessage)
         if len(userResult) > 0:
             res = session.get("http://api.reddit.com/user/{0}/about".format(userResult[0]))
             if res.status_code == 200:

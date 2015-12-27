@@ -24,10 +24,15 @@ class BotConstants:
     totalTopics = 0
     messageCount = 0
 
-    db.execute("SELECT table_name AS tableName FROM information_schema.tables WHERE table_schema = database()")
+    db.execute("SELECT TABLE_NAME AS tableName FROM information_schema.TABLES WHERE TABLE_SCHEMA = database()")
     result = db.fetchall()
     for table in result:
         tables.append(table["tableName"])
+
+    db.execute("SELECT val FROM `BotVars` WHERE name = 'autoTopicCount'")
+    result = db.fetchall()
+    if len(result) > 0:
+        messageCount = int(result[0]["val"])
 
     def runQuery(self, query, *args):
         argList = [a for a in args]

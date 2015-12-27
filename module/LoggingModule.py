@@ -122,7 +122,7 @@ class LoggingModule(ModuleBase):
             BotConstants().runQuery("SELECT Username, Message FROM `{0}` WHERE ID = (SELECT MAX(ID) - %s FROM `{0}`)".format(channel), index)
             topicResult = BotConstants.db.fetchall()
 
-            if len(topicResult) != 0:
+            if len(topicResult) > 0:
                 topicResult = topicResult[0]
                 if topicResult["Message"].startswith("@topic"):
                     Util.sendMessage(channel, "Ignoring Duplicate request!")
@@ -140,7 +140,6 @@ class LoggingModule(ModuleBase):
             else:
                 raise Exception()
         except:
-            traceback.print_exc()
             Util.sendMessage(channel, "Invalid message index.")
 
     def updateTopic(self, channel, args):
@@ -162,9 +161,7 @@ class LoggingModule(ModuleBase):
             index = BotConstants.currentTopicID
             if args[0] == "removeindex":
                 try:
-                    index = args[1]
-                    index = int(index)
-                    index = abs(index)
+                    index = abs(int(args[1]))
 
                     if index > BotConstants.totalTopics:
                         Util.sendMessage(channel, "Index out of range.")

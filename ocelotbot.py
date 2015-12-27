@@ -74,7 +74,7 @@ while True:
         irc.send("PONG %s\r\n" % data.split()[1])
 
     if data.find("332") != -1:
-        topicData = data.split("##Ocelotworks :")
+        topicData = data.split("{0} :".format(BotConstants.config["irc"]["topicChannel"]))
         if len(topicData) >= 2:
             LoggingModule.updateTopicCounts()
 
@@ -82,7 +82,7 @@ while True:
             currentTopic = topicData[1].rstrip("\r\n")
             BotConstants().runQuery("SELECT id FROM `Topics` WHERE topic = %s", currentTopic)
             topicIDResult = BotConstants.db.fetchall()
-            if len(topicIDResult) == 1 and len(topicIDResult[0]) == 1:
+            if len(topicIDResult) > 0:
                 BotConstants.currentTopicID = topicIDResult[0]["id"]
             else:
                 BotConstants.currentTopicID = 1
@@ -101,10 +101,7 @@ while True:
     channel = data.split(" ")
 
     #check if message is from user PM/channel or from server
-    if len(channel) > 2:
-        channel = channel[2]
-    else:
-        channel = ""
+    channel = channel[2] if len(channel) > 2 else ""
 
     #if the channel is our username, it's a PM so get the sender nickname
     if channel == nickname:
@@ -115,6 +112,8 @@ while True:
         if BotConstants.messageCount > 100:
             LoggingModule().updateTopic(channel, args = ["up"])
             BotConstants.messageCount = 0
+
+        BotConstants().runQuery("UPDATE `BotVars` SET val = %s WHERE name = 'autoTopicCount'", BotConstants.messageCount)
 
     #starts with an @ so process it as a command
     if commandMessage.startswith("@"):
