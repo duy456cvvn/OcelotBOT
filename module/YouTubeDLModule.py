@@ -1,6 +1,6 @@
 from . import ModuleBase, Util, UtilityModule
 from constants import *
-import youtube_dl, thread, urllib2, os
+import youtube_dl, thread, urllib2, os, requests
 
 class YouTubeDLModule(ModuleBase):
     def accessLevel(self, commandName):
@@ -10,7 +10,7 @@ class YouTubeDLModule(ModuleBase):
         return "YouTube-DL Module"
 
     def getCommands(self):
-        return ["youtube", "mixcloud", "soundcloud", "bandcamp"]
+        return ["youtube", "mixcloud", "soundcloud", "bandcamp", "nowplaying"]
 
     def tooltip(self, channel, args):
         Util.sendMessage(self.channel, "Usage: @{0} <{0} url>".format(args["command"]))
@@ -99,7 +99,8 @@ class YouTubeDLModule(ModuleBase):
         thread.start_new_thread(YouTubeDLModule().downloader, (channel, args))
 
     #mixcloud command
-    def mixcloud(self, channel, args):
+    @staticmethod
+    def mixcloud(channel, args):
         args = [
             args[0] if len(args) >= 1 else None,
             "mixcloud"
@@ -108,7 +109,8 @@ class YouTubeDLModule(ModuleBase):
         thread.start_new_thread(YouTubeDLModule().downloader, (channel, args))
 
     #soundcloud command
-    def soundcloud(self, channel, args):
+    @staticmethod
+    def soundcloud(channel, args):
         args = [
             args[0] if len(args) >= 1 else None,
             "soundcloud"
@@ -117,10 +119,19 @@ class YouTubeDLModule(ModuleBase):
         thread.start_new_thread(YouTubeDLModule().downloader, (channel, args))
 
     #bandcamp command
-    def bandcamp(self, channel, args):
+    @staticmethod
+    def bandcamp(channel, args):
         args = [
             args[0] if len(args) >= 1 else None,
             "bandcamp"
         ]
 
         thread.start_new_thread(YouTubeDLModule().downloader, (channel, args))
+
+    @staticmethod
+    def nowplaying(channel, args):
+        res = requests.get(BotConstants.config["misc"]["radioNowPlayingURL"])
+        if res.status_code == 200:
+            rJSON = res.json()
+            nowPlaying = " // ".join(["\x033{0}\x03: {1}".format(s["genre"], s["title"]) for s in rJSON["icestats"]["source"]])
+            Util.sendMessage(channel, "\x02Now Playing:\x02 {0}".format(nowPlaying))
