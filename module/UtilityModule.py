@@ -158,12 +158,18 @@ class UtilityModule(ModuleBase):
         urlResult = urlRegex(origUserMessage)
         if len(urlResult) > 0:
             urls = []
+            proxyStr = "http://{0}".format(BotConstants.config["misc"]["proxyURL"])
+            proxies = {
+                "http": proxyStr,
+                "https": proxyStr
+            }
             for u in urlResult:
                 if len(re.findall(redditURLRegex, u[0])) == 0: urls.append(u[0])
+
             for u in urls:
                 try:
-                    res = requests.get(u, headers = {"User-Agent": "OcelotBOT/1.0.0"})
-                except:
+                    res = session.get(u, proxies = proxies if "youtu.be" or "youtube.com" in u else None)
+                except requests.RequestException:
                     res = None
 
                 if res is not None and res.status_code == 200:
