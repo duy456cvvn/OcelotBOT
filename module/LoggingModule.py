@@ -177,6 +177,7 @@ class LoggingModule(ModuleBase):
             if index == BotConstants.currentTopicID:
                 self.updateTopic(channel, ["up"])
             self.updateTopicCounts()
+            BotConstants.currentTopicID -= 1
             Util.sendMessage(channel, "Deleted topic \"{0}\" successfully.".format(deletedTopic))
 
     @staticmethod

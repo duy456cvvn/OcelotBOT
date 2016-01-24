@@ -1,6 +1,7 @@
 # coding=utf-8
 from . import ModuleBase, Util
 from constants import *
+import requests
 
 class MiscModule(ModuleBase):
     def accessLevel(self, commandName):
@@ -10,7 +11,7 @@ class MiscModule(ModuleBase):
         return "Miscellaneous Module"
 
     def getCommands(self):
-        return ["meme", "rekt"]
+        return ["meme", "rekt", "ispetersleeping"]
 
     def tooltip(self, channel, args):
         if args["command"] == "meme":
@@ -70,3 +71,11 @@ class MiscModule(ModuleBase):
                     Util.sendMessage(channel, meme[0]["url"])
         else:
             self.tooltip(channel, args = {"command": "meme"})
+
+    @staticmethod
+    def ispetersleeping(channel, args):
+        res = requests.get(BotConstants.config["misc"]["isPeterSleepingURL"], headers = {"User-Agent": "OcelotBOT/1.0.0"})
+        if res.status_code == 200:
+            Util.sendMessage(channel, "Yes" if res.content == "1" else "No")
+        else:
+            Util.sendMessage(channel, "Error getting Peter's sleeping status")
