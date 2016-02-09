@@ -1,4 +1,4 @@
-import socket, ssl, json, MySQLdb, MySQLdb.cursors
+import socket, ssl, json, pymysql
 
 class BotConstants:
     ircSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -9,15 +9,19 @@ class BotConstants:
     with open("constants/bot.config") as file:
         config = json.loads(file.read().replace("\n", ""))
 
-    connection = MySQLdb.connect(host           = config["mysql"]["host"],
-                                 user           = config["mysql"]["user"],
-                                 passwd         = config["mysql"]["password"],
-                                 db             = config["mysql"]["database"],
-                                 use_unicode    = True,
-                                 charset        = "utf8mb4",
-                                 cursorclass    = MySQLdb.cursors.DictCursor)
+    getDBConnection = lambda c: pymysql.connect(host           = c["mysql"]["host"],
+                                                user           = c["mysql"]["user"],
+                                                passwd         = c["mysql"]["password"],
+                                                db             = c["mysql"]["database"],
+                                                use_unicode    = True,
+                                                charset        = "utf8mb4",
+                                                autocommit     = True,
+                                                cursorclass    = pymysql.cursors.DictCursor)
+    connection = getDBConnection(config)
     db = connection.cursor()
-    connection.autocommit(True)
+
+    loggingConnection = getDBConnection(config)
+    loggingDB = loggingConnection.cursor()
 
     tables = []
     currentTopicID = 1
@@ -34,10 +38,18 @@ class BotConstants:
     if len(result) > 0:
         messageCount = int(result[0]["val"])
 
-    def runQuery(self, query, *args):
+    def runQuery(self, query, database = None, *args):
         argList = [a for a in args]
+
+        if database is None:
+            database = self.db
+        elif type(database) is not pymysql.cursors.DictCursor:
+            argList.insert(0, database)
+            database = self.db
+
         try:
-            self.db.execute(query, argList)
-        except MySQLdb.OperationalError:
-            self.connection.ping(True)
-            self.db.execute(query, argList)
+            print "Running Query: {0}".format(database.mogrify(query, argList))
+            database.execute(query, argList)
+        except pymysql.OperationalError:
+            database.connection.ping(True)
+            database.execute(query, argList)

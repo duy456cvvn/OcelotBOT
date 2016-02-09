@@ -11,7 +11,7 @@ class LoggingModule(ModuleBase):
         return "Logging Module"
 
     def getCommands(self):
-        return ["topic", "sentence", "seen"]
+        return ["topic", "sentence", "seen", "count"]
 
     def checkAccessLevel(self, channel, args):
         return
@@ -21,6 +21,8 @@ class LoggingModule(ModuleBase):
             Util.sendMessage(channel, "Usage: @sentence <word(s)> [-context #]")
         elif args["command"] == "seen":
             Util.sendMessage(channel, "Usage: @seen <nickname>")
+        elif args["command"] == "count":
+            Util.sendMessage(channel, "Usage: @count <word(s)>")
 
     @staticmethod
     def logger(channel, username, message, timestamp):
@@ -28,34 +30,29 @@ class LoggingModule(ModuleBase):
         if channel not in BotConstants.tables:
             BotConstants().runQuery("CREATE TABLE IF NOT EXISTS `{0}` (ID int NOT NULL AUTO_INCREMENT, Time text,Username text,Message text, PRIMARY KEY (ID))".format(channel))
 
-        BotConstants().runQuery("INSERT INTO `{0}` (`Time`, `Username`, `Message`) VALUES (%s, %s, %s)".format(channel), timestamp, username, message)
+        BotConstants().runQuery("INSERT INTO `{0}` (`Time`, `Username`, `Message`) VALUES (%s, %s, %s)".format(channel), BotConstants.loggingDB, timestamp, username, message)
 
     def sentence(self, channel, args):
-        if len(args) >= 1:
-            index = 0
+        if len(args) > 0:
             bCtx = 0
             fCtx = 0
-            cIndex = None
-            for arg in args:
-                if arg == "-context":
-                    cIndex = index
-                    try:
-                        ctx = int(args[index + 1])
-                        ctx = abs(ctx)
-                    except:
-                        Util.sendMessage(channel, "Invalid context amount")
-                        return
+
+            if "-context" in args:
+                ctxArgsIndex = args.index("-context")
+                try:
+                    ctx = int(args[ctxArgsIndex + 1])
                     fCtx = math.ceil(ctx / 2)
                     bCtx = ctx - fCtx
-                index += 1
-                
-                if cIndex is not None:
-                    args.pop(cIndex + 1)
-                    args.pop(cIndex)
-                
-                searchTerm = " ".join(args)
 
-            BotConstants().runQuery("SELECT * FROM `{0}` WHERE Message LIKE %s  AND Message NOT LIKE \"@sentence%%\"".format(channel), "%{0}%".format(searchTerm))
+                    args.pop(ctxArgsIndex + 1)
+                    args.pop(args.index("-context"))
+                except (ValueError, IndexError):
+                    Util.sendMessage(channel, "Invalid context amount")
+                    return
+
+
+            searchTerm = " ".join(args)
+            BotConstants().runQuery("SELECT * FROM `{0}` WHERE Message LIKE %s AND Message NOT LIKE '@sentence%%'".format(channel), "%{0}%".format(searchTerm))
 
             result = BotConstants.db.fetchall()
             if len(result) != 0:
@@ -75,16 +72,26 @@ class LoggingModule(ModuleBase):
                         if index == bCtx:
                             search = re.compile(r"({0})".format(searchTerm), re.I)
                             messageString = search.sub("\x02\x034\\1\x03\x02", messageString)
-                        
+
                         Util.sendMessage(channel, "<{0}> {1}".format(message["Username"], messageString))
                         index += 1
             else:
-                Util.sendMessage(channel, "No messages containing \"{0}\"".format(searchTerm))
+                Util.sendMessage(channel, 'No messages containing "{0}"'.format(searchTerm))
         else:
             self.tooltip(channel, args = {"command": "sentence"})
 
+    def count(self, channel, args):
+        if len(args) > 0:
+            searchString = " ".join(args)
+            BotConstants().runQuery("SELECT COUNT(*) wordCount FROM `{0}` WHERE Message REGEXP %s".format(channel), "[[:<:]]{0}[[:>:]]".format(searchString))
+
+            result = BotConstants.db.fetchall()
+            Util.sendMessage(channel, "\x02\x034{0}\x03\x02 has been said {1} times in {2}".format(searchString, result[0]["wordCount"], channel))
+        else:
+            self.tooltip(channel, args = {"command": "seen"})
+
     def seen(self, channel, args):
-        if len(args) >= 1:
+        if len(args) > 0:
             BotConstants().runQuery("SELECT * FROM `{0}` WHERE Username = %s ORDER BY ID DESC LIMIT 1".format(channel), args[0])
 
             result = BotConstants.db.fetchall()
@@ -100,7 +107,7 @@ class LoggingModule(ModuleBase):
 
                 Util.sendMessage(channel, "{0} was last seen at {1} ({2} ago) with the message: {3}".format(args[0], result["Time"], timeDelta, result["Message"]))
             else:
-                Util.sendMessage(channel, "User \"{0}\" has never been logged in this channel".format(args[0]))
+                Util.sendMessage(channel, 'User "{0}" has never been logged in this channel'.format(args[0]))
         else:
             self.tooltip(channel, args = {"command": "seen"})
 

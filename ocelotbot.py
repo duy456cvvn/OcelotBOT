@@ -128,7 +128,7 @@ while True:
         Util.sendMessage(channel, "icles")
 
     if channel.startswith("#"):
-        if commandMessage.startswith("@"):
+        if commandMessage.startswith("@topic"):
             time.sleep(1)
 
         userWhoSent = data.split(":")[1].split("!")[0]
