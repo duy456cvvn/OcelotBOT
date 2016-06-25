@@ -1,0 +1,16 @@
+{
+  "name": "OcelotBOT",
+  "version": "3.0.0",
+  "dependencies": {
+    "@slack/client": "^3.4.0",
+    "caller-id": "^0.1.0",
+    "express": "^",
+    "forever": "^0.15.2",
+    "markov": "0.0.7",
+    "mw-dictionary": "0.0.4",
+    "mysql": "^2.10.2",
+    "node-mysql": "^0.4.2",
+    "sourcequery": "0.0.2",
+    "websocket": "^1.0.23"
+  }
+}
