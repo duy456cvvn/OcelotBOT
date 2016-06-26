@@ -16,6 +16,24 @@ var RtmClient       = require('@slack/client').RtmClient,
 
 var year = new Date().getFullYear();
 
+var WS_CLOSE_CODES = {
+    1000: "CLOSE_NORMAL",
+    1001: "CLOSE_GOING_AWAY",
+    1002: "CLOSE_PROTOCOL ERROR",
+    1003: "CLOSE_UNSUPPORTED",
+    1004: "RESERVED",
+    1005: "CLOSE_NO_STATUS",
+    1006: "CLOSE_ABNORMAL",
+    1007: "Unsupported data",
+    1008: "Policy violation",
+    1009: "CLOSE_TOO_LARGE",
+    1010: "Missing Extension",
+    1011: "Internal Error",
+    1012: "Service Restart",
+    1013: "Try Again Later",
+    1014: "RESERVED",
+    1015: "TLS Handshake failiure"
+};
 
 var bot = {};
 bot.config = {
@@ -133,25 +151,27 @@ function botInit(cb){
     bot.web = new WebClient(bot.config.slack.token);
 
     bot.sendMessage = function(data, cb){
-        data.message = data.message
-            .replace(bot.config.slack.token, "<REDACTED>")
-            .replace(bot.config.slack.webhook, "<REDACTED>")
-            .replace(bot.config.slack.payload_token, "<REDACTED>")
-            .replace(bot.config.slack.clientSecret, "<REDACTED>")
-            .replace(bot.config.database.password, "<REDACTED>")
-            .replace(bot.config.petermon.password, "<REDACTED>");
+        if(!data.message || data.message == ""){
+            var caller = caller_id.getData();
+            var file = caller.filePath ? caller.filePath.split("/") : ["unknown"];
+            bot.sendMessage({
+                to: data.to,
+                message: `*WARNING: ${file[file.length-1]}/${caller.functionName} tried to send a blank or null message.*`
+            });
+        }else{
+            data.message = (""+data.message)
+                .replace(bot.config.slack.token, "<REDACTED>")
+                .replace(bot.config.slack.webhook, "<REDACTED>")
+                .replace(bot.config.slack.payload_token, "<REDACTED>")
+                .replace(bot.config.slack.clientSecret, "<REDACTED>")
+                .replace(bot.config.database.password, "<REDACTED>");
 
-        bot.rtm.sendMessage(data.message, data.to, function(err, resp){
-            if(err){
-                bot.log("Error sending message: "+err);
-            //}else if(!resp.ok){
-            //    bot.sendMessage({
-            //        to: data.to,
-            //        message: "Unknown error occurred tell <@Peter> to handle this:\n```"+JSON.stringify(resp)+"```"
-            //    });
-            //    //TODO: Retry?
-            }else if(cb){cb(err, resp)}
-        });
+            bot.rtm.sendMessage(data.message, data.to, function sendMessageResult(err, resp){
+                if(err){
+                    bot.log("Error sending message: "+JSON.stringify(err));
+                }else if(cb){cb(err, resp)}
+            });
+        }
     };
 
     bot.editMessage = function(data, cb){
@@ -243,8 +263,7 @@ function botInit(cb){
     });
 
     bot.rtm.on(CLIENT_EVENTS.RTM.WS_CLOSE, function wsCloseEvent(data){
-        bot.log("RTM WebSocket closed:");
-        bot.log(data);
+        bot.log("RTM Websocket closed with code: "+(WS_CLOSE_CODES[data] ? WS_CLOSE_CODES[data] : data));
     });
 
     bot.rtm.on(CLIENT_EVENTS.RTM.DISCONNECT, function disconnectEventEvent(data){
