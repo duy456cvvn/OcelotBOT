@@ -10,8 +10,8 @@ exports.command = {
 		if(args[1] == "doublecross"){
 			args[1] = "193.111.142.33";
 			args[2] = "27021";
-		}else if(args[1] == "dh"){
-			args[1] = "185.38.148.28"; 
+		}else if(args[1] == "anex"){
+			args[1] = "89.34.96.39";
 			args[2] = "27225";
 		}
 		sq.open(args[1], args[2] ? args[2] : 27015);
