@@ -383,6 +383,8 @@ function checkImportantDates(cb){
             to: bot.config.misc.mainChannel,
             message: bot.config.importantDates[date.getDate()+"/"+date.getMonth()]
         });
+    }else{
+        bot.log("No important dates today.");
     }
     setTimeout(checkImportantDates,  8.64e7); //24 hours
     if(cb)
