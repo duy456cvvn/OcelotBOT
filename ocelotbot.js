@@ -161,9 +161,11 @@ function botInit(cb){
      */
     bot.sendButtons = function (channel, text, fallback, callback, colour, buttons){
         for(var i in buttons){
-            var button = buttons[i];
-            if(!button.type)buttons[i].type = "button";
-            if(!button.value)buttons[i].value = button.name;
+            if(buttons.hasOwnProperty(i)){
+                var button = buttons[i];
+                if(!button.type)buttons[i].type = "button";
+                if(!button.value)buttons[i].value = button.name;
+            }
         }
         bot.web.chat.postMessage(channel, "", {attachments: [
             {
@@ -273,14 +275,16 @@ function loadCommands(cb){
     //Reads the /commands directory, and loads exports.command of each file
     var files = fs.readdirSync(bot.config.misc.commandsDir);
     for (var i in files) {
-        if(!fs.lstatSync('./'+bot.config.misc.commandsDir+'/'+files[i]).isDirectory()){
-            try {
-                var newCommand = require('./' + bot.config.misc.commandsDir + '/' + files[i]).command;
-                bot.log("Loaded command: " + newCommand.name);
-                bot.commands[newCommand.name] = newCommand;
-            }catch(e){
-                bot.log("Error loading module "+files[i]+" - "+e);
-                bot.log(e);
+        if(files.hasOwnProperty(i)){
+            if(!fs.lstatSync('./'+bot.config.misc.commandsDir+'/'+files[i]).isDirectory()){
+                try {
+                    var newCommand = require('./' + bot.config.misc.commandsDir + '/' + files[i]).command;
+                    bot.log("Loaded command: " + newCommand.name);
+                    bot.commands[newCommand.name] = newCommand;
+                }catch(e){
+                    bot.log("Error loading module "+files[i]+" - "+e);
+                    bot.log(e);
+                }
             }
         }
     }
@@ -409,12 +413,14 @@ function handleAutoReplies(message, channelID){
     if(message.indexOf("ass") > -1 && message.toLowerCase().indexOf("-") === -1){
         var words = message.toLowerCase().split(" ");
         for(var i in words){
-            if(words[i] === "ass" && words.length > parseInt(i)+1){
-                bot.sendMessage({
-                    to: channelID,
-                    message: "*ass-"+words[parseInt(i)+1]+"*"
-                });
-                break;
+            if(words.hasOwnProperty(i)){
+                if(words[i] === "ass" && words.length > parseInt(i)+1){
+                    bot.sendMessage({
+                        to: channelID,
+                        message: "*ass-"+words[parseInt(i)+1]+"*"
+                    });
+                    break;
+                }
             }
         }
     }
