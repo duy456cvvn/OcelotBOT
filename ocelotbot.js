@@ -284,7 +284,8 @@ function loadCommands(cb){
             }
         }
     }
-    cb();
+    if(cb)
+        cb();
 }
 
 function mysqlInit(cb){
@@ -305,12 +306,14 @@ function mysqlInit(cb){
         bot.connection.connect(function mySqlConnect(err) {
             if (err){
                 bot.log('Error connecting: ' + err);
-                cb();
+                if(cb)
+                    cb();
                 setTimeout(mysqlInit, 3000);
             }
             else{
                 bot.log("Connected to MySQL");
-                cb();
+                if(cb)
+                    cb();
             }
 
         });
@@ -336,6 +339,8 @@ function httpInit(cb){
         cert: fs.readFileSync(bot.config.slack.certs.cert)
     }, bot.app).listen(3001, function httpServerInit(){
         bot.log("HTTP Server opened on port 3001");
+        if(cb)
+            cb();
     });
 
     bot.app.get('/slack/oauth', function getSlackOauth(req, res){
@@ -364,7 +369,6 @@ function httpInit(cb){
        res.send("Hello World!");
     });
 
-    cb();
 
 }
 
@@ -377,7 +381,8 @@ function checkImportantDates(cb){
         });
     }
     setTimeout(checkImportantDates,  8.64e7); //24 hours
-    cb();
+    if(cb)
+        cb();
 }
 
 function handleCommand(message, channelID, user, userID){
