@@ -136,12 +136,12 @@ function botInit(cb){
         bot.rtm.sendMessage(data.message, data.to, function(err, resp){
             if(err){
                 bot.log("Error sending message: "+err);
-            }else if(!resp.ok){
-                bot.sendMessage({
-                    to: data.to,
-                    message: "Unknown error occurred tell <@Peter> to handle this:\n```"+JSON.stringify(resp)+"```"
-                });
-                //TODO: Retry?
+            //}else if(!resp.ok){
+            //    bot.sendMessage({
+            //        to: data.to,
+            //        message: "Unknown error occurred tell <@Peter> to handle this:\n```"+JSON.stringify(resp)+"```"
+            //    });
+            //    //TODO: Retry?
             }else if(cb){cb(err, resp)}
         });
     };
