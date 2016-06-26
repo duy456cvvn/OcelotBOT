@@ -62,7 +62,8 @@ bot.config = {
     misc:{
         commandPrefix: "!",
         commandsDir: "commands",
-        mainChannel: ""
+        mainChannel: "",
+        proxyURL: ""
     },
     petermon:{
         username: "",
@@ -484,6 +485,7 @@ function handleTopicUpdate(channelID){
 
 process.on('uncaughtException', function uncaughtException(err){
     bot.log(err);
+    console.log(err);
 });
 
 startBot();
