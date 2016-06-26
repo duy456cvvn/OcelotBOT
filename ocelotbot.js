@@ -133,6 +133,14 @@ function botInit(cb){
     bot.web = new WebClient(bot.config.slack.token);
 
     bot.sendMessage = function(data, cb){
+        data.message = data.message
+            .replace(bot.config.slack.token, "<REDACTED>")
+            .replace(bot.config.slack.webhook, "<REDACTED>")
+            .replace(bot.config.slack.payload_token, "<REDACTED>")
+            .replace(bot.config.slack.clientSecret, "<REDACTED>")
+            .replace(bot.config.database.password, "<REDACTED>")
+            .replace(bot.config.petermon.password, "<REDACTED>");
+
         bot.rtm.sendMessage(data.message, data.to, function(err, resp){
             if(err){
                 bot.log("Error sending message: "+err);
