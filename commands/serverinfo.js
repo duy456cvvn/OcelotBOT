@@ -15,8 +15,8 @@ exports.command = {
 			args[2] = "27225";
 		}
 		sq.open(args[1], args[2] ? args[2] : 27015);
-		sq.getInfo(function(err, info){
-			console.log("[SERVERINFO] Retrieved server info for "+args[1]);
+		sq.getInfo(function sourceQueryInfo(err, info){
+			bot.log("Retrieved server info for "+args[1]);
 			if(err){
 				bot.sendMessage({
 					to: channel,
