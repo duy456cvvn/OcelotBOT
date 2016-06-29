@@ -99,8 +99,8 @@ function startBot(){
         loadCommands,
         mysqlInit,
         httpInit,
-        botInit,
-        checkImportantDates
+        botInit//,
+        //checkImportantDates
     ]);
 
 
@@ -285,6 +285,7 @@ function botInit(cb){
 
 
     bot.rtm.on(RTM_EVENTS.MESSAGE, function (messageData) {
+        bot.log("Received message");
         var message = messageData.text;
         var channelID = messageData.channel;
         var user = "<"+messageData.user+">";
