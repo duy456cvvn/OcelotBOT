@@ -20,10 +20,6 @@ exports.command = {
 				if(args[2].indexOf("reddit.com/live") > -1){
 					args[2] = args[2].replace("<","").replace(">","");
 					var url = args[2]+"/about/.json";
-					bot.sendMessage({
-						to: channel,
-						message: url
-					});
 					var proto = args[2].startsWith("https") ? https : http;
 					proto.get(url, function(response){
 						var body = "";
@@ -51,16 +47,14 @@ exports.command = {
 							        });
 
 							        connection.on('message', function(message){
-							        	var data = message.utf8Data;
-							        	//if(data.type !== "activity"){
-										if(data.payload){
-											bot.sendMessage({
-												to: channel,
-												message: "**"+data.payload.data.author+" posted in `"+title+"`:** \n"+data.payload.data.body
-											});
-										}
-
-							        	//}
+							        	var data = JSON.parse(message.utf8Data);
+                                        bot.log("Got message: "+JSON.stringify(message));
+							        	if(data.type == "update" && data.payload){
+                                            bot.sendMessage({
+                                                to: channel,
+                                                message: "*"+data.payload.data.author+" posted in `"+title+"`:* \n>"+data.payload.data.body.replace(new RegExp("\n"), "\n>")
+                                            });
+							        	}
 							        });
 					          	});
 
