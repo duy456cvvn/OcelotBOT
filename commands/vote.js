@@ -12,6 +12,35 @@ exports.command = {
     name: "vote",
     desc: "Vote",
     usage: "vote start opt1,opt2,opt3.../1/2/3../end",
+    onReady: function(bot){
+        bot.registerInteractiveMessage("vote", function(name, val, info){
+            console.log(info);
+            if(!currentVoteStamp){
+                bot.sendMessage({
+                	to: info.channel.id,
+                	message: "<@"+info.user.id+">: There is no vote right now!"
+                });
+            } else if (alreadyVoted.indexOf(info.user.id) > -1) {
+                bot.sendMessage({
+                    to: info.channel.id,
+                    message: "<@"+info.user.id+">: You can only vote once!"
+                });
+            } else {
+                var vote = name;
+                alreadyVoted.push(info.user.id);
+                bot.sendMessage({
+                    to: info.channel.id,
+                    message: "<@" + info.user.id+ "> voted for `" + options[vote] + "`"
+                });
+                votes[vote]++;
+                totalVotes++;
+                generateUpdate(bot);
+
+            }
+
+            return "";
+        });
+    },
     func: function(user, userID, channel, args, message, bot){
         if(args.length < 2)return false;
         if(args[1] === "start"){
@@ -22,11 +51,13 @@ exports.command = {
                 //});
                 //return false;
             //}else{
+                totalVotes = 0;
                 alreadyVoted = [];
                 var sub = message.substring(message.indexOf(args[2]));
                 options = sub.split(",");
                 startedBy = userID;
                 var output = "*<@"+startedBy+"> started a vote:*\n";
+                 var buttons = [];
                 for(var i in options){
                     votes[i] = 0;
                     output+= (parseInt(i)+1)+". `"+options[i]+"`\n[\u2588";
@@ -34,6 +65,15 @@ exports.command = {
                         output+= "\u2591";
                     }
                     output += "]\n";
+
+                    buttons.push(
+                        {
+                            name: i,
+                            text: options[i],
+                            value: currentVoteStamp
+                        }
+                    );
+                    //[{"name": "a", "text": "Test", "value": "dick"}]
                 }
                 bot.sendMessage({
                 	to: channel,
@@ -44,6 +84,9 @@ exports.command = {
                         currentVoteChannel = channel;
                     }
                 });
+
+
+                bot.sendButtons(channel, "Vote Here:", "Vote using !vote <option>", "vote", "#ff0000", buttons);
            // }
         }else if(!isNaN(args[1])) {
             if (!currentVoteStamp) {
@@ -58,7 +101,7 @@ exports.command = {
                 });
             } else {
                 var vote = parseInt(args[1]);
-                if (vote >= votes.length) {
+                if (vote >= votes.length+1) {
                     bot.sendMessage({
                         to: channel,
                         message: "You have to vote between 1 and " + votes.length
