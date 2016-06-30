@@ -11,6 +11,7 @@ var RtmClient       = require('@slack/client').RtmClient,
     simplebus       = require('simplebus'),
     https           = require('https'),
     express         = require('express'),
+    bodyparser      = require('body-parser'),
     caller_id       = require('caller-id'),
     async           = require('async');
 
@@ -39,7 +40,8 @@ var bot = {};
 bot.config = {
     slack:{
         username: "",
-        token: "",
+        token_b: "",
+        token_p: "",
         webhook: "",
         payload_token: "",
         clientId: "",
@@ -63,6 +65,7 @@ bot.config = {
         commandPrefix: "!",
         commandsDir: "commands",
         mainChannel: "",
+        logChannel: "",
         proxyURL: ""
     },
     petermon:{
@@ -99,8 +102,8 @@ function startBot(){
         loadCommands,
         mysqlInit,
         httpInit,
-        botInit//,
-        //checkImportantDates
+        botInit,
+        checkImportantDates
     ]);
 
 
@@ -148,8 +151,25 @@ function saveConfig(cb){
 
 function botInit(cb){
 
-    bot.rtm = new RtmClient(bot.config.slack.token);
-    bot.web = new WebClient(bot.config.slack.token);
+    bot.rtm = new RtmClient(bot.config.slack.token_b);
+    bot.web = new WebClient(bot.config.slack.token_b);
+    bot.web_p = new WebClient(bot.config.slack.token_p);
+
+    bot.interactiveMessages = {};
+
+    bot.registerInteractiveMessage = function(callback_id, func){
+      bot.interactiveMessages[callback_id] = func;
+    };
+
+
+    bot.fireInteractiveMessage = function(callback_id, name, value){
+        if(bot.interactiveMessages[callback_id]){
+            return bot.interactiveMessages[callback_id](name, value);
+        }
+
+        return false;
+    };
+
 
     bot.sendMessage = function(data, cb){
         if(!data.message || data.message == ""){
@@ -285,7 +305,6 @@ function botInit(cb){
 
 
     bot.rtm.on(RTM_EVENTS.MESSAGE, function (messageData) {
-        bot.log("Received message");
         var message = messageData.text;
         var channelID = messageData.channel;
         var user = "<"+messageData.user+">";
@@ -376,6 +395,8 @@ function httpInit(cb){
             cb();
     });
 
+    bot.app.use(bodyparser.urlencoded());
+
     bot.app.get('/slack/oauth', function getSlackOauth(req, res){
         bot.web.oauth.access(bot.config.slack.clientId,bot.config.slack.clientSecret, req.query.code, function(err, data){
             res.send(JSON.stringify(data));
@@ -387,15 +408,28 @@ function httpInit(cb){
     });
 
     bot.app.post('/slack/interactive', function postSlackEndpoint(req, res){
-        var bodyStr = '';
-        req.on("data",function(chunk){
-            bodyStr += chunk.toString();
-        });
-        req.on("end",function(){
-            res.send(bodyStr);
-        });
-        bot.log("Message body:"+bodyStr);
-        res.send("");
+        if(req.body.payload){
+            var info = JSON.parse(req.body.payload);
+            if(bot.interactiveMessages[info.callback_id]) {
+                for(var i in info.actions){
+                    if(info.actions.hasOwnProperty(i)){
+                        bot.log("Triggered interactive message callback");
+                        res.send(bot.interactiveMessages[info.callback_id](info.actions[i].name, info.actions[i].value));
+                    }
+                }
+            }else{
+                bot.sendMessage({
+                	to: bot.config.misc.mainChannel,
+                	message: "*WARNING:* Received interactive message with no callback registered: `"+info.callback_id+"`"
+                });
+                res.send("No callback registered.");
+            }
+
+        }else{
+            bot.log("Invalid Interactive Message request receieved.");
+            res.send("Invalid request.");
+        }
+
     });
 
     bot.app.get('/', function(req, res){
