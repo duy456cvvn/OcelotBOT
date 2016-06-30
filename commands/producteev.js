@@ -4,11 +4,11 @@
 exports.command = {
     name: "test",
     desc: "A test command",
-    usage: "test",
+    usage: "producteev",
     func: function(user, userID, channel, args, message, bot){
         bot.sendMessage({
             to: channel,
-            message: "pong"
+            message: "pppproducteeev pong"
         });
         return true;
     }

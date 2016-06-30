@@ -9,7 +9,7 @@ exports.command = {
     func: function (user, userID, channel, args, message, bot) {
         bot.sendMessage({
             to: channel,
-            message: "pong"
+            message: " mmmmmusic pong"
         });
 
 		//Allow a minimum of one argument
