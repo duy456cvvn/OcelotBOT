@@ -95,6 +95,13 @@ function startBot(){
         console.log("["+file[file.length-1]+(caller.functionName ? "/"+caller.functionName+"] "+message : "] "+message));
     };
 
+    bot.interactiveMessages = {};
+
+    bot.registerInteractiveMessage = function registerInteractiveMessage(callback_id, func){
+        bot.log("Registered interactive message for "+callback_id);
+        bot.interactiveMessages[callback_id] = func;
+    };
+
 
     async.series([
         loadConfig,
@@ -155,11 +162,7 @@ function botInit(cb){
     bot.web = new WebClient(bot.config.slack.token_b);
     bot.web_p = new WebClient(bot.config.slack.token_p);
 
-    bot.interactiveMessages = {};
 
-    bot.registerInteractiveMessage = function(callback_id, func){
-      bot.interactiveMessages[callback_id] = func;
-    };
 
 
     bot.fireInteractiveMessage = function(callback_id, name, value){
@@ -181,7 +184,8 @@ function botInit(cb){
             });
         }else{
             data.message = (""+data.message)
-                .replace(bot.config.slack.token, "<REDACTED>")
+                .replace(bot.config.slack.token_b, "<REDACTED>")
+                .replace(bot.config.slack.token_p, "<REDACTED>")
                 .replace(bot.config.slack.webhook, "<REDACTED>")
                 .replace(bot.config.slack.payload_token, "<REDACTED>")
                 .replace(bot.config.slack.clientSecret, "<REDACTED>")
@@ -329,6 +333,11 @@ function loadCommands(cb){
                     var newCommand = require('./' + bot.config.misc.commandsDir + '/' + files[i]).command;
                     bot.log("Loaded command: " + newCommand.name);
                     bot.commands[newCommand.name] = newCommand;
+
+                    if(newCommand.onReady){
+                        bot.log("Performed start-up tasks for "+newCommand.name);
+                        newCommand.onReady(bot);
+                    }
                 }catch(e){
                     bot.log("Error loading module "+files[i]+" - "+e);
                     bot.log(e);
@@ -410,20 +419,31 @@ function httpInit(cb){
     bot.app.post('/slack/interactive', function postSlackEndpoint(req, res){
         if(req.body.payload){
             var info = JSON.parse(req.body.payload);
-            if(bot.interactiveMessages[info.callback_id]) {
-                for(var i in info.actions){
-                    if(info.actions.hasOwnProperty(i)){
-                        bot.log("Triggered interactive message callback");
-                        res.send(bot.interactiveMessages[info.callback_id](info.actions[i].name, info.actions[i].value));
+            if(info.token === bot.config.slack.payload_token){
+                if(bot.interactiveMessages[info.callback_id]) {
+                    for(var i in info.actions){
+                        if(info.actions.hasOwnProperty(i)){
+                            bot.log("Triggered interactive message callback");
+                            try {
+                                res.send(bot.interactiveMessages[info.callback_id](info.actions[i].name, info.actions[i].value, info));
+                            }catch(e){
+                                bot.log("Error during interactive message: "+e);
+                                res.send(e);
+                            }
+                        }
                     }
+                }else{
+                    bot.sendMessage({
+                        to: bot.config.misc.mainChannel,
+                        message: "*WARNING:* Received interactive message with no callback registered: `"+info.callback_id+"`"
+                    });
+                    res.send("No callback registered.");
                 }
             }else{
-                bot.sendMessage({
-                	to: bot.config.misc.mainChannel,
-                	message: "*WARNING:* Received interactive message with no callback registered: `"+info.callback_id+"`"
-                });
-                res.send("No callback registered.");
+                bot.log("Received interactive message with invalid payload token.");
+                res.send("Invalid payload token.")
             }
+
 
         }else{
             bot.log("Invalid Interactive Message request receieved.");
