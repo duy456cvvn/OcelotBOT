@@ -70,7 +70,8 @@ exports.command = {
                         {
                             name: i,
                             text: options[i],
-                            value: currentVoteStamp
+                            value: currentVoteStamp,
+                            style: "primary"
                         }
                     );
                     //[{"name": "a", "text": "Test", "value": "dick"}]
