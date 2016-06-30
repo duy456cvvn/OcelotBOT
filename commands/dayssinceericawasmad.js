@@ -13,11 +13,14 @@ var vids = [
 '[{"url":"https://www.youtube.com/watch?v=sGKCC9G9H-c","title":"Porcelain Black - Pretty Little Psycho (Audio)","duration":"3:21"}]'
 ];
 
-
+/**
+ * @deprecated
+ * @type {{name: string, desc: string, usage: string, func: Function}}
+ */
 exports.command = {
     name: "dsem",
     desc: "Days since Erica was mad",
-    usage: "dsem [reset] [reason]",
+    usage: "*DEPRECATED* dsem [reset] [reason]",
     func: function(user, userID, channel, args, message, bot){
         var erica = {mad: 0, record: 0, reason: "", total: 0, count: 0}
         var now = new Date().getTime();
