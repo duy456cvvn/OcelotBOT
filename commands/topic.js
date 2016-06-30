@@ -35,6 +35,10 @@ exports.command = {
 		bot.web.channels.history(channel, {count: !isNaN(index) ? index + 1 : 1}, function(err, resp){
             if(err || !resp.ok){
                 if(!resp.ok && resp.error === "missing_scope"){
+					bot.sendMessage({
+						to: channel,
+						message: JSON.stringify(resp)
+					});
                     bot.sendMessage({
                     	to: channel,
                     	message: "The bot needs to be granted the permission `"+resp.needed+"` to topic messages."
