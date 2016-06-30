@@ -22,7 +22,7 @@ exports.command = {
     desc: "Days since Erica was mad",
     usage: "*DEPRECATED* dsem [reset] [reason]",
     func: function(user, userID, channel, args, message, bot){
-        var erica = {mad: 0, record: 0, reason: "", total: 0, count: 0}
+        var erica = {mad: 0, record: 0, reason: "", total: 0, count: 0};
         var now = new Date().getTime();
 
          fs.readFile('erica.json', function(err, data){
