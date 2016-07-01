@@ -193,7 +193,8 @@ function botInit(cb){
                 .replace(bot.config.slack.webhook, "<REDACTED>")
                 .replace(bot.config.slack.payload_token, "<REDACTED>")
                 .replace(bot.config.slack.clientSecret, "<REDACTED>")
-                .replace(bot.config.database.password, "<REDACTED>");
+                .replace(bot.config.database.password, "<REDACTED>")
+                .replace("undefined", "https://www.youtube.com/watch?v=b7k0a5hYnSI&t=18");
 
             bot.rtm.sendMessage(data.message, data.to, function sendMessageResult(err, resp){
                 if(err){
