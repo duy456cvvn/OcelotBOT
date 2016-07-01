@@ -234,6 +234,10 @@ function botInit(cb){
         });
     };
 
+    bot.sendAttachment = function sendAttachment(channel, text, attachments, cb){
+          bot.web.chat.postMessage(channel, text, {attachments: attachments}, cb);
+    };
+
     bot.incrementTopic = function (channel) {
         bot.currentTopic++;
         bot.updateTopic(channel);
@@ -403,6 +407,8 @@ function httpInit(cb){
         if(cb)
             cb();
     });
+
+    bot.app.use(express.static('static'));
 
     bot.app.use(bodyparser.urlencoded());
 
