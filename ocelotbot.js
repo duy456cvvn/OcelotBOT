@@ -73,6 +73,10 @@ bot.config = {
         password: "",
         url: ""
     },
+    fabric: {
+        email: "",
+        password: ""
+    },
     importantDates:{
         "20/1": "Happy Birthday Steve! 20/1/2014-16/8/2014 (%2014 years ago.)",
         "9/2": "Happy Birthday me! 9/2/2016-FOREVER (%2016 years ago.) Also Happy Birthday Peter!",
