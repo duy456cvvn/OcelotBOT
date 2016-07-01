@@ -1,5 +1,9 @@
 var SourceQuery = require('sourcequery');
 var sq = new SourceQuery(1000);
+var gameColours = {
+  tf: "#9C5220",
+  garrysmod: "#1295F0"
+};
 exports.command = {
 	name: "serverinfo",
 	desc: "Get information about a source based multiplayer server",
@@ -23,10 +27,42 @@ exports.command = {
 					message: "Error retrieving server information: "+err
 				});
 			}else{
-				bot.sendMessage({
-					to: channel,
-					message: "_\n*"+info.name+"* ("+info.players+"+"+info.bots+"/"+info.maxplayers+") steam://connect/"+args[1]+":"+args[2]+"\n`map`: "+info.map+"\n`game`: "+info.game+"\n`version`:"+info.version+"\n`folder`:"+info.folder
-				});
+
+				bot.sendAttachment(channel, "\n", [{
+					fallback:   `_\n*${info.name}* (${info.players}+${info.bots}/${info.maxplayers}) steam://connect/${args[1]}:${args[2]}\n`+
+                                `\`map\`: ${info.map}\n`+
+                                `\`game\`: ${info.game}\n`+
+                                `\`version\`:${info.version}\n`+
+                                `\`folder\`: ${info.folder}`,
+                    color: gameColours[info.folder] ? gameColours[info.folder] : "#45a569",
+                    author_name: info.name,
+                    author_link: `steam://connect/${args[1]}:${args[2]}`,
+                    author_icon: `https://unacceptableuse.com/ocelotbot/${info.folder}.png`,
+                    fields: [
+                        {
+                            title: "Players",
+                            value: `${info.players}+${info.bots}/${info.maxplayers}`,
+                            short: true
+                        },
+                        {
+                            title: "Map",
+                            value: info.map,
+                            short: true
+                        },
+                        {
+                            title: "Gamemode",
+                            value: info.game,
+                            short: true
+                        },
+                        {
+                            title: "Version",
+                            value: info.version,
+                            short: true
+                        }
+                    ]
+				}]);
+
+
 			}
 
 		});
