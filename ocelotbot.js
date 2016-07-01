@@ -260,7 +260,7 @@ function botInit(cb){
                 });
             } else {
                 bot.log("Changing topic...");
-                bot.web.channels.setTopic(channel, result[0].topic);
+                bot.web_p.channels.setTopic(channel, result[0].topic);
             }
             fs.writeFile(bot.config.topic.file, bot.currentTopic, function topicFileWriteError(err) {
                 if (err) {
