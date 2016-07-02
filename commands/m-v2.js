@@ -14,33 +14,33 @@ exports.command = {
     usage: "m q",
     onReady: function onReady(bot){
 
-        var track = "/home/peter/nsp/Non-stop Pop Interlude 1.mp3";
-
-
-        encoder.on("data", function(data) {
-            clients.forEach(function(client){
-                client.write(data);
-            });
-        });
-
-        decoder.on('format', function(format) {
-            decoder.pipe(encoder);
-        });
-
-        var that = this;
-        this.streamTrack(track, function trackFinish(){
-            bot.log("Song finished");
-            that.streamTrack(track);
-        });
-
-        bot.app.get("/radio/stream.ogg", function getRadioStream(req, res){
-            bot.log("Socket opened");
-            clients.push(res);
-            req.socket.on('close', function socketClose(){
-               bot.log("Socket closed");
-                delete clients[clients.indexOf(res)];
-            });
-        });
+        //var track = "/home/peter/nsp/Non-stop Pop Interlude 1.mp3";
+        //
+        //
+        //encoder.on("data", function(data) {
+        //    clients.forEach(function(client){
+        //        client.write(data);
+        //    });
+        //});
+        //
+        //decoder.on('format', function(format) {
+        //    decoder.pipe(encoder);
+        //});
+        //
+        //var that = this;
+        //this.streamTrack(track, function trackFinish(){
+        //    bot.log("Song finished");
+        //    that.streamTrack(track);
+        //});
+        //
+        //bot.app.get("/radio/stream.ogg", function getRadioStream(req, res){
+        //    bot.log("Socket opened");
+        //    clients.push(res);
+        //    req.socket.on('close', function socketClose(){
+        //       bot.log("Socket closed");
+        //        delete clients[clients.indexOf(res)];
+        //    });
+        //});
     },
 
     streamTrack: function streamTrack(path, onEnd){
