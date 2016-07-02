@@ -110,9 +110,9 @@ function startBot(){
     async.series([
         loadConfig,
         saveConfig,
-        loadCommands,
-        mysqlInit,
         httpInit,
+        mysqlInit,
+        loadCommands,
         botInit,
         checkImportantDates
     ]);
@@ -560,8 +560,7 @@ function handleTopicUpdate(channelID){
 }
 
 process.on('uncaughtException', function uncaughtException(err){
-    bot.log(err);
-    console.log(err);
+    bot.log(err.stack);
 });
 
 startBot();
