@@ -33,7 +33,7 @@ var WS_CLOSE_CODES = {
     1012: "Service Restart",
     1013: "Try Again Later",
     1014: "RESERVED",
-    1015: "TLS Handshake failiure"
+    1015: "TLS Handshake failure"
 };
 
 var bot = {};
@@ -372,7 +372,7 @@ function mysqlInit(cb){
     bot.connection = mysql.createConnection(bot.config.database);
 
     bot.connection.on('error', function mysqlErrorEvent(err){
-        bot.log("MySQL Error: %s", err);
+        bot.log("MySQL Error: "+err);
         bot.log(err);
         setTimeout(mysqlInit, 3000);
     });
@@ -398,7 +398,7 @@ function mysqlInit(cb){
 
         });
     }catch(e){
-        bot.log("Exception conencting to MySQL: %s", e);
+        bot.log("Exception connecting to MySQL: "+e);
         setTimeout(mysqlInit, 3000);
     }
 }
@@ -467,7 +467,7 @@ function httpInit(cb){
 
 
         }else{
-            bot.log("Invalid Interactive Message request receieved.");
+            bot.log("Invalid Interactive Message request received.");
             res.send("Invalid request.");
         }
 

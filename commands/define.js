@@ -1,4 +1,4 @@
-//FIXME Find working disctionary
+//FIXME Find working dictionary
 var Dictionary = require('mw-dictionary');
 exports.command = {
 	name: "define",
