@@ -520,6 +520,16 @@ function handleAutoReplies(message, channelID){
             }
         }
     }
+    if(message.indexOf("ack ") > -1){ //ack test
+        var index = message.indexOf("ack ")+4; //4
+        var newBit = message.substring(index); //test
+        newBit = newBit.split(" ")[0]; //test
+        bot.sendMessage({
+            to: channelID,
+            message: "`syn "+newBit+"`"
+        })
+    }
+
     if(message.indexOf("whoop there it is") > -1){
         bot.sendMessage({
             to: channelID,
