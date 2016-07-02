@@ -212,7 +212,7 @@ exports.command = {
         }else{
             now = new Date();
         }
-        var emoji = ":clock"+(now.getHours() > 12 ? now.getHours()-12 : now.getHours());
+        var emoji = ":clock"+((now.getHours() === 0) ? 12 : (now.getHours() > 12 ? now.getHours()-12 : now.getHours()));
         if(now.getMinutes() >= 30)
             emoji+="30";
         emoji += ":";
