@@ -145,6 +145,16 @@ function loadConfig(cb){
         }
     });
 
+
+    fs.readFile("topic.dat", function readTopicFile(err, data){
+       if(err){
+           bot.log("Error loading topic index file: "+err);
+       } else{
+           bot.currentTopic = parseInt(data);
+           bot.log("Topic index loaded successfully ("+bot.currentTopic+")");
+       }
+    });
+
 }
 
 
