@@ -22,7 +22,7 @@ for(var i in autoDirs){
 }
 
 exports.command = {
-	name: "m",
+	name: "m-DEPRECATED",
 	desc: "Music controls",
 	usage: "m\n"+
     "**--SONG CONTROLS--**\n"+
