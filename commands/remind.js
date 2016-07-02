@@ -22,7 +22,7 @@ exports.command = {
 			}else{
 				var at = Date.now() + offset;
 				var thisIndex = outstandingReminders.length;
-				outstandingReminders.push({date: at, channel: channel, user: userID, message: rargs[2]})
+				outstandingReminders.push({date: at, channel: channel, user: userID, message: rargs[2]});
 				bot.sendMessage({to: channel, message: "Reminding you at "+new Date(at)});
 				schedule.scheduleJob(at, function triggerRuntimeReminder(){
 			  		bot.sendMessage({to: channel, message: "<@"+userID+">, you told me to remind you of this: \n	"+rargs[2]});

@@ -3,6 +3,7 @@ var http = require('http');
 var https = require('https');
 var client;
 var title = "";
+var ws;
 exports.command = {
 	name: "rlive",
 	desc: "Subscribe to reddit live threads",

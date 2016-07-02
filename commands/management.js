@@ -125,4 +125,4 @@ function uncache(moduleName, cb) {
             delete module.constructor._pathCache[cacheKey];
         }
     });
-};
+}

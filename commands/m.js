@@ -160,8 +160,7 @@ exports.command = {
                         });
 
                         response.on('end', function () {
-                            var rawQueue = str;
-                            var newQueue = JSON.parse(rawQueue);
+                            var newQueue = JSON.parse(str);
                             queue = queue.concat(newQueue);
                             bot.sendMessage({
                                 to: channel,

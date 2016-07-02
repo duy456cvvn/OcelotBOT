@@ -17,7 +17,7 @@ exports.command = {
 			}else{
 				var m = markov(3);
 				var parsedMessages = "";
-				for(i in messages){
+				for(var i in messages){
 					var message = messages[i];
 					if(message.author.username === args[1]){
 						parsedMessages += " "+message.content;
