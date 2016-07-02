@@ -520,7 +520,8 @@ function handleAutoReplies(message, channelID){
             }
         }
     }
-    if(message.indexOf("ack ") > -1){ //ack test
+    var ogIndex = message.indexOf("ack");
+    if(ogIndex > -1 && (ogIndex > 1 ? message.indexOf(" ") < ogIndex : true)){ //ack test
         var index = message.indexOf("ack ")+4; //4
         var newBit = message.substring(index); //test
         newBit = newBit.split(" ")[0]; //test
