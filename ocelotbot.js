@@ -66,7 +66,8 @@ bot.config = {
         commandsDir: "commands",
         mainChannel: "",
         logChannel: "",
-        proxyURL: ""
+        proxyURL: "",
+        translateKey: ""
     },
     petermon:{
         username: "",
@@ -89,7 +90,7 @@ bot.config = {
 };
 bot.currentTopic = 0;
 bot.topicCounter = 0;
-
+bot.lastCrash = new Date();
 
 
 function startBot(){
@@ -531,7 +532,7 @@ function handleAutoReplies(message, channelID){
         }
     }
     var ogIndex = message.indexOf("ack");
-    if(ogIndex > -1 && (ogIndex > 1 ? message.indexOf(" ") < ogIndex : true)){ //ack test
+    if(ogIndex > -1 && (ogIndex > 0 ? message.indexOf(" ack ") > -1 : true)){ //ack test
         var index = message.indexOf("ack ")+4; //4
         var newBit = message.substring(index); //test
         newBit = newBit.split(" ")[0]; //test
@@ -572,6 +573,7 @@ function handleTopicUpdate(channelID){
 
 process.on('uncaughtException', function uncaughtException(err){
     bot.log(err.stack);
+    bot.lastCrash = new Date();
 });
 
 startBot();
