@@ -243,7 +243,8 @@ function botInit(cb){
                 callback_id: callback,
                 color: colour,
                 attachment_type: "default",
-                actions: buttons
+                actions: buttons,
+                "mrkdwn_in": ["text"]
             }
         ],
             as_user: true
