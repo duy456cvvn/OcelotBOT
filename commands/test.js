@@ -5,7 +5,7 @@ exports.command = {
     onReady: function(bot){
         bot.registerInteractiveMessage("test", function(name, val, info){
             bot.sendMessage({
-                to: channel,
+                to: info.channel.id,
                 message: `:whey: Receieved callback response: \`${name}\`=\`${val}\``
             });
             return "";
