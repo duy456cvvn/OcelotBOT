@@ -8,6 +8,32 @@ exports.command = {
 	name: "serverinfo",
 	desc: "Get information about a source based multiplayer server",
 	usage: "serverinfo <server> [port]",
+    onReady: function(bot){
+        bot.registerInteractiveMessage("serverinfo", function(name, val, info){
+            var stuff = val.split(":");
+            var ip = stuff[0];
+            var port = stuff[1];
+            sq.open(ip, port ? port : 27015);
+            sq.getPlayers(function sourceQueryPlayers(err, players){
+               if(err){
+                   bot.web.chat.update(info.original_message.ts, info.channel.id, "Error: "+err);
+               } else{
+                   if(players.length === 0){
+                       bot.web.chat.update(info.original_message.ts, info.channel.id, "There's nobody online...");
+                   }else{
+                       var output = "*Online players:*\n ";
+                       for(var i in players){
+                             output+=players[i].name+"\n";
+                       }
+                       bot.web.chat.update(info.original_message.ts, info.channel.id, output);
+                   }
+
+               }
+
+                sq.close();
+            });
+        });
+    },
 	func: function(user, userID, channel, args, message, bot){
 		if(args.length < 2)return false;
 
@@ -59,11 +85,22 @@ exports.command = {
                             value: info.version,
                             short: true
                         }
+                    ],
+                    "callback_id": "serverinfo",
+                    actions: [
+                        {
+                            text: "View Players",
+                            name: "viewplayers",
+                            value: `${args[1]}:${args[2]}`,
+                            type: "button"
+                        }
                     ]
 				}]);
 
 
 			}
+
+            sq.close();
 
 		});
 
