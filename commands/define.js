@@ -180,7 +180,7 @@ exports.command = {
                             }
 
 
-                            bot.sendButtons(channel,`*${result.headword}* _${result.part_of_speech}_:\n>${result.senses[0].definition}`, "Some buttons", "define", "#1e1e1e", attachments);
+                            bot.sendButtons(channel,`*${result.headword}* _${result.part_of_speech}_:\n>${result.senses[0].definition}`, `*${result.headword}* _${result.part_of_speech}_:\n>${result.senses[0].definition}`, "define", "#1e1e1e", attachments);
                         }else{
                             bot.sendMessage({
                             	to: channel,
