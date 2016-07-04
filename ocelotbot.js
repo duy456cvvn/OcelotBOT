@@ -68,7 +68,8 @@ bot.config = {
         logChannel: "",
         logChannelEnabled: false,
         proxyURL: "",
-        translateKey: ""
+        translateKey: "",
+        weatherKey: ""
     },
     petermon:{
         username: "",
