@@ -66,6 +66,7 @@ bot.config = {
         commandsDir: "commands",
         mainChannel: "",
         logChannel: "",
+        logChannelEnabled: false,
         proxyURL: "",
         translateKey: ""
     },
@@ -96,8 +97,17 @@ bot.lastCrash = new Date();
 function startBot(){
     bot.log = function(message){
         var caller = caller_id.getData();
-        var file = caller.filePath.split("/");
-        console.log("["+file[file.length-1]+(caller.functionName ? "/"+caller.functionName+"] "+message : "] "+message));
+        var file = ["Nowhere"];
+        if(caller.filePath)
+            file = caller.filePath.split("/");
+        var output = "["+file[file.length-1]+(caller.functionName ? "/"+caller.functionName+"] "+message : "] "+message);
+        console.log(output);
+        if(bot.config.misc.logChannelEnabled && bot.rtm && bot.rtm.connected){
+            bot.sendMessage({
+                to: bot.config.misc.logChannel,
+                message: output
+            });
+        }
     };
 
     bot.interactiveMessages = {};
@@ -209,7 +219,7 @@ function botInit(cb){
 
             bot.rtm.sendMessage(data.message, data.to, function sendMessageResult(err, resp){
                 if(err){
-                    bot.log("Error sending message: "+JSON.stringify(err));
+                   console.log("Error sending message: "+JSON.stringify(err));
                 }else if(cb){cb(err, resp)}
             });
         }
