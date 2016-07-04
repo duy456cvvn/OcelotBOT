@@ -9,6 +9,7 @@
     "forever": "^0.15.2",
     "lame": "^1.2.4",
     "markov": "0.0.7",
+    "moment-timezone": "^0.5.4",
     "mw-dictionary": "0.0.4",
     "mysql": "^2.10.2",
     "node-ffprobe": "^1.2.2",
