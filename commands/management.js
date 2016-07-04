@@ -60,11 +60,13 @@ exports.command = {
                     bot.commands[newCommand.name] = newCommand;
                     if(newCommand.onReady)
                         newCommand.onReady(bot);
+
+                    bot.sendMessage({
+                        to: channel,
+                        message: "`Loaded command: " + newCommand.name+"`"
+                    });
                 });
-                bot.sendMessage({
-                    to: channel,
-                    message: "`Loaded command: " + newCommand.name+"`"
-                });
+
 
             }catch(e){
                 bot.sendMessage({
