@@ -18,18 +18,11 @@ exports.command = {
 
             if(args[2] === "set"){
                 if(args.length < 4)return false;
-                if(!bot.config[args[3]][args[4]]){
-                    bot.sendMessage({
-                        to: channel,
-                        message: "Specified config key doesn't exist."
-                    });
-                }else{
                     bot.sendMessage({
                         to: channel,
                         message: '`config.'+args[3]+"."+args[4]+" = "+args[5]+"`"
                     });
                     bot.config[args[3]][args[4]] = args[5];
-                }
             }else if(args[2] === "get") {
                 if (!bot.config[args[3]][args[4]]) {
                     bot.sendMessage({
