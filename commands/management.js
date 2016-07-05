@@ -36,17 +36,21 @@ exports.command = {
                     });
                 }
             }else if(args[2] === "save") {
-                bot.saveConfig();
-                bot.sendMessage({
-                    to: channel,
-                    message: "Saved config."
+                bot.saveConfig(function(){
+                    bot.sendMessage({
+                        to: channel,
+                        message: "Saved config."
+                    });
                 });
+
             }else if(args[2] === "load"){
-                bot.saveConfig();
-                bot.sendMessage({
-                    to: channel,
-                    message: "Reloaded config. (Commands with onReady events may not take update without restart)"
+                bot.loadConfig(function(){
+                    bot.sendMessage({
+                        to: channel,
+                        message: "Reloaded config. (Commands with onReady events may not take update without restart)"
+                    });
                 });
+
 
             }else{
                 return false;
