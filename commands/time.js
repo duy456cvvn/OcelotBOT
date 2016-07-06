@@ -12,6 +12,7 @@ exports.command = {
             now = timezone ? m.tz(timezone) : m,
             emoji = `:clock${now.format("h")}${(now.get("m") >= 30) ? "30" : ""}:`;
 
+            if(now.format("HH:mm") == "4:20")emoji = ":weed:";
         bot.sendMessage({
         	to: channel,
         	message: `${emoji} The time is *${now.format("HH:mm:ss YYYY-MM-DD z")}*`
