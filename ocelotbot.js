@@ -285,7 +285,7 @@ function botInit(cb){
     bot.updateTopic = function (channel) {
         bot.connection.query("SELECT `topic` FROM stevie.Topics WHERE `id` = ?;", [bot.currentTopic], function topicUpdateQuery(err, result) {
             if (err || !result[0] || !result[0].topic) {
-               // bot.currentTopic = 0;
+                bot.currentTopic++;
                 bot.sendMessage({
                     to: channel,
                     message: "Could not switch topic, best log this on producteev and pester @Peter until he fixes it: " + err
