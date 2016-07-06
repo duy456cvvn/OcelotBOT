@@ -10,10 +10,11 @@ var RtmClient       = require('@slack/client').RtmClient,
     mysql           = require('mysql'),
     simplebus       = require('simplebus'),
     https           = require('https'),
-    express         = require('express'),
-    bodyparser      = require('body-parser'),
     caller_id       = require('caller-id'),
     async           = require('async');
+
+
+
 
 var year = new Date().getFullYear();
 
@@ -37,6 +38,12 @@ var WS_CLOSE_CODES = {
 };
 
 var bot = {};
+
+//OcelotBOT Modules
+var interactiveMessages = require('./interactiveMessages.js')(bot);
+var database = require('./database.js')(bot);
+
+
 bot.config = {
     slack:{
         username: "",
@@ -113,17 +120,12 @@ function startBot(){
 
     bot.interactiveMessages = {};
 
-    bot.registerInteractiveMessage = function registerInteractiveMessage(callback_id, func){
-        bot.log("Registered interactive message for "+callback_id);
-        bot.interactiveMessages[callback_id] = func;
-    };
-
 
     async.series([
         loadConfig,
         saveConfig,
-        httpInit,
-        mysqlInit,
+        interactiveMessages.init,
+        database.init,
         loadCommands,
         botInit,
         checkImportantDates
@@ -184,12 +186,10 @@ function saveConfig(cb){
 
 function botInit(cb){
 
+    bot.log("Initialising...");
     bot.rtm = new RtmClient(bot.config.slack.token_b);
     bot.web = new WebClient(bot.config.slack.token_b);
     bot.web_p = new WebClient(bot.config.slack.token_p);
-
-
-
 
     bot.fireInteractiveMessage = function(callback_id, name, value){
         if(bot.interactiveMessages[callback_id]){
@@ -291,7 +291,7 @@ function botInit(cb){
                     message: "Could not switch topic, best log this on producteev and pester @Peter until he fixes it: " + err
                 });
             } else {
-                bot.log("Changing topic...");
+                bot.log("Changing topic to ID "+bot.currentTopic);
                 bot.web_p.channels.setTopic(channel, result[0].topic);
             }
             fs.writeFile(bot.config.topic.file, bot.currentTopic, function topicFileWriteError(err) {
@@ -381,40 +381,6 @@ function loadCommands(cb){
         cb();
 }
 
-function mysqlInit(cb){
-    bot.connection = mysql.createConnection(bot.config.database);
-
-    bot.connection.on('error', function mysqlErrorEvent(err){
-        bot.log("MySQL Error: "+err);
-        bot.log(err);
-        setTimeout(mysqlInit, 3000);
-    });
-
-    bot.connection.on('disconnected', function mysqlDisconnectEvent(){
-        bot.log("MySQL Disconnected");
-        setTimeout(mysqlInit, 3000);
-    });
-
-    try {
-        bot.connection.connect(function mySqlConnect(err) {
-            if (err){
-                bot.log('Error connecting: ' + err);
-                if(cb)
-                    cb();
-                setTimeout(mysqlInit, 3000);
-            }
-            else{
-                bot.log("Connected to MySQL");
-                if(cb)
-                    cb();
-            }
-
-        });
-    }catch(e){
-        bot.log("Exception connecting to MySQL: "+e);
-        setTimeout(mysqlInit, 3000);
-    }
-}
 
 function busInit(){
     bot.log("Creating message bus...");
@@ -425,73 +391,6 @@ function busInit(){
     });
 }
 
-function httpInit(cb){
-    bot.app = express();
-    bot.httpsServer = https.createServer({
-        key: fs.readFileSync(bot.config.slack.certs.key),
-        cert: fs.readFileSync(bot.config.slack.certs.cert)
-    }, bot.app).listen(3001, function httpServerInit(){
-        bot.log("HTTP Server opened on port 3001");
-        if(cb)
-            cb();
-    });
-
-    bot.app.use(express.static('static'));
-
-    bot.app.use(bodyparser.urlencoded());
-
-    bot.app.get('/slack/oauth', function getSlackOauth(req, res){
-        bot.web.oauth.access(bot.config.slack.clientId,bot.config.slack.clientSecret, req.query.code, function(err, data){
-            res.send(JSON.stringify(data));
-        });
-    });
-
-    bot.app.get('/slack/interactive', function getSlackEndpoint(req, res){
-        bot.log("Received GET Request to slack endpoint");
-    });
-
-    bot.app.post('/slack/interactive', function postSlackEndpoint(req, res){
-        if(req.body.payload){
-            var info = JSON.parse(req.body.payload);
-            if(info.token === bot.config.slack.payload_token){
-                if(bot.interactiveMessages[info.callback_id]) {
-                    for(var i in info.actions){
-                        if(info.actions.hasOwnProperty(i)){
-                            bot.log("Triggered interactive message callback");
-                            try {
-                                res.send(bot.interactiveMessages[info.callback_id](info.actions[i].name, info.actions[i].value, info));
-                            }catch(e){
-                                bot.log("Error during interactive message: "+e);
-                                res.send(e);
-                            }
-                        }
-                    }
-                }else{
-                    bot.sendMessage({
-                        to: bot.config.misc.mainChannel,
-                        message: "*WARNING:* Received interactive message with no callback registered: `"+info.callback_id+"`"
-                    });
-                    res.send("No callback registered.");
-                }
-            }else{
-                bot.log("Received interactive message with invalid payload token.");
-                res.send("Invalid payload token.")
-            }
-
-
-        }else{
-            bot.log("Invalid Interactive Message request received.");
-            res.send("Invalid request.");
-        }
-
-    });
-
-    bot.app.get('/', function(req, res){
-       res.send("Hello World!");
-    });
-
-
-}
 
 function checkImportantDates(cb){
     var date = new Date();

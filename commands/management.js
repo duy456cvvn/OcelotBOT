@@ -23,6 +23,7 @@ exports.command = {
                         message: '`config.'+args[3]+"."+args[4]+" = "+args[5]+"`"
                     });
                     bot.config[args[3]][args[4]] = args[5];
+                bot.log(user+" set "+ args[3] + "." + args[4]+" to "+args[5]);
             }else if(args[2] === "get") {
                 if (!bot.config[args[3]][args[4]]) {
                     bot.sendMessage({
@@ -36,7 +37,8 @@ exports.command = {
                     });
                 }
             }else if(args[2] === "save") {
-                bot.saveConfig(function(){
+                bot.saveConfig(function saveConfig(){
+                    bot.log("Configuration saved manually.");
                     bot.sendMessage({
                         to: channel,
                         message: "Saved config."
@@ -44,7 +46,8 @@ exports.command = {
                 });
 
             }else if(args[2] === "load"){
-                bot.loadConfig(function(){
+                bot.loadConfig(function loadConfig(){
+                    bot.log("Configuration loaded manually.");
                     bot.sendMessage({
                         to: channel,
                         message: "Reloaded config. (Commands with onReady events may not take update without restart)"
