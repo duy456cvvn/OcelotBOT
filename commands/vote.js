@@ -14,7 +14,6 @@ exports.command = {
     usage: "vote start opt1,opt2,opt3.../1/2/3../end",
     onReady: function(bot){
         bot.registerInteractiveMessage("vote", function(name, val, info){
-            console.log(info);
             if(!currentVoteStamp){
                 bot.sendMessage({
                 	to: info.channel.id,
@@ -34,7 +33,7 @@ exports.command = {
                 });
                 votes[vote]++;
                 totalVotes++;
-                generateUpdate(bot);
+                bot.web.chat.update(currentVoteStamp, currentVoteChannel, generateUpdate());
 
             }
 
@@ -57,7 +56,7 @@ exports.command = {
                 options = sub.split(",");
                 startedBy = userID;
                 var output = "*<@"+startedBy+"> started a vote:*\n";
-                 var buttons = [];
+                var buttons = [];
                 for(var i in options){
                     votes[i] = 0;
                     output+= (parseInt(i)+1)+". `"+options[i]+"`\n[\u2588";
@@ -69,6 +68,7 @@ exports.command = {
                     buttons.push(
                         {
                             name: i,
+                            type: "button",
                             text: options[i],
                             value: currentVoteStamp,
                             style: "primary"
@@ -76,9 +76,19 @@ exports.command = {
                     );
                     //[{"name": "a", "text": "Test", "value": "dick"}]
                 }
-                bot.sendMessage({
-                	to: channel,
-                	message: output
+
+                bot.web.chat.postMessage(channel, output, {attachments: [
+                    {
+                        text: "Vote Here:",
+                        fallback: "Vote using !vote <num>",
+                        callback_id: "vote",
+                        color: "#fefefe",
+                        attachment_type: "default",
+                        actions: buttons,
+                        "mrkdwn_in": ["text"]
+                    }
+                ],
+                    as_user: true
                 }, function(err, data){
                     if(!err){
                         currentVoteStamp = data.ts;
@@ -87,7 +97,6 @@ exports.command = {
                 });
 
 
-                bot.sendButtons(channel, "Vote Here:", "Vote using !vote <option>", "vote", "#ff0000", buttons);
            // }
         }else if(!isNaN(args[1])) {
             if (!currentVoteStamp) {
@@ -115,7 +124,7 @@ exports.command = {
                     });
                     votes[vote - 1]++;
                     totalVotes++;
-                    generateUpdate(bot);
+                    bot.web.chat.update(currentVoteStamp, currentVoteChannel, generateUpdate());
                 }
             }
         }else if(args[1] === "end" || args[1] === "finish" || args[1] === "stop"){
@@ -129,6 +138,7 @@ exports.command = {
                     	to: channel,
                     	message: "*Vote finished: `"+options[votes.indexOf(votes.sort()[0])]+"` wins!*"
                     });
+                    bot.web.chat.update(currentVoteStamp, currentVoteChannel, generateUpdate(), {attachments: []});
                     currentVoteStamp = null;
                 }
         }else{
@@ -139,7 +149,7 @@ exports.command = {
 };
 
 
-function generateUpdate(bot){
+function generateUpdate(){
     var output = "*<@"+startedBy+"> started a vote:*\n";
     for(var i in options){
         output+= (parseInt(i)+1)+". `"+options[i]+"`\n";
@@ -147,7 +157,7 @@ function generateUpdate(bot){
         output += "("+votes[i]+"/"+totalVotes+")\n";
     }
 
-    bot.web.chat.update(currentVoteStamp, currentVoteChannel, output);
+    return output;
 }
 
 
