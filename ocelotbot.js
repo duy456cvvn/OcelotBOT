@@ -130,7 +130,16 @@ function startBot(){
         database.init,
         commands.init,
         botInit,
-        importantDates.init
+        importantDates.init,
+        function(cb){
+            if(bot.failedModules > 0){
+                bot.sendMessage({
+                    to: bot.config.misc.mainChannel,
+                    message: "WARNING: *"+bot.failedModules+"* modules failed to load. Consult the log for more details."
+                });
+            }
+            cb();
+        }
     ]);
 
 
@@ -277,12 +286,6 @@ function botInit(cb){
     bot.log("Waiting for bot to start...");
     bot.rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, function rtmAuthEvent(data){
         bot.log("RTM Client authenticated.");
-        if(bot.failedModules > 0){
-            bot.sendMessage({
-            	to: bot.config.misc.mainChannel,
-            	message: "WARNING: *"+bot.failedModules+"* modules failed to load. Consult the log for more details."
-            });
-        }
         cb();
     });
 
