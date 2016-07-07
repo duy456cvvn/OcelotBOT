@@ -44,6 +44,7 @@ exports.command = {
     "clear - **Clears the entire queue.**\n"+
     "rm <index> - **Removes the song at the index from the queue.**\n",
     onReady: function(bot){
+        return;
         bot.joinVoiceChannel(bot.nspChannel, function(){
             bot.log("Joined NSP");
         });
@@ -58,6 +59,7 @@ exports.command = {
 
     },
 	func: function(user, userID, channel, args, message, bot){
+        return;
 		if(args.length < 2)return false;
 		if(args[1] === "q"){
 			if(args.length < 3)return false;
