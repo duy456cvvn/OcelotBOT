@@ -58,28 +58,52 @@ exports.command = {
             }else{
                 return false;
             }
-        }else if(args[1] === "add"){
+        }else if(args[1] === "add") {
             try {
-                var location = './'+args[2];
+                var location = './' + args[2];
                 var newCommand;
-                uncache(location, function(){
+                uncache(location, function () {
                     newCommand = require(location).command;
                     bot.commands[newCommand.name] = newCommand;
-                    if(newCommand.onReady)
+                    if (newCommand.onReady)
                         newCommand.onReady(bot);
 
                     bot.sendMessage({
                         to: channel,
-                        message: "`Loaded command: " + newCommand.name+"`"
+                        message: "`Loaded command: " + newCommand.name + "`"
                     });
                 });
 
 
-            }catch(e){
+            } catch (e) {
                 bot.sendMessage({
                     to: channel,
-                    message: "`Error loading module "+args[2]+" - "+e+"`"
+                    message: "`Error loading module " + args[2] + " - " + e + "`"
                 });
+            }
+        }else if(args[1] === "module"){
+            if(args.length < 3){
+                bot.sendMessage({
+                	to: channel,
+                	message: "`mgt module list/reload/remove`"
+                });
+                return true;
+            }
+            if(args[3] === "list"){
+                var output = "*INTERACTIVE MESSAGE HANDLERS:*\n";
+                for(var intID in bot.interactiveMessages){
+                    output+= intID+"\n"
+                }
+                output+="*MESSAGE HANDLERS:*\n";
+                for(var msgID in bot.messageHandlers){
+                    output+= msgID+"\n"
+                }
+                bot.sendMessage({
+                	to: channel,
+                	message: output
+                });
+            }else if(args[3] === "remove"){
+
             }
         }else{
             return false;
