@@ -39,60 +39,6 @@ var WS_CLOSE_CODES = {
 
 var bot = {};
 
-
-bot.config = {
-    slack:{
-        username: "",
-        token_b: "",
-        token_p: "",
-        webhook: "",
-        payload_token: "",
-        clientId: "",
-        clientSecret: "",
-        certs: {
-            key: "",
-            cert: ""
-        }
-    },
-    database: {
-        host: "",
-        port: 3306,
-        user: "",
-        password: ""
-    },
-    topic: {
-        threshold: 100,
-        file: "topic.dat"
-    },
-    misc:{
-        commandPrefix: "!",
-        commandsDir: "commands",
-        mainChannel: "",
-        logChannel: "",
-        logChannelEnabled: false,
-        proxyURL: "",
-        translateKey: "",
-        weatherKey: ""
-    },
-    petermon:{
-        username: "",
-        password: "",
-        url: ""
-    },
-    fabric: {
-        email: "",
-        password: ""
-    },
-    importantDates:{
-        "20/1": "Happy Birthday Steve! 20/1/2014-16/8/2014 (%2014 years ago.)",
-        "9/2": "Happy Birthday me! 9/2/2016-FOREVER (%2016 years ago.) Also Happy Birthday Peter!",
-        "29/5": "Happy Birthday OcelotBOT 1 29/5/2015-9/2/2016 (%2015 years ago.)",
-        "22/7": "Happy Birthday Stevie! 22/7/2014-2/5/2015 (%2014 years ago.)",
-        "31/8": "Happy Georgia got fingered day! 31/8/2014 (%2014 years ago.)",
-        "7/9": "Happy Birthday Alex!",
-        "11/9": "Happy 9/11 guys"
-    }
-};
 bot.messageHandlers = {};
 bot.lastCrash = new Date();
 
@@ -102,6 +48,7 @@ var database = require('./database.js')(bot);
 var commands = require('./commands.js')(bot);
 var autoReplies = require('./autoReplies.js')(bot);
 var importantDates = require('./importantDates.js')(bot);
+var config = require('./config.js')(bot);
 
 
 function startBot(){
@@ -129,8 +76,7 @@ function startBot(){
     };
 
     async.series([
-        loadConfig,
-        saveConfig,
+        config.init,
         interactiveMessages.init,
         database.init,
         commands.init,
@@ -140,46 +86,6 @@ function startBot(){
     ]);
 
 
-}
-
-function loadConfig(cb){
-    bot.log("Loading configuration file...");
-    fs.readFile("config.json", function readConfigFile(err, data){
-        if(err){
-            bot.log("Could not load configuration file: "+err);
-        }else{
-            try {
-                bot.config = JSON.parse(data);
-                bot.log("Configuration loaded successfully");
-                //var newConfig = JSON.parse(data);
-                //bot.log(newConfig);
-                //for(var key in Object.keys(bot.config)){
-                //    if(newConfig[key]){
-                //        bot.log(key+" = "+newConfig[key]);
-                //        bot.config[key] = newConfig[key];
-                //    }
-                //}
-                cb();
-            }catch(e){
-                bot.log("Config parse error: "+e);
-                cb();
-            }
-        }
-    });
-
-}
-
-
-function saveConfig(cb){
-    fs.writeFile("config.json", JSON.stringify(bot.config, null, "  "), function writeConfigFile(err){
-        if(err){
-            bot.log("Error writing configuration file: "+err);
-            cb();
-        }else{
-            bot.log("Configuration saved successfully.");
-            cb();
-        }
-    });
 }
 
 function botInit(cb){
@@ -265,9 +171,6 @@ function botInit(cb){
     };
 
 
-    bot.saveConfig = saveConfig;
-    bot.loadConfig = loadConfig;
-
 
     bot.rtm.start();
     bot.log("Waiting for bot to start...");
@@ -325,7 +228,6 @@ function botInit(cb){
     });
 }
 
-
 function busInit(){
     bot.log("Creating message bus...");
     bot.bus = simplebus.createBus(1000);
@@ -334,8 +236,6 @@ function busInit(){
        bot.log("Received message: "+msg);
     });
 }
-
-
 
 
 process.on('uncaughtException', function uncaughtException(err){
