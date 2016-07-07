@@ -280,7 +280,7 @@ function botInit(cb){
         cb();
     });
 
-    bot.rtm.on(CLIENT_EVENTS.RTM.WS_OPENED, function rtmOpenEvent(data){
+    bot.rtm.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, function rtmOpenEvent(data){
         if(bot.failedModules > 0){
             bot.sendMessage({
                 to: bot.config.misc.mainChannel,

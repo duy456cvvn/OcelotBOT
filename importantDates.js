@@ -5,7 +5,7 @@ var CLIENT_EVENTS   = require('@slack/client').CLIENT_EVENTS;
 module.exports = function(bot){
     return{
         init: function checkImportantDates(cb){
-            bot.rtm.on(CLIENT_EVENTS.RTM.WS_OPENED, function rtmOpenEvent(data){
+            bot.rtm.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, function rtmOpenEvent(data){
                 var date = new Date();
                 if(bot.config.importantDates[date.getDate()+"/"+date.getMonth()]){
                     bot.sendMessage({
