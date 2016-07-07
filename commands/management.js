@@ -88,8 +88,8 @@ exports.command = {
                 	message: "`mgt module list/reload/remove`"
                 });
                 return true;
-            }
-            if(args[3] === "list"){
+            }else
+            if(args[2] === "list"){
                 var output = "*INTERACTIVE MESSAGE HANDLERS:*\n";
                 for(var intID in bot.interactiveMessages){
                     output+= intID+"\n"
@@ -102,8 +102,32 @@ exports.command = {
                 	to: channel,
                 	message: output
                 });
-            }else if(args[3] === "remove"){
-
+            }else if(args[2] === "remove"){
+                if(!args[3] || !args[4]){
+                    bot.sendMessage({
+                        to: channel,
+                        message: "`mgt module remove interactiveMessages/messageHandler <name>`"
+                    });
+                }else if(bot[args[3]]){
+                    if(bot[args[3]][args[4]]){
+                        delete bot[args[3]][args[4]];
+                        bot.sendMessage({
+                        	to: channel,
+                        	message: "Removed."
+                        });
+                        bot.log(userID+" removed "+args[3]+"."+args[4]);
+                    }else{
+                        bot.sendMessage({
+                            to: channel,
+                            message: "No such property."
+                        });
+                    }
+                }else{
+                    bot.sendMessage({
+                        to: channel,
+                        message: "No such register."
+                    });
+                }
             }
         }else{
             return false;
