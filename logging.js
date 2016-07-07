@@ -23,15 +23,20 @@ module.exports = function logging(bot){
                 }
             });
 
-            bot.log(JSON.stringify(userList));
 
             bot.registerMessageHandler("logging", function logMessages(message, channelID, user, userID){
-                var messageObj = {channel: channelID, user: userList[userID], message: message, time: new Date().getTime()};
-                r.db('ocelotbot').table('messages').insert(messageObj).run(bot.rconnection, function logMessageQuery(err){
-                    if(err){
-                        bot.log("Error logging message: "+err);
-                    }
-                })
+                if(userID){
+                    var messageObj = {channel: channelID, user: userList[userID] ? userList[userID]  : userID , message: message, time: new Date().getTime()};
+                    r.db('ocelotbot').table('messages').insert(messageObj).run(bot.rconnection, function logMessageQuery(err){
+                        if(err){
+                            bot.log("Error logging message: "+err);
+                        }
+
+                        if(!userList[userID]){
+                            bot.log("WARNING: "+userID+" has no attached username. ("+message+")");
+                        }
+                    })
+                }
             });
         },
 
