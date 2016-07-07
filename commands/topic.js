@@ -3,6 +3,9 @@ exports.command = {
 	desc: "Add a *hilarious* comment from one of your good buddies to the topic.",
 	usage: "topic [<message> *or* <username>] *or* [up] [down] [set <index>]",
 	onReady: function(bot){
+        bot.currentTopic = 0;
+        bot.topicCounter = 0;
+
 		bot.incrementTopic = function (channel) {
 			bot.currentTopic++;
 			bot.updateTopic(channel);
@@ -39,6 +42,16 @@ exports.command = {
 			});
 
 		};
+
+
+        bot.messageHandlers.push(function topicUpdate(message, channelID, user, userID){
+            bot.topicCounter++;
+
+            if(bot.topicCounter > bot.config.topic.threshold){
+                bot.incrementTopic(channelID);
+                bot.topicCounter = 0;
+            }
+        });
 	},
 	func: function(user, userID, channel, args, message, bot){
 		var index = args.length < 2 ? 1 : parseInt(args[1]);
