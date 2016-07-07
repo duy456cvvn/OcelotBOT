@@ -93,7 +93,7 @@ bot.config = {
         "11/9": "Happy 9/11 guys"
     }
 };
-bot.messageHandlers = [];
+bot.messageHandlers = {};
 bot.lastCrash = new Date();
 
 //OcelotBOT Modules
@@ -123,6 +123,11 @@ function startBot(){
     bot.interactiveMessages = {};
 
 
+    bot.registerMessageHandler = function registerMessageHandler(name, func){
+        bot.log((bot.messageHandlers[name] ? "Overwritten" : "Registered") + " message handler "+name);
+        bot.messageHandlers[name] = func;
+    };
+
     async.series([
         loadConfig,
         saveConfig,
@@ -130,7 +135,8 @@ function startBot(){
         database.init,
         commands.init,
         botInit,
-        importantDates.init
+        importantDates.init,
+        autoReplies.init
     ]);
 
 

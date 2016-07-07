@@ -54,7 +54,7 @@ exports.command = {
 		};
 
 
-        bot.messageHandlers.push(function topicUpdate(message, channelID, user, userID){
+        bot.registerMessageHandler("topic", function topicUpdate(message, channelID){
             bot.topicCounter++;
 
             if(bot.topicCounter > bot.config.topic.threshold){
@@ -62,6 +62,8 @@ exports.command = {
                 bot.topicCounter = 0;
             }
         });
+
+
 	},
 	func: function(user, userID, channel, args, message, bot){
 		var index = args.length < 2 ? 1 : parseInt(args[1]);

@@ -31,7 +31,7 @@ module.exports = function(bot){
                 }
             }
 
-            bot.messageHandlers.push(function handleCommand(message, channelID, user, userID){
+            bot.registerMessageHandler("command", function handleCommand(message, channelID, user, userID){
                 if (message.startsWith(bot.config.misc.commandPrefix)) {
                     var args = message.split(" ");
                     var command = args[0].replace(bot.config.misc.commandPrefix, "").toLowerCase();
