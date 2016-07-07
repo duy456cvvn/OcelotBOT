@@ -266,42 +266,6 @@ function botInit(cb){
           bot.web.chat.postMessage(channel, text, {attachments: attachments}, cb);
     };
 
-    bot.incrementTopic = function (channel) {
-        bot.currentTopic++;
-        bot.updateTopic(channel);
-    };
-
-    bot.decrementTopic = function (channel) {
-        if (bot.currentTopic > 0) {
-            bot.currentTopic--;
-            bot.updateTopic(channel);
-        }
-    };
-
-    bot.setTopic = function (index) {
-        bot.currentTopic = index;
-    };
-
-    bot.updateTopic = function (channel) {
-        bot.connection.query("SELECT `topic` FROM stevie.Topics WHERE `id` = ?;", [bot.currentTopic], function topicUpdateQuery(err, result) {
-            if (err || !result[0] || !result[0].topic) {
-                bot.currentTopic++;
-                bot.sendMessage({
-                    to: channel,
-                    message: "Could not switch topic, best log this on producteev and pester @Peter until he fixes it: " + err
-                });
-            } else {
-                bot.log("Changing topic to ID "+bot.currentTopic);
-                bot.web_p.channels.setTopic(channel, result[0].topic);
-            }
-            fs.writeFile(bot.config.topic.file, bot.currentTopic, function topicFileWriteError(err) {
-                if (err) {
-                    bot.log("Could not save topic! " + err);
-                }
-            });
-        });
-
-    };
 
     bot.saveConfig = saveConfig;
     bot.loadConfig = loadConfig;
