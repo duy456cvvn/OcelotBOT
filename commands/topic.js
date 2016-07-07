@@ -1,3 +1,4 @@
+var fs = require('fs');
 exports.command = {
 	name: "topic",
 	desc: "Add a *hilarious* comment from one of your good buddies to the topic.",
@@ -5,6 +6,15 @@ exports.command = {
 	onReady: function(bot){
         bot.currentTopic = 0;
         bot.topicCounter = 0;
+
+        fs.readFile("topic.dat", function readTopicFile(err, data){
+            if(err){
+                bot.log("Error loading topic index file: "+err);
+            } else{
+                bot.currentTopic = parseInt(data);
+                bot.log("Topic index loaded successfully ("+bot.currentTopic+")");
+            }
+        });
 
 		bot.incrementTopic = function (channel) {
 			bot.currentTopic++;
