@@ -49,7 +49,7 @@ var commands = require('./commands.js')(bot);
 var autoReplies = require('./autoReplies.js')(bot);
 var importantDates = require('./importantDates.js')(bot);
 var config = require('./config.js')(bot);
-
+var logging = require('./logging.js')(bot);
 
 function startBot(){
     bot.log = function(message){
@@ -81,6 +81,7 @@ function startBot(){
         database.init,
         commands.init,
         botInit,
+        logging.init,
         importantDates.init,
         autoReplies.init
     ]);

@@ -2,10 +2,20 @@
  * Created by Peter on 06/07/2016.
  */
 var mysql = require('mysql');
-
+var rethinkdb = require('rethinkdb');
 module.exports = function database(bot){
     return {
         init: function databaseInit(cb) {
+            rethinkdb.connect(bot.config.rethinkdb,
+            function rethinkDbConnect(err, connection){
+                if(err){
+                    bot.log("Error connecting to rethinkdb: "+err);
+                }else{
+                    bot.log("Connected to rethinkdb");
+                    bot.rconnection = connection;
+                }
+            });
+
             bot.connection = mysql.createConnection(bot.config.database);
 
             bot.connection.on('error', function mysqlErrorEvent(err) {
@@ -38,6 +48,7 @@ module.exports = function database(bot){
                 bot.log("Exception connecting to MySQL: " + e);
                 setTimeout(mysqlInit, 3000);
             }
+
         }
     }
 };

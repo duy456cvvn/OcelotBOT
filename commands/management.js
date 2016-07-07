@@ -62,7 +62,7 @@ exports.command = {
             try {
                 var location = './' + args[2];
                 var newCommand;
-                uncache(location, function () {
+                require.uncache(location, function () {
                     newCommand = require(location).command;
                     bot.commands[newCommand.name] = newCommand;
                     if (newCommand.onReady)
@@ -159,7 +159,7 @@ require.searchCache = function (moduleName, callback) {
     }
 };
 
-function uncache(moduleName, cb) {
+require.uncache = function uncache(moduleName, cb) {
     // Run over the cache looking for the files
     // loaded by the specified module name
     require.searchCache(moduleName, function (mod) {

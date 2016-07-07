@@ -1,56 +1,32 @@
 var fs = require('fs');
+var r = require('rethinkdb');
+var async = require("async");
 exports.command = {
 	name: "topic",
 	desc: "Add a *hilarious* comment from one of your good buddies to the topic.",
-	usage: "topic [<message> *or* <username>] *or* [up] [down] [set <index>]",
+	usage: "topic [<message> *or* <username>] *or* next/set <id>",
 	onReady: function(bot){
-        bot.currentTopic = 0;
         bot.topicCounter = 0;
-
-        fs.readFile("topic.dat", function readTopicFile(err, data){
-            if(err){
-                bot.log("Error loading topic index file: "+err);
-            } else{
-                bot.currentTopic = parseInt(data);
-                bot.log("Topic index loaded successfully ("+bot.currentTopic+")");
-            }
-        });
-
-		bot.incrementTopic = function (channel) {
-			bot.currentTopic++;
-			bot.updateTopic(channel);
-		};
-
-		bot.decrementTopic = function (channel) {
-			if (bot.currentTopic > 0) {
-				bot.currentTopic--;
-				bot.updateTopic(channel);
-			}
-		};
-
-		bot.setTopic = function (index) {
-			bot.currentTopic = index;
-		};
+        bot.currentTopic = "";
+        bot.lastTopic = "";
 
 		bot.updateTopic = function (channel) {
-			bot.connection.query("SELECT `topic` FROM stevie.Topics WHERE `id` = ?;", [bot.currentTopic], function topicUpdateQuery(err, result) {
-				if (err || !result[0] || !result[0].topic) {
-					bot.currentTopic++;
-					bot.sendMessage({
-						to: channel,
-						message: "Could not switch topic, best log this on producteev and pester @Peter until he fixes it: " + err
-					});
-				} else {
-					bot.log("Changing topic to ID "+bot.currentTopic);
-					bot.web_p.channels.setTopic(channel, result[0].topic);
-				}
-				fs.writeFile(bot.config.topic.file, bot.currentTopic, function topicFileWriteError(err) {
-					if (err) {
-						bot.log("Could not save topic! " + err);
-					}
-				});
-			});
-
+            r.db("ocelotbot").table("topics").run(bot.rconnection, function topicUpdateQuery(err, cursor){
+                if(err){
+                    bot.log("Error getting topic list: "+err);
+                }else{
+                    cursor.toArray(function cursorToArray(err, result){
+                        if(err){
+                            bot.log("Error converting cursor to array: "+err);
+                        }else{
+                            var newTopic = result[parseInt(Math.random() * result.length)];
+                            bot.currentTopic = newTopic.id;
+                            bot.log("Changing topic to ID "+newTopic.id);
+                            bot.web_p.channels.setTopic(channel, `<${newTopic.username}> ${newTopic.topic}`);
+                        }
+                    });
+                }
+            });
 		};
 
 
@@ -58,7 +34,7 @@ exports.command = {
             bot.topicCounter++;
 
             if(bot.topicCounter > bot.config.topic.threshold){
-                bot.incrementTopic(channelID);
+                bot.updateTopic(channelID);
                 bot.topicCounter = 0;
             }
         });
@@ -70,25 +46,94 @@ exports.command = {
 		bot.log("Index: "+index);
 		if(isNaN(index)){
 			if(args[1] === "set"){
-				if(args.length < 3){
-					return false;
-				}
+				if(args.length < 3)return false;
 
-				var index = parseInt(args[2]);
-				if(isNaN(index)){
-					return false;
-				}
+				var index = args[2];
+                r.db("ocelotbot").table("topics").get(index).run(bot.rconnection, function topicUpdateQuery(err, newTopic){
+                    if(err){
+                        bot.sendMessage({
+                        	to: channel,
+                        	message: "Error getting topic list: "+err
+                        });
+                    }else{
+                        if(newTopic){
+                            bot.currentTopic = newTopic.id;
+                            bot.log("Changing topic to ID "+newTopic.id);
+                            bot.web_p.channels.setTopic(channel, `<${newTopic.username}> ${newTopic.topic}`);
+                        }else{
+                            bot.sendMessage({
+                            	to: channel,
+                            	message: "No topic with that ID found"
+                            });
+                        }
+                    }
+                });
+			}else if(args[1] === "next") {
+                bot.updateTopic(channel);
+            }else if(args[1] === "count") {
+                r.db("ocelotbot").table("topics").getField("username").distinct().run(bot.rconnection, function userCountQuery(err, result) {
+                    var out = "Topic counts by username:\n";
+                    async.each(result, function (val, cb) {
+                        r.db('ocelotbot').table('topics').filter({username: val}).count().run(bot.rconnection, function getCountForUser(err, count) {
+                            if (err) {
+                                out += val + ": *ERROR* " + err + "\n";
+                            } else {
+                                out += "*" + val + "*: " + count + "\n"
+                            }
+                            cb();
+                        });
+                    }, function (err) {
+                        if (err) {
+                            bot.sendMessage({
+                                to: channel,
+                                message: "Error: " + err
+                            });
+                        } else {
+                            bot.sendMessage({
+                                to: channel,
+                                message: out
+                            });
+                        }
+                    });
+                });
+            }else if(args[1] === "removecurrent"){
+                if(bot.currentTopic !== "") {
+                    r.db("ocelotbot").table("topics").get(bot.currentTopic).delete({returnChanges: true}).run(bot.rconnection, function topicUpdateQuery(err, result) {
+                        if (err) {
+                            bot.sendMessage({
+                                to: channel,
+                                message: "Error deleting topic: " + err
+                            });
+                        } else {
+                            var oldTopic = result.changes[0].old_val;
+                            bot.sendMessage({
+                                to: channel,
+                                message: "Removed *<"+oldTopic.username+"> "+oldTopic.topic+"* from the list of topics."
+                            });
+                        }
+                    });
+                }else{
+                    bot.sendMessage({
+                    	to: channel,
+                    	message: "Cannot delete topic that was set before restart"
+                    });
+                }
+            }else if(args[1] === "removelast"){
+                r.db("ocelotbot").table("topics").get(bot.lastTopic).delete({returnChanges: true}).run(bot.rconnection, function topicUpdateQuery(err, result) {
+                    if (err) {
+                        bot.sendMessage({
+                            to: channel,
+                            message: "Error deleting topic: " + err
+                        });
+                    } else {
+                        var oldTopic = result.changes[0].old_val;
 
-				bot.setTopic(index);
-				bot.updateTopic(channel);
-			}else if(args[1] === "up"){
-				bot.incrementTopic(channel);
-			}else if(args[1] === "down"){
-				if(bot.currentTopic === 0){
-					bot.sendMessage({to: channel, message: "You've hit rock bottom."});
-				}else{
-					bot.decrementTopic(channel);
-				}
+                        bot.sendMessage({
+                            to: channel,
+                            message: "Removed *<"+oldTopic.username+"> "+oldTopic.topic+"* from the list of topics."
+                        });
+                    }
+                });
 			}else{
 				return false;
 			}
@@ -117,12 +162,18 @@ exports.command = {
                     if(err){
                         bot.sendMessage({to: channel, message: "Error adding topic:\n "+err});
                     }else{
-                        var thisMessage = "<"+user.user.name+"> "+messages[index].text;
-                        bot.connection.query("INSERT INTO `stevie`.`Topics` (`topic`) VALUES (?)", [thisMessage], function(err, result){
+                        r.db("ocelotbot").table("topics").insert({username: user.user.name, topic: messages[index].text}, {returnChanges: true}).run(bot.rconnection, function(err, result){
                             if(err){
-                                bot.sendMessage({to: channel, message: "Error adding topic:\n "+err.message});
+                                bot.sendMessage({
+                                    to: channel,
+                                    message: "Error adding topic: "+err
+                                });
                             }else{
-                                bot.sendMessage({to: channel, message: "Added *"+thisMessage+"* to the list of topics."});
+                                bot.lastTopic = result.changes[0].new_val.id;
+                                bot.sendMessage({
+                                    to: channel,
+                                    message: "Added *<"+user.user.name+"> "+messages[index].text+"* to the list of topics."
+                                });
                             }
                         });
                     }
