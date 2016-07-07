@@ -275,6 +275,12 @@ function botInit(cb){
     bot.log("Waiting for bot to start...");
     bot.rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, function rtmAuthEvent(data){
         bot.log("RTM Client authenticated.");
+        if(bot.failedModules > 0){
+            bot.sendMessage({
+            	to: bot.config.misc.mainChannel,
+            	message: "WARNING: *"+bot.failedModules+"* modules failed to load. Consult the log for more details."
+            });
+        }
         cb();
     });
 
@@ -303,7 +309,6 @@ function botInit(cb){
         bot.log(data);
     });
 
-
     bot.rtm.on(RTM_EVENTS.MESSAGE, function (messageData) {
         var message = messageData.text;
         var channelID = messageData.channel;
@@ -319,6 +324,7 @@ function botInit(cb){
 
 function loadCommands(cb){
     bot.commands = {};
+    bot.failedModules = 0;
     bot.log("Loading commands...");
     //Reads the /commands directory, and loads exports.command of each file
     var files = fs.readdirSync(bot.config.misc.commandsDir);
@@ -337,6 +343,7 @@ function loadCommands(cb){
                 }catch(e){
                     bot.log("Error loading module "+files[i]+" - "+e);
                     bot.log(e);
+                    bot.failedModules++;
                 }
             }
         }
