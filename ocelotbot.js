@@ -39,10 +39,6 @@ var WS_CLOSE_CODES = {
 
 var bot = {};
 
-//OcelotBOT Modules
-var interactiveMessages = require('./interactiveMessages.js')(bot);
-var database = require('./database.js')(bot);
-
 
 bot.config = {
     slack:{
@@ -97,9 +93,15 @@ bot.config = {
         "11/9": "Happy 9/11 guys"
     }
 };
-bot.currentTopic = 0;
-bot.topicCounter = 0;
+bot.messageHandlers = [];
 bot.lastCrash = new Date();
+
+//OcelotBOT Modules
+var interactiveMessages = require('./interactiveMessages.js')(bot);
+var database = require('./database.js')(bot);
+var commands = require('./commands.js')(bot);
+var autoReplies = require('./autoReplies.js')(bot);
+var importantDates = require('./importantDates.js')(bot);
 
 
 function startBot(){
@@ -126,9 +128,9 @@ function startBot(){
         saveConfig,
         interactiveMessages.init,
         database.init,
-        loadCommands,
+        commands.init,
         botInit,
-        checkImportantDates
+        importantDates.init
     ]);
 
 
@@ -315,41 +317,13 @@ function botInit(cb){
         var user = "<"+messageData.user+">";
         var userID = messageData.user;
         if(message) {
-            handleAutoReplies(message, channelID);
-            handleCommand(message, channelID, user, userID);
-        }
-        handleTopicUpdate(channelID);
-    });
-}
-
-function loadCommands(cb){
-    bot.commands = {};
-    bot.failedModules = 0;
-    bot.log("Loading commands...");
-    //Reads the /commands directory, and loads exports.command of each file
-    var files = fs.readdirSync(bot.config.misc.commandsDir);
-    for (var i in files) {
-        if(files.hasOwnProperty(i)){
-            if(!fs.lstatSync('./'+bot.config.misc.commandsDir+'/'+files[i]).isDirectory()){
-                try {
-                    var newCommand = require('./' + bot.config.misc.commandsDir + '/' + files[i]).command;
-                    bot.log("Loaded command: " + newCommand.name);
-                    bot.commands[newCommand.name] = newCommand;
-
-                    if(newCommand.onReady){
-                        bot.log("Performed start-up tasks for "+newCommand.name);
-                        newCommand.onReady(bot);
-                    }
-                }catch(e){
-                    bot.log("Error loading module "+files[i]+" - "+e);
-                    bot.log(e);
-                    bot.failedModules++;
+            for(var i in bot.messageHandlers){
+                if(bot.messageHandlers.hasOwnProperty(i)){
+                    bot.messageHandlers[i](message, channelID, user, userID);
                 }
             }
         }
-    }
-    if(cb)
-        cb();
+    });
 }
 
 
@@ -363,95 +337,7 @@ function busInit(){
 }
 
 
-function checkImportantDates(cb){
-    var date = new Date();
-    if(bot.config.importantDates[date.getDate()+"/"+date.getMonth()]){
-        bot.sendMessage({
-            to: bot.config.misc.mainChannel,
-            message: bot.config.importantDates[date.getDate()+"/"+date.getMonth()]
-        });
-    }else{
-        bot.log("No important dates today.");
-    }
-    setTimeout(checkImportantDates,  8.64e7); //24 hours
-    if(cb)
-        cb();
-}
 
-function handleCommand(message, channelID, user, userID){
-    if (message.startsWith(bot.config.misc.commandPrefix)) {
-        var args = message.split(" ");
-        var command = args[0].replace(bot.config.misc.commandPrefix, "").toLowerCase();
-        if (bot.commands[command]) {
-            try {
-                if (!bot.commands[command].func(user, userID, channelID, args, message, bot)) {
-                    bot.sendMessage({
-                        to: channelID,
-                        message: "*Invalid Usage:*\n!" + bot.commands[command].usage
-                    });
-                }
-            } catch (e) {
-                bot.sendMessage({to: channelID, message: "Error performing command: " + e.toString()});
-            }
-        }
-    }
-}
-
-function handleAutoReplies(message, channelID){
-    message = message.toLowerCase();
-    if(message.indexOf("ass") > -1 && message.toLowerCase().indexOf("-") === -1){
-        var words = message.toLowerCase().split(" ");
-        for(var i in words){
-            if(words.hasOwnProperty(i)){
-                if(words[i] === "ass" && words.length > parseInt(i)+1){
-                    bot.sendMessage({
-                        to: channelID,
-                        message: "*ass-"+words[parseInt(i)+1]+"*"
-                    });
-                    break;
-                }
-            }
-        }
-    }
-    var ogIndex = message.indexOf("ack");
-    if(ogIndex > -1 && (ogIndex > 0 ? message.indexOf(" ack ") > -1 : true)){ //ack test
-        var index = message.indexOf("ack ")+4; //4
-        var newBit = message.substring(index); //test
-        newBit = newBit.split(" ")[0]; //test
-        bot.sendMessage({
-            to: channelID,
-            message: "`syn "+newBit+"`"
-        })
-    }
-
-    if(message.indexOf("whoop there it is") > -1){
-        bot.sendMessage({
-            to: channelID,
-            message: "_*WHO THE FUCK SAID THAT?*_"
-        });
-    }
-    if (message === "test") {
-        bot.sendMessage({
-            to: channelID,
-            message: "icles"
-        });
-    }
-    if(message.indexOf("too hot") > -1){
-        bot.sendMessage({
-            to: channelID,
-            message: "*hot damn*"
-        });
-    }
-}
-
-function handleTopicUpdate(channelID){
-    bot.topicCounter++;
-
-    if(bot.topicCounter > bot.config.topic.threshold){
-        bot.incrementTopic(channelID);
-        bot.topicCounter = 0;
-    }
-}
 
 process.on('uncaughtException', function uncaughtException(err){
     bot.log(err.stack);
