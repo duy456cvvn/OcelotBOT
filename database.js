@@ -10,36 +10,34 @@ module.exports = function database(bot){
             function rethinkDbConnect(err, connection){
                 if(err){
                     bot.log("Error connecting to rethinkdb: "+err);
+                    bot.failedModules++;
                 }else{
                     bot.log("Connected to rethinkdb");
                     bot.rconnection = connection;
+                    connection.addListener('error', function rethinkdbError(e){
+                        bot.log("Error: "+e);
+                        setTimeout(function reconnect(){
+                            connection.reconnect({noReplyWait: false}, function(err){
+                                if(err){
+                                    bot.log("Error reconnecting... Trying again in 3 seconds.");
+                                    setTimeout(reconnect, 3000);
+                                }
+                            });
+                        }, 500);
+                    });
+
+                    connection.addListener('close', function(){
+                        bot.log("Rethinkdb connection closed.");
+                        setTimeout(function reconnect(){
+                            connection.reconnect({noReplyWait: false},function(err){
+                                if(err){
+                                    bot.log("Error reconnecting... Trying again in 3 seconds.");
+                                    setTimeout(reconnect, 3000);
+                                }
+                            });
+                        }, 500);
+                    });
                 }
-
-                connection.addListener('error', function rethinkdbError(e){
-                    bot.log("Error: "+e);
-                    setTimeout(function reconnect(){
-                        connection.reconnect({noReplyWait: false}, function(err){
-                           if(err){
-                               bot.log("Error reconnecting... Trying again in 3 seconds.");
-                               setTimeout(reconnect, 3000);
-                           }
-                        });
-                    }, 500);
-                });
-
-                connection.addListener('close', function(){
-                    bot.log("Rethinkdb connection closed.");
-                    setTimeout(function reconnect(){
-                        connection.reconnect({noReplyWait: false},function(err){
-                            if(err){
-                                bot.log("Error reconnecting... Trying again in 3 seconds.");
-                                setTimeout(reconnect, 3000);
-                            }
-                        });
-                    }, 500);
-                });
-
-
             });
 
             bot.connection = mysql.createConnection(bot.config.database);
