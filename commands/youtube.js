@@ -1,7 +1,8 @@
 var youtubedl 	= require('youtube-dl'),
 	fs 			= require('fs'),
 	ffmpeg		= require('fluent-ffmpeg'),
-	path		= require('path').resolve;
+	path		= require('path').resolve,
+    async       = require('async');
 
 
 
@@ -45,11 +46,11 @@ exports.command = {
                     for(var i in info){
                         videos.push({url: info[i].webpage_url, title: info[i].title, duration: info[i].duration});
                     }
-                    downloadPlaylist(videos, bot);
+                    downloadPlaylist(videos, bot,"/home/www-data/files.unacceptableuse.com/", channel, messageID);
                 }else{
                     var video = {url: info.webpage_url, title: info.title, duration: info.duration};
-                    sendOrEdit("Downloading `"+info.fulltitle+"`...", messageID, channel, bot);
-                    download(video, bot);
+                    sendOrEdit("Downloading `"+info.fulltitle+"` (Downloading)...\n"+generateBar(100, 0), messageID, channel, bot);
+                    download(video, bot, "/home/www-data/files.unacceptableuse.com/",channel, messageID);
                     //queue.push(video);
                 }
             }
@@ -60,11 +61,109 @@ exports.command = {
 };
 
 
-function download(video, bot){
+function download(video, bot, destination, channel, messageID){
+    var ytdl = youtubedl(video.url,[
+        "--proxy=" + bot.config.misc.proxyURL,
+        "--force-ipv4"]);
 
+
+    ytdl.on('info', function(info){
+        sendOrEdit("Downloading `"+video.title+"` (Downloading)...\n"+generateBar(100, 10), messageID, channel, bot);
+        var durationSplit = video.duration.split(":");
+        var totalSeconds = (durationSplit[0] * 60) + parseInt(durationSplit[1]);
+        ffmpeg()
+            .input(ytdl)
+            .audioCodec('libmp3lame')
+            .save(destination+"/"+video.title+".mp3")
+            .on('error', function(err){
+                sendOrEdit("Downloading `"+video.title+"` (Converting)...\n*ERROR*: "+err, messageID, channel, bot);
+            })
+            .on('progress', function(progress){
+                var timeSplit = progress.timemark.split(":"); //hh:mm:ss.ms
+                var currentSeconds = (timeSplit[0] * 3600) + (timeSplit[1] * 60) + parseInt(timeSplit[2]);
+                sendOrEdit("Downloading `"+video.title+"` (Converting)...\n"+generateBar(totalSeconds, currentSeconds), messageID, channel, bot);
+            })
+            .on('end', function(){
+                sendOrEdit("Downloading `"+video.title+"`...\n*Done!* Download here: http://files.unacceptableuse.com/"+encodeURIComponent(video.title)+".mp3", messageID, channel, bot);
+            });
+
+    });
+
+    ytdl.on('error', function(err){
+        sendOrEdit("Downloading `"+video.title+"` (Downloading)...\n*ERROR*: "+err, messageID, channel, bot);
+    });
 }
 
-function downloadPlaylist(videos, bot){
+function downloadPlaylist(videos, bot, destination, channel, messageID){
+    if(videos.length < 5){
+        for(var i in videos){
+            if(videos.hasOwnProperty(i)){
+                bot.sendMessage({
+                    to: channel,
+                    message: "Retrieving video information..."
+                }, function messageResponse(err, resp){
+                    if(!err) {
+                        var messageID = resp.ts;
+                        download(videos[i], bot, destination, channel, messageID);
+                    }
+                    else
+                        bot.sendMessage({
+                            to: channel,
+                            message: err
+                        });
+
+                });
+            }
+        }
+    }else{
+        var totalSeconds = 0;
+        var progressSeconds = 0;
+        async.each(videos, function each(video, cb){
+            var durationSplit = video.duration.split(":");
+            totalSeconds += (durationSplit[0] * 60) + parseInt(durationSplit[1]);
+            cb();
+        }, function done(){
+
+            for(var i in videos){
+                if(videos.hasOwnProperty(i)){
+                    (function downloadVideoSync() {
+                        var video = videos[i];
+                        var ytdl = youtubedl(video.url, [
+                            "--proxy=" + bot.config.misc.proxyURL,
+                            "--force-ipv4"]);
+
+                        ytdl.on('info', function (info) {
+                            var lastSeconds = 0;
+                            ffmpeg()
+                                .input(ytdl)
+                                .audioCodec('libmp3lame')
+                                .save(destination + "/" + video.title + ".mp3")
+                                .on('error', function (err) {
+                                    sendOrEdit("Downloading `" + video.title + "` (Converting)...\n*ERROR*: " + err, messageID, channel, bot);
+                                })
+                                .on('progress', function (progress) {
+                                    var timeSplit = progress.timemark.split(":"); //hh:mm:ss.ms
+                                    var newSeconds = (timeSplit[0] * 3600) + (timeSplit[1] * 60) + parseInt(timeSplit[2]);
+                                    progressSeconds += newSeconds-lastSeconds;
+                                    lastSeconds = newSeconds;
+                                    sendOrEdit("Downloading " + videos.length + " videos...\n" + generateBar(totalSeconds, progressSeconds), messageID, channel, bot);
+                                })
+                                .on('end', function () {
+                                    sendOrEdit("Done!", messageID, channel, bot);
+                                });
+
+                        });
+
+                        ytdl.on('error', function (err) {
+                            sendOrEdit("Error downloading " + video.title + " " + err, messageID, channel, bot);
+                        });
+                    })();
+                }
+            }
+        });
+
+    }
+
 
 }
 
@@ -100,6 +199,6 @@ function generateBar(total, remaining){
             str += "\u2588";
         }
     }
-    str += "]";
+    str += "] "+parseInt(percentage*100)+"%";
     return str;
 }
