@@ -36,7 +36,8 @@ module.exports = function(bot){
             logChannelEnabled: false,
             proxyURL: "",
             translateKey: "",
-            weatherKey: ""
+            weatherKey: "",
+            textMode: null
         },
         petermon:{
             username: "",

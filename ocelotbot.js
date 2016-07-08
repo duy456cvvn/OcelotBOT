@@ -123,7 +123,7 @@ function botInit(cb){
                 .replace(bot.config.database.password, "<REDACTED>")
                 .replace("undefined", "https://www.youtube.com/watch?v=b7k0a5hYnSI&t=18");
 
-            bot.rtm.sendMessage(data.message, data.to, function sendMessageResult(err, resp){
+            bot.rtm.sendMessage(bot.config.misc.textMode ? data.message[bot.config.misc.textMode] : data.message, data.to, function sendMessageResult(err, resp){
                 if(err){
                    console.log("Error sending message: "+JSON.stringify(err));
                 }else if(cb){cb(err, resp)}
