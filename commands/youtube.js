@@ -50,7 +50,7 @@ exports.command = {
                 }else{
                     var video = {url: info.webpage_url, title: info.title, duration: info.duration};
                     sendOrEdit("Downloading `"+info.fulltitle+"` (Downloading)...\n"+generateBar(100, 0), messageID, channel, bot);
-                    download(video, bot, "/home/www-data/files.unacceptableuse.com/",channel, messageID);
+                    download(video, bot, args[2] ? "/home/peter/"+args[2] : "/home/www-data/files.unacceptableuse.com/",channel, messageID);
                     //queue.push(video);
                 }
             }
@@ -84,7 +84,12 @@ function download(video, bot, destination, channel, messageID){
                 sendOrEdit("Downloading `"+video.title+"` (Converting)...\n"+generateBar(totalSeconds, currentSeconds), messageID, channel, bot);
             })
             .on('end', function(){
-                sendOrEdit("Downloading `"+video.title+"`...\n*Done!* Download here: http://files.unacceptableuse.com/"+encodeURIComponent(video.title)+".mp3", messageID, channel, bot);
+                if(destination.indexOf("files.unacceptableuse.com") > -1){
+                    sendOrEdit("Downloading `"+video.title+"`...\n*Done!* Download here: http://files.unacceptableuse.com/"+encodeURIComponent(video.title)+".mp3", messageID, channel, bot);
+                }else{
+                    sendOrEdit("Downloading `"+video.title+"`...\n*Done!* Added to radio station.", messageID, channel, bot);
+                }
+
             });
 
     });
