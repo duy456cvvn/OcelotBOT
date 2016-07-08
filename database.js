@@ -52,6 +52,8 @@ module.exports = function database(bot){
                 }
             };
 
+            bot.mysqlConnect();
+
 
         }
     }
