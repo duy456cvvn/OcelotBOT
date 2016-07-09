@@ -98,6 +98,10 @@ exports.command = {
                 for(var msgID in bot.messageHandlers){
                     output+= msgID+"\n"
                 }
+                output+="*MODULES*\n";
+                for(var i in bot.modules){
+                    output+= i+" "+bot.modules[i]+"\n"
+                }
                 bot.sendMessage({
                 	to: channel,
                 	message: output

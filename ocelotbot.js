@@ -42,14 +42,15 @@ var bot = {};
 bot.messageHandlers = {};
 bot.lastCrash = new Date();
 
-//OcelotBOT Modules
-var interactiveMessages = require('./interactiveMessages.js')(bot);
-var database = require('./database.js')(bot);
-var commands = require('./commands.js')(bot);
-var autoReplies = require('./autoReplies.js')(bot);
-var importantDates = require('./importantDates.js')(bot);
-var config = require('./config.js')(bot);
-var logging = require('./logging.js')(bot);
+bot.modules = [
+    require('./interactiveMessages.js')(bot).init,
+    require('./database.js')(bot).init,
+    require('./commands.js')(bot).init,
+    require('./autoReplies.js')(bot).init,
+    require('./importantDates.js')(bot).init,
+    require('./config.js')(bot).init,
+    require('./logging.js')(bot).init
+];
 
 function startBot(){
     bot.log = function(message){
@@ -75,16 +76,9 @@ function startBot(){
         bot.messageHandlers[name] = func;
     };
 
-    async.series([
-        config.init,
-        interactiveMessages.init,
-        database.init,
-        commands.init,
-        botInit,
-        logging.init,
-        importantDates.init,
-        autoReplies.init
-    ]);
+    //Init all modules
+    bot.log("Initialising modules...");
+    async.series(bot.modules);
 
 
 }
