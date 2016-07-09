@@ -11,9 +11,9 @@ var RtmClient       = require('@slack/client').RtmClient,
     simplebus       = require('simplebus'),
     https           = require('https'),
     caller_id       = require('caller-id'),
-    async           = require('async');
-
-
+    async           = require('async'),
+    colors          = require('colors'),
+    dateFormat      = require('dateformat');
 
 
 var year = new Date().getFullYear();
@@ -43,40 +43,42 @@ bot.messageHandlers = {};
 bot.lastCrash = new Date();
 
 bot.modules = [
-    require('./interactiveMessages.js')(bot).init,
-    require('./database.js')(bot).init,
-    require('./commands.js')(bot).init,
-    require('./autoReplies.js')(bot).init,
-    require('./importantDates.js')(bot).init,
     require('./config.js')(bot).init,
-    require('./logging.js')(bot).init
+    require('./database.js')(bot).init,
+    require('./interactiveMessages.js')(bot).init,
+    require('./commands.js')(bot).init,
+    botInit,
+    require('./autoReplies.js')(bot).init,
+    require('./logging.js')(bot).init,
+    require('./importantDates.js')(bot).init
 ];
 
 function startBot(){
-    bot.log = function(message){
-        var caller = caller_id.getData();
+    bot.log = function(message, caller){
+        if(!caller)
+             caller = caller_id.getData();
         var file = ["Nowhere"];
         if(caller.filePath)
             file = caller.filePath.split("/");
 
-        var origin = `[${file[file.length-1]}}${caller.functionName ? "/"+caller.functionName : ""}}]`.bold;
+        var origin = `[${file[file.length-1]}${caller.functionName ? "/"+caller.functionName : ""}] `.bold;
 
         var output = origin+message;
-        console.log(output);
+        console.log(`[${dateFormat(new Date(), "dd/mm/yy hh:MM")}]`+output);
         if(bot.config.misc.logChannelEnabled && bot.rtm && bot.rtm.connected){
             bot.sendMessage({
                 to: bot.config.misc.logChannel,
-                message: output.strip
+                message: output
             });
         }
     };
 
     bot.error = function(message){
-      bot.log(message.red);
+      bot.log(message.red, caller_id.getData());
     };
 
     bot.warn = function(message){
-        bot.log(message.orange);
+        bot.log(message.orange, caller_id.getData());
     };
 
     bot.interactiveMessages = {};
@@ -90,8 +92,6 @@ function startBot(){
     //Init all modules
     bot.log("Initialising modules...");
     async.series(bot.modules);
-
-
 }
 
 function botInit(cb){

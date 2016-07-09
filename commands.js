@@ -50,8 +50,11 @@ module.exports = function(bot){
                 }
             });
 
-            if(cb)
+            if(cb){
+                bot.log("Finished loading commands.");
                 cb();
+            }
+
         }
     }
 };
