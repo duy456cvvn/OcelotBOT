@@ -4,7 +4,76 @@
 var mysql = require('mysql');
 var rethinkdb = require('rethinkdb');
 module.exports = function database(bot){
-    return {
+
+
+    var databaseObject = {
+
+        mysqlErrorHandler: function mysqlError(err){
+            databaseObject.mysqlRetries++;
+            bot.log("MySQL Error:" +err+" trying again in "+(3+databaseObject.mysqlRetries)+" seconds...");
+            setTimeout(databaseObject.mysqlConnect, 3000+(databaseObject.mysqlRetries*1000));
+
+        },
+
+        mysqlDisconnectHandler: function mysqlDisconnect(){
+            databaseObject.mysqlRetries++;
+            bot.log("Disconnected from MySQL: reconnecting in "+(3+databaseObject.mysqlRetries)+" seconds...");
+            setTimeout(databaseObject.mysqlConnect, 3000+(databaseObject.mysqlRetries*1000));
+        },
+
+        mysqlConnectHandler: function mysqlConnected(err){
+            if (err) {
+                databaseObject.mysqlRetries++;
+                bot.log('Error connecting: ' + err+" trying again in "+(3+databaseObject.mysqlRetries)+" seconds...");
+                setTimeout(databaseObject.mysqlConnect, 3000+(databaseObject.mysqlRetries*1000));
+            }
+            else {
+                bot.log("Connected to MySQL");
+                databaseObject.mysqlRetries = 0;
+            }
+        },
+
+        mysqlRetries: 0,
+
+        mysqlConnect: function mysqlConnect(cb){
+            try {
+                bot.connection = mysql.createConnection(bot.config.database);
+
+                bot.connection.on('error', databaseObject.mysqlErrorHandler);
+                bot.connection.on('disconnected', databaseObject.mysqlDisconnectHandler);
+
+                bot.connection.connect(databaseObject.mysqlConnectHandler);
+
+                if(cb)
+                    cb();
+            } catch (e) {
+                databaseObject.mysqlRetries++;
+                bot.log("Exception connecting: " +e+" trying again in "+(3+databaseObject.mysqlRetries)+" seconds...");
+                setTimeout(databaseObject.mysqlConnect, 3000+(databaseObject.mysqlRetries*1000));
+            }
+        },
+
+        rethinkErrorHandler: function rethinkError(err){
+            bot.log("Error: "+e);
+            setTimeout(databaseObject.rethinkReconnect, 500);
+        },
+
+        rethinkDisconnectHandler: function rethinkDisconnect(){
+            bot.log("Rethinkdb connection closed.");
+            setTimeout(databaseObject.rethinkReconnect, 500);
+        },
+
+        rethinkRetries: 0,
+        rethinkReconnect: function rethinkReconnect(){
+            connection.reconnect({noReplyWait: false}, function(err){
+                if(err){
+                    databaseObject.rethinkRetries++;
+                    bot.log("Error reconnecting... Trying again in "+(3+databaseObject.rethinkRetries)+" seconds.");
+                    setTimeout(databaseObject.rethinkReconnect, 3000+(databaseObject.rethinkRetries*1000));
+                }
+            });
+        },
+
         init: function databaseInit(cb) {
             rethinkdb.connect(bot.config.rethinkdb,
             function rethinkDbConnect(err, connection){
@@ -14,71 +83,16 @@ module.exports = function database(bot){
                 }else{
                     bot.log("Connected to rethinkdb");
                     bot.rconnection = connection;
-                    connection.addListener('error', function rethinkdbError(e){
-                        bot.log("Error: "+e);
-                        setTimeout(function reconnect(){
-                            connection.reconnect({noReplyWait: false}, function(err){
-                                if(err){
-                                    bot.log("Error reconnecting... Trying again in 3 seconds.");
-                                    setTimeout(reconnect, 3000);
-                                }
-                            });
-                        }, 500);
-                    });
-
-                    connection.addListener('close', function(){
-                        bot.log("Rethinkdb connection closed.");
-                        setTimeout(function reconnect(){
-                            connection.reconnect({noReplyWait: false},function(err){
-                                if(err){
-                                    bot.log("Error reconnecting... Trying again in 3 seconds.");
-                                    setTimeout(reconnect, 3000);
-                                }
-                            });
-                        }, 500);
-                    });
+                    connection.addListener('error', databaseObject.rethinkErrorHandler);
+                    connection.addListener('close', databaseObject.rethinkDisconnectHandler);
                 }
             });
 
-            bot.connection = mysql.createConnection(bot.config.database);
-
-            bot.connection.on('error', function mysqlErrorEvent(err) {
-                bot.log("MySQL Error: " + err);
-                bot.log(err);
-                setTimeout(bot.mysqlConnect, 3000);
-            });
-
-            bot.connection.on('disconnected', function mysqlDisconnectEvent() {
-                bot.log("MySQL Disconnected");
-                setTimeout(bot.mysqlConnect, 3000);
-            });
-
-
-            bot.mysqlConnect = function mysqlConnect(){
-                try {
-                    bot.connection.connect(function mySqlConnect(err) {
-                        if (err) {
-                            bot.log('Error connecting: ' + err);
-                            if (cb)
-                                cb();
-                            setTimeout(bot.mysqlConnect, 3000);
-                        }
-                        else {
-                            bot.log("Connected to MySQL");
-                            if (cb)
-                                cb();
-                        }
-
-                    });
-                } catch (e) {
-                    bot.log("Exception connecting to MySQL: " + e);
-                    setTimeout(bot.mysqlConnect, 3000);
-                }
-            };
-
-            bot.mysqlConnect();
-
-
+            databaseObject.mysqlConnect(cb);
         }
-    }
+    };
+
+    return databaseObject;
 };
+
+
