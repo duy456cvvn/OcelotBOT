@@ -16,7 +16,7 @@ exports.command = {
                 	to: channel,
                 	message: "There was an error contacting the translation server."
                 });
-                bot.log("Error getting translation language: "+err);
+                bot.error("Error getting translation language: "+err);
             }else{
                 var langResult = JSON.parse(body);
                 if(langResult.code === 200){
@@ -26,7 +26,7 @@ exports.command = {
                                 to: channel,
                                 message: "There was an error contacting the translation server."
                             });
-                            bot.log("Error translating '"+sentence+"': "+err);
+                            bot.error("Error translating '"+sentence+"': "+err);
                         }else{
                             var transResult = JSON.parse(body);
                             if(transResult.code === 200){

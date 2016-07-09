@@ -44,7 +44,7 @@ exports.command = {
 	onReady: function(bot){
 		fs.readFile('reminders.json', function loadRemindersFile(err, data){
 			if(err){
-				bot.log("Could not open reminders file!");
+				bot.warn("Could not open reminders file!");
 		    }else{
 		    	outstandingReminders = JSON.parse(data);
 		    	var now = Date.now();

@@ -65,7 +65,7 @@ module.exports = function(bot){
                 bot.log("Loading configuration file...");
                 fs.readFile("config.json", function readConfigFile(err, data){
                     if(err){
-                        bot.log("Could not load configuration file: "+err);
+                        bot.error("Could not load configuration file: "+err);
                     }else{
                         try {
                             bot.config = JSON.parse(data);
@@ -81,7 +81,7 @@ module.exports = function(bot){
                             if(cb)
                                 cb();
                         }catch(e){
-                            bot.log("Config parse error: "+e);
+                            bot.error("Config parse error: "+e);
                             if(cb)
                                 cb();
                         }
@@ -92,7 +92,7 @@ module.exports = function(bot){
             bot.saveConfig = function saveConfig(cb){
                 fs.writeFile("config.json", JSON.stringify(bot.config, null, "  "), function writeConfigFile(err){
                     if(err){
-                        bot.log("Error writing configuration file: "+err);
+                        bot.error("Error writing configuration file: "+err);
                         if(cb)
                             cb();
                     }else{

@@ -54,7 +54,7 @@ module.exports = function interactiveMessages(bot) {
                                     try {
                                         res.send(bot.interactiveMessages[info.callback_id](info.actions[i].name, info.actions[i].value, info));
                                     }catch(e){
-                                        bot.log("Error during interactive message: "+e);
+                                        bot.error("Error during interactive message: "+e);
                                         res.send(e);
                                     }
                                 }
@@ -67,13 +67,13 @@ module.exports = function interactiveMessages(bot) {
                             res.send("No callback registered.");
                         }
                     }else{
-                        bot.log("Received interactive message with invalid payload token.");
+                        bot.warn("Received interactive message with invalid payload token.");
                         res.send("Invalid payload token.")
                     }
 
 
                 }else{
-                    bot.log("Invalid Interactive Message request received.");
+                    bot.warn("Invalid Interactive Message request received.");
                     res.send("Invalid request.");
                 }
 

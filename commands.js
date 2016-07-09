@@ -23,8 +23,8 @@ module.exports = function(bot){
                                 newCommand.onReady(bot);
                             }
                         }catch(e){
-                            bot.log("Error loading module "+files[i]+" - "+e);
-                            bot.log(e);
+                            bot.error("Error loading module "+files[i]+" - "+e);
+                            bot.error(e);
                             bot.failedModules++;
                         }
                     }

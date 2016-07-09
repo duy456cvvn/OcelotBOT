@@ -10,21 +10,21 @@ module.exports = function database(bot){
 
         mysqlErrorHandler: function mysqlError(err){
             databaseObject.mysqlRetries++;
-            bot.log("MySQL Error:" +err+" trying again in "+(3+databaseObject.mysqlRetries)+" seconds...");
+            bot.error("MySQL Error:" +err+" trying again in "+(3+databaseObject.mysqlRetries)+" seconds...");
             setTimeout(databaseObject.mysqlConnect, 3000+(databaseObject.mysqlRetries*1000));
 
         },
 
         mysqlDisconnectHandler: function mysqlDisconnect(){
             databaseObject.mysqlRetries++;
-            bot.log("Disconnected from MySQL: reconnecting in "+(3+databaseObject.mysqlRetries)+" seconds...");
+            bot.error("Disconnected from MySQL: reconnecting in "+(3+databaseObject.mysqlRetries)+" seconds...");
             setTimeout(databaseObject.mysqlConnect, 3000+(databaseObject.mysqlRetries*1000));
         },
 
         mysqlConnectHandler: function mysqlConnected(err){
             if (err) {
                 databaseObject.mysqlRetries++;
-                bot.log('Error connecting: ' + err+" trying again in "+(3+databaseObject.mysqlRetries)+" seconds...");
+                bot.error('Error connecting: ' + err+" trying again in "+(3+databaseObject.mysqlRetries)+" seconds...");
                 setTimeout(databaseObject.mysqlConnect, 3000+(databaseObject.mysqlRetries*1000));
             }
             else {
@@ -48,18 +48,18 @@ module.exports = function database(bot){
                     cb();
             } catch (e) {
                 databaseObject.mysqlRetries++;
-                bot.log("Exception connecting: " +e+" trying again in "+(3+databaseObject.mysqlRetries)+" seconds...");
+                bot.error("Exception connecting: " +e+" trying again in "+(3+databaseObject.mysqlRetries)+" seconds...");
                 setTimeout(databaseObject.mysqlConnect, 3000+(databaseObject.mysqlRetries*1000));
             }
         },
 
         rethinkErrorHandler: function rethinkError(err){
-            bot.log("Error: "+e);
+            bot.error("Error: "+e);
             setTimeout(databaseObject.rethinkReconnect, 500);
         },
 
         rethinkDisconnectHandler: function rethinkDisconnect(){
-            bot.log("Rethinkdb connection closed.");
+            bot.error("Rethinkdb connection closed.");
             setTimeout(databaseObject.rethinkReconnect, 500);
         },
 
@@ -68,7 +68,7 @@ module.exports = function database(bot){
             connection.reconnect({noReplyWait: false}, function(err){
                 if(err){
                     databaseObject.rethinkRetries++;
-                    bot.log("Error reconnecting... Trying again in "+(3+databaseObject.rethinkRetries)+" seconds.");
+                    bot.error("Error reconnecting... Trying again in "+(3+databaseObject.rethinkRetries)+" seconds.");
                     setTimeout(databaseObject.rethinkReconnect, 3000+(databaseObject.rethinkRetries*1000));
                 }
             });
@@ -78,7 +78,7 @@ module.exports = function database(bot){
             rethinkdb.connect(bot.config.rethinkdb,
             function rethinkDbConnect(err, connection){
                 if(err){
-                    bot.log("Error connecting to rethinkdb: "+err);
+                    bot.error("Error connecting to rethinkdb: "+err);
                     bot.failedModules++;
                 }else{
                     bot.log("Connected to rethinkdb");

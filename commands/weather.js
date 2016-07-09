@@ -13,7 +13,7 @@ exports.command = {
 
         request("http://api.openweathermap.org/data/2.5/weather?q="+search+"&appid="+bot.config.misc.weatherKey+"&units=metric", function getWeather(err, resp, body){
            if(err){
-               bot.log("Error getting weather information: "+err);
+               bot.error("Error getting weather information: "+err);
                bot.sendMessage({
                 to: channel,
                 message: "Error contacting weather API."

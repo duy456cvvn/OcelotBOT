@@ -10,7 +10,7 @@ module.exports = function logging(bot){
 
             bot.web.users.list(function getUserList(err, list){
                 if(err || !list.ok){
-                    bot.log("Error getting user list: "+err)
+                    bot.error("Error getting user list: "+err)
                 }else{
                     for(var i in list.members){
                         if(list.members.hasOwnProperty(i)){
@@ -29,11 +29,11 @@ module.exports = function logging(bot){
                     var messageObj = {channel: channelID, user: userList[userID] ? userList[userID]  : userID , message: message, time: new Date().getTime()};
                     r.db('ocelotbot').table('messages').insert(messageObj).run(bot.rconnection, function logMessageQuery(err){
                         if(err){
-                            bot.log("Error logging message: "+err);
+                            bot.error("Error logging message: "+err);
                         }
 
                         if(!userList[userID]){
-                            bot.log("WARNING: "+userID+" has no attached username. ("+message+")");
+                            bot.warn("WARNING: "+userID+" has no attached username. ("+message+")");
                         }
                     })
                 }

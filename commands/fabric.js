@@ -9,7 +9,7 @@ exports.command = {
     desc: "Integration with fabric.io",
     usage: "fabric",
     onBready: function onReady(bot){
-        bot.log("Obtaining fabric.io cookie...");
+        bot.error("Obtaining fabric.io cookie...");
         request.post(
             {
                 url: "https://www.fabric.io/api/v2/session",
@@ -24,7 +24,7 @@ exports.command = {
             },
             function fabricLogin(err, resp, body){
                 if(err){
-                    bot.log("Error logging into fabric.io: "+err);
+                    bot.error("Error logging into fabric.io: "+err);
                 }else{
                     bot.log("Obtained cookie");
                     try {
@@ -34,7 +34,7 @@ exports.command = {
                         }else{
                             bot.log(JSON.stringify(data));                        }
                     }catch(e){
-                        bot.log("Error logging in to fabric.io: "+e);
+                        bot.error("Error logging in to fabric.io: "+e);
                     }
                 }
 

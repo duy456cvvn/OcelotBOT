@@ -11,13 +11,14 @@ exports.command = {
         bot.lastTopic = "";
 
 		bot.updateTopic = function (channel) {
+            //TODO: Use .sample here
             r.db("ocelotbot").table("topics").run(bot.rconnection, function topicUpdateQuery(err, cursor){
                 if(err){
-                    bot.log("Error getting topic list: "+err);
+                    bot.error("Error getting topic list: "+err);
                 }else{
                     cursor.toArray(function cursorToArray(err, result){
                         if(err){
-                            bot.log("Error converting cursor to array: "+err);
+                            bot.error("Error converting cursor to array: "+err);
                         }else{
                             var newTopic = result[parseInt(Math.random() * result.length)];
                             bot.currentTopic = newTopic.id;

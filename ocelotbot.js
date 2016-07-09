@@ -58,14 +58,25 @@ function startBot(){
         var file = ["Nowhere"];
         if(caller.filePath)
             file = caller.filePath.split("/");
-        var output = "["+file[file.length-1]+(caller.functionName ? "/"+caller.functionName+"] "+message : "] "+message);
+
+        var origin = `[${file[file.length-1]}}${caller.functionName ? "/"+caller.functionName : ""}}]`.bold;
+
+        var output = origin+message;
         console.log(output);
         if(bot.config.misc.logChannelEnabled && bot.rtm && bot.rtm.connected){
             bot.sendMessage({
                 to: bot.config.misc.logChannel,
-                message: output
+                message: output.strip
             });
         }
+    };
+
+    bot.error = function(message){
+      bot.log(message.red);
+    };
+
+    bot.warn = function(message){
+        bot.log(message.orange);
     };
 
     bot.interactiveMessages = {};
@@ -184,27 +195,26 @@ function botInit(cb){
     });
 
     bot.rtm.on(CLIENT_EVENTS.RTM.WS_ERROR, function wsErrorEvent(data){
-        bot.log("RTM WebSocket error:");
+        bot.error("RTM WebSocket error:");
         bot.log(data);
     });
 
     bot.rtm.on(CLIENT_EVENTS.RTM.WS_CLOSE, function wsCloseEvent(data){
-        bot.log("RTM Websocket closed with code: "+(WS_CLOSE_CODES[data] ? WS_CLOSE_CODES[data] : data));
+        bot.warn("RTM Websocket closed with code: "+(WS_CLOSE_CODES[data] ? WS_CLOSE_CODES[data] : data));
     });
 
     bot.rtm.on(CLIENT_EVENTS.RTM.DISCONNECT, function disconnectEventEvent(data){
-        bot.log("RTM Client disconnected, not attempting to reconnect.");
+        bot.error("RTM Client disconnected, not attempting to reconnect.");
         bot.log(data);
 
     });
 
     bot.rtm.on(CLIENT_EVENTS.RTM.ATTEMPTING_RECONNECT, function attemptingReconnectEvent(data){
-        bot.log("RTM Client disconnected, attempting to reconnect.");
-        bot.log(data);
+        bot.warn("RTM Client disconnected, attempting to reconnect.");
     });
 
     bot.rtm.on(CLIENT_EVENTS.WEB.RATE_LIMITED, function rateLimitEvent(data){
-        bot.log("Web request rate limited:");
+        bot.warn("Web request rate limited:");
         bot.log(data);
     });
 
@@ -234,7 +244,7 @@ function busInit(){
 
 
 process.on('uncaughtException', function uncaughtException(err){
-    bot.log(err.stack);
+    bot.error(err.stack);
     bot.lastCrash = new Date();
 });
 
