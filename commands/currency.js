@@ -10,7 +10,7 @@ exports.command = {
 
         if(args.length < 3)return false;
 
-        https.get("https://api.fixer.io/latest?symbols="+args[2]+"&base="+args[1], function(response){
+        https.get("https://api.fixer.io/latest?symbols="+args[2].toUpperCase()+"&base="+args[1].toUpperCase(), function(response){
             var body = "";
             response.on('data', function (chunk) {
                 body += chunk;
