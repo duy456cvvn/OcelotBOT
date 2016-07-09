@@ -2,25 +2,29 @@
  * Created by Peter on 07/07/2016.
  */
 var r = require('rethinkdb');
+var CLIENT_EVENTS   = require('@slack/client').CLIENT_EVENTS;
 module.exports = function logging(bot){
     var userList = {};
     return {
         init: function init(){
             bot.log("Initialising message logging...");
 
-            bot.web.users.list(function getUserList(err, list){
-                if(err || !list.ok){
-                    bot.error("Error getting user list: "+err)
-                }else{
-                    for(var i in list.members){
-                        if(list.members.hasOwnProperty(i)){
-                            var user = list.members[i];
-                            if(!user.deleted){
-                                userList[user.id] = user.name;
+            bot.rtm.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, function rtmOpenEvent(data) {
+                bot.web.users.list(function getUserList(err, list) {
+                    if (err || !list.ok) {
+                        bot.error("Error getting user list: " + err)
+                    } else {
+                        for (var i in list.members) {
+                            if (list.members.hasOwnProperty(i)) {
+                                var user = list.members[i];
+                                if (!user.deleted) {
+                                    userList[user.id] = user.name;
+                                }
                             }
                         }
+                        bot.log("Aquired user list.");
                     }
-                }
+                });
             });
 
 
