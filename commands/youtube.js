@@ -46,7 +46,7 @@ exports.command = {
                     for(var i in info){
                         videos.push({url: info[i].webpage_url, title: info[i].title, duration: info[i].duration});
                     }
-                    downloadPlaylist(videos, bot,"/home/www-data/files.unacceptableuse.com/", channel, messageID);
+                    downloadPlaylist(videos, bot, args[2] ? "/home/peter/"+args[2] : "/home/www-data/files.unacceptableuse.com/", channel, messageID);
                 }else{
                     var video = {url: info.webpage_url, title: info.title, duration: info.duration};
                     sendOrEdit("Downloading `"+info.fulltitle+"` (Downloading)...\n"+generateBar(100, 0), messageID, channel, bot);
@@ -139,11 +139,13 @@ function downloadPlaylist(videos, bot, destination, channel, messageID){
 
                         ytdl.on('info', function (info) {
                             var lastSeconds = 0;
+                            bot.log("Downloading "+video.title+" to "+destination+"/"+video.title+".mp3");
                             ffmpeg()
                                 .input(ytdl)
                                 .audioCodec('libmp3lame')
                                 .save(destination + "/" + video.title + ".mp3")
                                 .on('error', function (err) {
+                                    bot.error("Error downloading "+video.title+": "+err);
                                     sendOrEdit("Downloading `" + video.title + "` (Converting)...\n*ERROR*: " + err, messageID, channel, bot);
                                 })
                                 .on('progress', function (progress) {
@@ -166,10 +168,7 @@ function downloadPlaylist(videos, bot, destination, channel, messageID){
                 }
             }
         });
-
     }
-
-
 }
 
 function sendOrEdit(text, messageID, channel, bot){
