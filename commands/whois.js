@@ -24,5 +24,11 @@ exports.command = {
 
 		
         return true;
+	},
+	test: function(test){
+		test('whois no arguments', function(t){
+			t.false(exports.command.func(null, null, "", ["whois"], "", null));
+		});
+
 	}
 };

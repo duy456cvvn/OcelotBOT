@@ -77,5 +77,15 @@ exports.command = {
             }
          });
         return true;
+    },
+    test: function(test){
+        test('DSEM Test', function(t){
+            var bot = {};
+            bot.sendMessage = function(data){
+                t.true(data.message.indexOf("since Erica was last mad.") > -1);
+            };
+
+            exports.command.func(null, null, "", ["dsem"], "", bot);
+        });
     }
 };

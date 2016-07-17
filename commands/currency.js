@@ -26,6 +26,28 @@ exports.command = {
             });
         });
       return true;
+    },
+    test: function(test){
+        test.cb('Currency ideal usage test', function(t){
+            var bot = {};
+            bot.sendMessage = function(data){
+                t.true(data.message.indexOf("USD") > -1 && data.message.indexOf("GBP") > -1);
+                t.end();
+            };
+
+            t.true(exports.command.func(null, null, "", ["currency", "GBP", "USD"], "", bot));
+        });
+
+        test.cb('Currency lowercase test', function(t){
+            t.plan(2);
+            var bot = {};
+            bot.sendMessage = function(data){
+                t.true(data.message.indexOf("USD") > -1 && data.message.indexOf("GBP") > -1);
+                t.end();
+            };
+
+            t.true(exports.command.func(null, null, "", ["currency", "gbp", "usd"], "", bot));
+        });
     }
 };
 

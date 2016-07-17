@@ -29,7 +29,19 @@ exports.command = {
 
 		return true;
 		
-	}
+	},
+    test: function(test){
+        test.cb('nowplaying', function(t){
+            t.plan(2);
+            var bot = {};
+            bot.sendMessage = function(data){
+                t.true(data.message.indexOf("Now Playing") > -1 || data.message.indexOf("Nothing is Playing!") > -1);
+                t.end();
+            };
+
+            t.true(exports.command.func(null, null, "", ["nowplaying"], "", bot));
+        });
+    }
 };
 
 

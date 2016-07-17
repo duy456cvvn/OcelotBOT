@@ -57,7 +57,20 @@ exports.command = {
             });
 		
         return true;
-	}
+	},
+    test: function(test){
+        //test.cb('ispetersleeping test', function(t){
+        //    t.plan(2);
+        //    var bot = {};
+        //
+        //    bot.sendMessage = function(data){
+        //        t.true(data.message.indexOf("error") === -1 && data.message.indexOf("Schrodinger") === -1);
+        //        t.end();
+        //    };
+        //
+        //    t.true(exports.command.func(null, null, "", ["ispetersleeping"], "", bot));
+        //});
+    }
 };
 
 

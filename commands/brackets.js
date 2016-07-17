@@ -201,8 +201,31 @@ exports.command = {
 	            message: "```"+makeFunction(input)+"()```"
 	        });
 		}
-
-		
         return true;
-	}
+	},
+    test: function(test){
+        test('Brackets in test', function(t){
+            var bot = {};
+            bot.sendMessage = function(data){
+                t.is(data.message, "test")
+            };
+
+            exports.command.func(null, null, "", ["brackets", "in", "[]+[(!![]+[])[+[]]]+[(!![]+[])[!+[]+!+[]+!+[]]]+[[(![]+[])][+[]][+!+[]+!+[]+!+[]]]+[(!![]+[])[+[]]]"], "!brackets in []+[(!![]+[])[+[]]]+[(!![]+[])[!+[]+!+[]+!+[]]]+[[(![]+[])][+[]][+!+[]+!+[]+!+[]]]+[(!![]+[])[+[]]]", bot);
+        });
+
+        test('Brackets no arguments test', function(t){
+            t.is(exports.command.func(null, null, "", ["brackets"], "", null), false);
+        });
+
+        test('Brackets out test', function(t){
+            var bot = {};
+            bot.sendMessage = function(data){
+                t.is(data.message, "```[]+[(!![]+[])[+[]]]+[(!![]+[])[!+[]+!+[]+!+[]]]+[[(![]+[])][+[]][+!+[]+!+[]+!+[]]]+[(!![]+[])[+[]]]```")
+            };
+
+            exports.command.func(null, null, "", ["brackets", "out", "test"], "!brackets out test", bot);
+        });
+
+        test.todo("Brackets outf test");
+    }
 };

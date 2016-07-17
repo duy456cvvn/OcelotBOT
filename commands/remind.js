@@ -61,6 +61,27 @@ exports.command = {
 		    	}
 		    }
 		});
+	},
+	test: function(test){
+        test('remind no arguments', function(t){
+            t.false(exports.command.func(null, null, "", ["remind"], "", null));
+        });
+
+        test.cb('remind 2 seconds', function(t){
+            t.plan(3);
+            var bot = {};
+            bot.sendMessage = function(data){
+                if(data.message.indexOf("Reminding you at") > -1){
+                    t.pass();
+                    setTimeout(t.fail, 3000);
+                }else{
+                    t.true(data.message.indexOf("test") > -1);
+                    t.end();
+                }
+            };
+
+            t.true(exports.command.func(null, "test", "", ["remind", "aa", "aa"], "!remind in 2 seconds \"test\"", bot));
+        });
 	}
 };
 

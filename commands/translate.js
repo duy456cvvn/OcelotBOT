@@ -54,5 +54,18 @@ exports.command = {
         });
 
         return true;
+    },
+    test: function(test){
+        test.cb.failing('translate french', function(t){
+            t.plan(2);
+            var bot = {};
+            bot.sendMessage = function(data){
+                t.is(data.message, "Translated fr-en:\n> I love cheese");
+                t.end();
+            };
+
+            t.true(exports.command.func(null, null, "", ["translate", "en", "asdadasd"], "!translate en J'adore le fromage", bot));
+        });
+        test.todo("translate no args");
     }
 };

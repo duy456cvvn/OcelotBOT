@@ -29,6 +29,18 @@ exports.command = {
         if (minutes < 10) {minutes = "0"+minutes;}
         if (seconds < 10) {seconds = "0"+seconds;}
         return hours+':'+minutes+':'+seconds;
+    },
+    test: function(test){
+        test.cb('lastcrash', function(t){
+            var bot = {};
+            bot.lastCrash = new Date();
+            bot.sendMessage = function(data){
+                t.true(data.message.indexOf("*00:00:00* ago") > -1);
+                t.end();
+            };
+
+            t.true(exports.command.func(null, null, "", ["lastcrash"], "", bot));
+        });
     }
 };
 

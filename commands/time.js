@@ -20,6 +20,18 @@ exports.command = {
         });
 
         return true;
+    },
+    test: function(test){
+        test.todo("timezones test");
+        test.cb('time no arguments', function(t){
+            var bot = {};
+            bot.sendMessage = function(data){
+                t.true(data.message.indexOf("The time is") > -1);
+                t.end();
+            };
+
+            t.true(exports.command.func(null, null, "", ["time"], "", bot));
+        });
     }
 };
 

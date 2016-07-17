@@ -40,6 +40,17 @@ exports.command = {
 
 
 		return true;
-	}
+	},
+    test: function(test){
+        test.cb('test no arguments', function(t){
+            var bot = {};
+            bot.sendMessage = function(data){
+                t.is(data.message, "pong");
+                t.end();
+            };
+
+            t.true(exports.command.func(null, null, "", ["test"], "", bot));
+        });
+    }
 };
 

@@ -69,13 +69,68 @@ exports.command = {
 				            to: channel,
 				            message: i === 50 ? "Couldn't find a post" : randPost.data.title +" - " +randPost.data.url
 			        	});
-	            		
-	            		
 
 	            	}
 	            }
 	        });
     	});
         return true;
+	},
+	test: function(test){
+        test.cb('Image with banned subreddit', function(t){
+            t.plan(2);
+            var bot = {};
+            bot.sendMessage = function(data){
+                t.is(data.message, "Subreddit does not exist or was banned");
+                t.end();
+            };
+
+            t.true(exports.command.func(null, null, "", ["image", "reddit"], "", bot));
+        });
+
+        test.cb('Image with imageless subreddit', function(t){
+            t.plan(2);
+            var bot = {};
+            bot.sendMessage = function(data){
+                t.is(data.message, "Couldn't find a post");
+                t.end();
+            };
+
+            t.true(exports.command.func(null, null, "", ["image", "askreddit"], "", bot));
+        });
+
+        test.cb('Image with invite only subreddit', function(t){
+            t.plan(2);
+            var bot = {};
+            bot.sendMessage = function(data){
+                t.is(data.message, "Subreddit is invite only or quarantined.");
+                t.end();
+            };
+
+            t.true(exports.command.func(null, null, "", ["image", "decadeclub"], "", bot));
+        });
+
+        test.cb.failing('Image with non existant subreddit', function(t){
+            t.plan(2);
+            var bot = {};
+            bot.sendMessage = function(data){
+                t.is(data.message, "Subreddit does not exist or was banned");
+                t.end();
+            };
+
+            t.true(exports.command.func(null, null, "", ["image", "asdasdasd"], "", bot));
+        });
+
+        test.cb('Image with quarantined subreddit', function(t){
+            t.plan(2);
+            var bot = {};
+            bot.sendMessage = function(data){
+                t.is(data.message, "Subreddit is invite only or quarantined.");
+                t.end();
+            };
+
+            t.true(exports.command.func(null, null, "", ["image", "CuteFemaleCorpses"], "", bot));
+        });
+
 	}
 };

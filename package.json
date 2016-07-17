@@ -1,10 +1,14 @@
 {
   "name": "OcelotBOT",
   "version": "3.0.0",
+  "scripts": {
+    "test": "ava"
+  },
   "dependencies": {
     "@slack/client": "^3.4.0",
     "body-parser": "^1.15.2",
     "caller-id": "^0.1.0",
+    "dateformat": "^1.0.12",
     "express": "^",
     "forever": "^0.15.2",
     "lame": "^1.2.4",
@@ -16,8 +20,13 @@
     "node-mysql": "^0.4.2",
     "pass-stream": "^0.1.5",
     "q": "^1.4.1",
+    "rethinkdb": "^2.3.2",
     "sourcequery": "0.0.2",
     "throttle": "^1.0.3",
-    "websocket": "^1.0.23"
+    "websocket": "^1.0.23",
+    "youtube-dl": "^1.11.1"
+  },
+  "devDependencies": {
+    "ava": "^0.15.2"
   }
 }

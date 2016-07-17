@@ -102,5 +102,10 @@ exports.command = {
 		}
 		
         return true;
+	},
+	test: function(test){
+        test('rlive no arguments', function(t){
+            t.false(exports.command.func(null, null, "", ["rlive"], "", null));
+        });
 	}
 };

@@ -63,6 +63,31 @@ exports.command = {
         if(temperature < 30)return "#ff6600";
         if(temperature < 40)return "#ff3300";
         if(temperature > 40)return "#cc3300";
+    },
+
+    test: function(test){
+        //test.cb('weather postcode', function(t){
+        //    t.plan(2);
+        //    var bot = {};
+        //    bot.sendMessage = function(data){
+        //        t.true(data.message.indexOf("Feeling horny?") > -1);
+        //        t.end();
+        //    };
+        //
+        //    t.true(exports.command.func(null, null, "", ["weather", "WA106BG"], "!weather WA106BG", bot));
+        //});
+
+        test('weather no arguments', function(t){
+            t.false(exports.command.func(null, null, "", ["weather"], "", null));
+        });
+
+        test('colourFromTemperature test', function(t){
+            t.is(exports.command.colourFromTemperature(-100), "#ccffff");
+            t.is(exports.command.colourFromTemperature(5), "#1ab2ff");
+            t.is(exports.command.colourFromTemperature(15), "#ffb31a");
+            t.is(exports.command.colourFromTemperature(25), "#ff6600");
+            t.is(exports.command.colourFromTemperature(250), "#cc3300");
+        });
     }
 };
 

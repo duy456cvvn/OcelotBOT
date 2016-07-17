@@ -11,7 +11,6 @@ exports.command = {
 	        });
 	        response.on('end', function () {
 	          	var names = JSON.parse(body);
-	          	console.log(names[parseInt(Math.random() * names.length)].keyword);
 	          	bot.sendMessage({
 	            	to: channel,
 	            	message: "Feeling horny? Try *"+(names[parseInt(Math.random() * names.length)].keyword)+"*"
@@ -21,5 +20,17 @@ exports.command = {
 		});
 
         return true;
+	},
+	test: function(test){
+        test.cb('pornsuggest', function(t){
+            t.plan(2);
+            var bot = {};
+            bot.sendMessage = function(data){
+                t.true(data.message.indexOf("Feeling horny?") > -1);
+                t.end();
+            };
+
+            t.true(exports.command.func(null, null, "", ["pornsuggest"], "", bot));
+        });
 	}
 };

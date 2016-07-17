@@ -105,5 +105,14 @@ exports.command = {
 		});
 
         return true;
-	}
+	},
+    test: function(test){
+        test.todo("serverinfo invalid test");
+        test.todo("serverinfo host test");
+        test.todo("serverinfo no port test");
+        test.todo("serverinfo ip test");
+        test('serverinfo no arguments', function(t){
+            t.false(exports.command.func(null, null, "", ["serverinfo"], "", null));
+        });
+    }
 };

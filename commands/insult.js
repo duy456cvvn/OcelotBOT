@@ -44,5 +44,16 @@ exports.command = {
             message: args[1]+", "+insults[parseInt(Math.random() * insults.length)]
         });
         return true;
+	},
+	test: function(test){
+		test.cb('Insult test', function(t){
+			var bot = {};
+			bot.sendMessage = function(data){
+                t.true(data.message.indexOf("test") > -1);
+				t.end();
+			};
+
+			t.true(exports.command.func(null, null, "", ["insult", "test"], "", bot));
+		});
 	}
 };

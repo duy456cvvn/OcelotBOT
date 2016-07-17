@@ -52,5 +52,28 @@ exports.command = {
 			return false;
 		}	
         return true;
+	},
+	test: function(test){
+        test.cb('Forever list test', function(t){
+            t.plan(2);
+            var bot = {};
+            bot.sendMessage = function(data){
+                t.true(data.message.indexOf("OcelotBOT3") > -1);
+                t.end();
+            };
+
+            t.true(exports.command.func(null, null, "", ["forever", "list"], "", bot));
+        });
+
+        //test.cb('Forever logs test', function(t){
+        //    t.plan(2);
+        //    var bot = {};
+        //    bot.sendMessage = function(data){
+        //        t.true(data.message.indexOf("```") > -1);
+        //        t.end();
+        //    };
+        //
+        //    t.true(exports.command.func(null, null, "", ["forever", "logs", "0"], "", bot));
+        //});
 	}
 };

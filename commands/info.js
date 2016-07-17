@@ -53,6 +53,23 @@ exports.command = {
         });
 
         return true;
+	},
+	test: function(test){
+        test('Info with no arguments', function(t){
+            t.false(exports.command.func(null, null, "", ["info"], "", null));
+        });
+
+
+        test.cb.failing('Info for bot', function(t){
+            t.plan(2);
+            var bot = {};
+            bot.sendMessage = function(data){
+                t.true(data.message.indexOf("uptime") > -1);
+                t.end();
+            };
+
+            t.true(exports.command.func(null, null, "", ["info", "bot"], "", bot));
+        });
 	}
 };
 

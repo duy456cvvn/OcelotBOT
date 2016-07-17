@@ -14,7 +14,7 @@ exports.command = {
             message: "Pinging...."
         }, function(err, resp){
         	messageID = resp.ts;
-			 ping.promise.probe(args[1])
+			 ping.promise.probe(args[1].replace("<","").replace(">", ""))
 				.then(function (res) {
 					if(res.alive){
 						bot.editMessage({
@@ -39,5 +39,43 @@ exports.command = {
 
 
         return true;
+	},
+	test: function(test){
+        test.cb('ping valid host', function(t){
+            t.plan(3);
+            var bot = {};
+            bot.sendMessage = function(data, cb){
+                t.is(data.message, "Pinging....");
+                cb(null, {});
+
+            };
+
+            bot.editMessage = function(data){
+                t.true(data.message.indexOf("Recieved response:") > -1);
+                t.end();
+            };
+
+            t.true(exports.command.func(null, null, "", ["ping", "google.com"], "", bot));
+        });
+        //
+        test.cb('ping invalid host', function(t){
+            t.plan(3);
+            var bot = {};
+            bot.sendMessage = function(data, cb){
+                t.is(data.message, "Pinging....");
+                cb(null, {});
+            };
+
+            bot.editMessage = function(data){
+                t.is(data.message, "Recieved no response from host.");
+                t.end();
+            };
+
+            t.true(exports.command.func(null, null, "", ["ping", "asdansdasd"], "", bot));
+        });
+
+        test('ping no arguments', function(t){
+            t.false(exports.command.func(null, null, "", ["ping"], "", null));
+        });
 	}
 };
