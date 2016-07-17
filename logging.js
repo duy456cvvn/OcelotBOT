@@ -6,7 +6,7 @@ var CLIENT_EVENTS   = require('@slack/client').CLIENT_EVENTS;
 module.exports = function logging(bot){
     var userList = {};
     return {
-        init: function init(){
+        init: function init(cb){
             bot.log("Initialising message logging...");
 
             bot.rtm.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, function rtmOpenEvent(data) {
@@ -42,6 +42,9 @@ module.exports = function logging(bot){
                     })
                 }
             });
+
+            if(cb)
+                cb();
         },
 
         userList: userList
