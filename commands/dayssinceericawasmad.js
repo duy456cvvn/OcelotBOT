@@ -71,7 +71,7 @@ exports.command = {
                 }else{
                      bot.sendMessage({
                         to: channel,
-                        message: "\nIt has been `"+diffDays+"` day(s) since Erica was last mad.\nThe record is `"+erica.record+"` day(s).\nThe last reason was `"+erica.reason+"`.\nAn average of `"+erica.total/erica.count+"` days between arguments.\n`"+erica.count+"` total arguments." 
+                        message: "\nIt has been `"+diffDays+"` day(s) since Erica was last mad.\nThe record is `"+erica.record+"` day(s).\nThe last reason was `"+erica.reason+"`.\nAn average of `"+(erica.total+diffDays)/(erica.count)+"` days between arguments.\n`"+erica.count+"` total arguments."
                     });
                 }
             }
