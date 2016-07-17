@@ -50,7 +50,8 @@ bot.modules = [
     botInit,
     require('./autoReplies.js')(bot).init,
     require('./logging.js')(bot).init,
-    require('./importantDates.js')(bot).init
+    require('./importantDates.js')(bot).init,
+    require('./poGoStatus.js')(bot).init
 ];
 
 function startBot(){
