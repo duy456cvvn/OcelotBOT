@@ -4,7 +4,7 @@ var youtubedl 	= require('youtube-dl'),
 	path		= require('path').resolve,
     async       = require('async');
 
-
+var illegalTitleRegex = /(?![A-Za-z0-9 \(\)\[\]!'.\-&+$%^])/gm;
 
 exports.command = {
 	name: "youtube",
@@ -74,7 +74,7 @@ function download(video, bot, destination, channel, messageID){
         ffmpeg()
             .input(ytdl)
             .audioCodec('libmp3lame')
-            .save(destination+"/"+video.title.replace(/(?!\.[^.]+$)\.|[^\w.]+/g, "")+".mp3")
+            .save(destination+"/"+video.title.replace(illegalTitleRegex, " ")+".mp3")
             .on('error', function(err){
                 sendOrEdit("Downloading `"+video.title+"` (Converting)...\n*ERROR*: "+err, messageID, channel, bot);
             })
@@ -85,7 +85,7 @@ function download(video, bot, destination, channel, messageID){
             })
             .on('end', function(){
                 if(destination.indexOf("files.unacceptableuse.com") > -1){
-                    sendOrEdit("Downloading `"+video.title+"`...\n*Done!* Download here: http://files.unacceptableuse.com/"+encodeURIComponent(video.title.replace(/(?!\.[^.]+$)\.|[^\w.]+/g, ""))+".mp3", messageID, channel, bot);
+                    sendOrEdit("Downloading `"+video.title+"`...\n*Done!* Download here: http://files.unacceptableuse.com/"+encodeURIComponent(video.title.replace(illegalTitleRegex, " "))+".mp3", messageID, channel, bot);
                 }else{
                     sendOrEdit("Downloading `"+video.title+"`...\n*Done!* Added to radio station.", messageID, channel, bot);
                 }
@@ -139,11 +139,11 @@ function downloadPlaylist(videos, bot, destination, channel, messageID){
 
                         ytdl.on('info', function (info) {
                             var lastSeconds = 0;
-                            bot.log("Downloading "+video.title+" to "+destination+"/"+video.title+".mp3");
+                            bot.log("Downloading "+video.title+" to "+destination+"/"+video.title.replace(illegalTitleRegex, " ")+".mp3");
                             ffmpeg()
                                 .input(ytdl)
                                 .audioCodec('libmp3lame')
-                                .save(destination + "/" + video.title.replace(/(?!\.[^.]+$)\.|[^\w.]+/g, "") + ".mp3")
+                                .save(destination + "/" + video.title.replace(illegalTitleRegex, " ") + ".mp3")
                                 .on('error', function (err) {
                                     bot.error("Error downloading "+video.title+": "+err);
                                     sendOrEdit("Downloading `" + video.title + "` (Converting)...\n*ERROR*: " + err, messageID, channel, bot);
