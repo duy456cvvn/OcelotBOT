@@ -2,7 +2,8 @@ var youtubedl 	= require('youtube-dl'),
 	fs 			= require('fs'),
 	ffmpeg		= require('fluent-ffmpeg'),
 	path		= require('path').resolve,
-    async       = require('async');
+    async       = require('async'),
+    spawn       = require('child_process').spawn;
 
 var illegalTitleRegex = /(?![A-Za-z0-9 \(\)\[\]!'.\-&+$%^])/gm;
 
@@ -87,7 +88,17 @@ function download(video, bot, destination, channel, messageID){
                 if(destination.indexOf("files.unacceptableuse.com") > -1){
                     sendOrEdit("Downloading `"+video.title+"`...\n*Done!* Download here: http://files.unacceptableuse.com/"+encodeURIComponent(video.title.replace(illegalTitleRegex, " "))+".mp3", messageID, channel, bot);
                 }else{
-                    sendOrEdit("Downloading `"+video.title+"`...\n*Done!* Added to radio station.", messageID, channel, bot);
+                    sendOrEdit("Downloading `"+video.title+"`...\n*Done!* Added to radio station. (Petify will update shortly)", messageID, channel, bot);
+                    var petifyUpdater = spawn("node", ['/home/peter/mp3Parser/update.js']);
+                    petifyUpdater.stdout.on('data', function petifyUpdaterLog(data){
+                        bot.log(data);
+                    });
+                    petifyUpdater.stderr.on('data', function petifyUpdaterErr(data){
+                        bot.error(data);
+                    });
+                    petifyUpdater.on('close', function petifyUpdaterClose(code){
+                        bot.log("Petify updater closed with code "+code);
+                    });
                 }
 
             });
