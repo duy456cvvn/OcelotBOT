@@ -14,7 +14,7 @@ exports.command = {
             message: "Pinging...."
         }, function(err, resp){
         	messageID = resp.ts;
-			 ping.promise.probe(args[1].replace("<","").replace(">", ""))
+			 ping.promise.probe(args[1].replace("<","").replace(">", "").split("|")[1])
 				.then(function (res) {
 					if(res.alive){
 						bot.editMessage({
