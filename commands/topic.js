@@ -159,6 +159,12 @@ exports.command = {
                     });
             }else{
                 var messages = resp.messages;
+                if(messages[index].user === user){
+                    bot.sendMessage({
+                    	to: channel,
+                    	message: "_topicing something you said is like laughing at your own joke_ - Neil 2015"
+                    });
+                }
                 bot.web.users.info(messages[index].user, function(err, user){
                     if(err){
                         bot.sendMessage({to: channel, message: "Error adding topic:\n "+err});
