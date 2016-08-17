@@ -7,7 +7,7 @@ Command List:
 
 *!currency* - Convert a currency `!currency <currency> <currency>`
 
-*!dsem* - Days since Erica was mad `!*DEPRECATED* dsem [reset] [reason]`
+*!dsem* - Days since Erica was mad `!*DEPRECATED* dsem [reset] [reason]` [Deprecated]
 
 *!define* - Define something `!define`
 
@@ -17,15 +17,15 @@ Command List:
 
 *!fabric* - Integration with fabric.io `!fabric`
 
-*!forever* - Interface with forever `!forever [logs/restart/list] [id]`
+*!forever* - Interface with forever `!forever [logs/restart/list] [id]` [Requires OcelotBOT to be running under forever]
 
 *!image* - Pull a random image from a subreddit `!image <subreddit>`
 
-*!info* - Get info on stuff `!info [bot/server/channel]`
+*!info* - Get info on stuff `!info [bot/server/channel]` [Broken by move to Slack]
 
 *!insult* - Insult a user `!insult <user>`
 
-*!peterstate* - Where's Peter? `!peterstate`
+*!peterstate* - Where's Peter? `!peterstate` [Broken]
 
 *!lastcrash* - How long since last crash `!lastcrash`
 
@@ -39,7 +39,7 @@ Command List:
 
 *!mgt* - Management command `!mgt eval/config set/get/save/load /add`
 
-*!markov* - Generate a markov chain based on a user `!markov <user> [sample] [length] [key]`
+*!markov* - Generate a markov chain based on a user `!markov <user> [sample] [length] [key]` [Experimental]
 
 *!meme* - Memes `!meme <meme/list/add <name> <url>>`
 
@@ -47,7 +47,7 @@ Command List:
 
 *!nowplaying* - Show whats currently playing `!nowplaying`
 
-*!ping* - Ping an address `!ping <address> [timeout] [times]`
+*!ping* - Ping an address `!ping <address> [timeout] [times]` [Deprecated with migration from IRC]
 
 *!pizzatrack* - Track pizza `!<id>`
 
@@ -55,7 +55,7 @@ Command List:
 
 *!test* - A test command `!test [buttons/base64]`
 
-*!push* - Push a notification to someones phone `!push <person> message`
+*!push* - Push a notification to someones phone `!push <person> message` [Experimental and Unfinished]
 
 *!quote* - Get a random quote by a user `!quote <username> [filter]`
 
