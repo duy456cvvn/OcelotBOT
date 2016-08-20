@@ -2,10 +2,12 @@
  * Created by Peter on 27/06/2016.
  */
 var https = require('https');
+var request = require('request');
 var pizzaStatuses=  {
+    3: "Delivered",
     5: "Baking",
     9: "Out for delivery",
-    3: "Delivered"
+    10: "Ready to Collect"
 };
 
 exports.command = {
@@ -13,21 +15,22 @@ exports.command = {
         desc: "Track pizza",
         usage: "<id>",
         func: function(user, userID, channel, args, message, bot){
-            https.get("https://www.dominos.co.uk/pizzaTracker/getOrderDetails?id=MTU2MTI4Mjg2fDZmMmZkM2M3LWY1NzItNGY0Yi05N2Y2LTI5ZDA1NzY3YjhiYw%3D%3D&noCache=1467061183166", function(response){
-                var body = "";
-                response.on('data', function (chunk) {
-                    body += chunk;
+            bot.log(args[1]);
+            request("https://www.dominos.co.uk/pizzaTracker/getOrderDetails?id=MTYxMTkyNDk4fDc0ZmJlYzk2LWQ4NTctNGZiOS04NzM4LTA4ZjJkYTk4OWZjZQ==", function(err, response, body){
+                bot.sendMessage({
+                    to: channel,
+                    message: "Error: "+err
                 });
-
-                response.on('end', function () {
-                    var data = JSON.parse(body);
-                    bot.sendMessage({
-                        to: channel,
-                        message: `Pizza is *${pizzaStatuses[data.statusId] ? pizzaStatuses[data.statusId] : data.statusId}*, for ${data.customerName} in ${data.storeName}, made by ${data.storeManagerName} and delivered by ${data.driverName}`
-                    });
-
+                bot.sendMessage({
+                    to: channel,
+                    message: ": "+response
+                });
+                bot.sendMessage({
+                    to: channel,
+                    message: ": "+body
                 });
             });
+
             return true;
         }
     };
