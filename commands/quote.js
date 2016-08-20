@@ -13,18 +13,25 @@ exports.command = {
 
         if(args[2]){
             var sentence = message.substring(message.indexOf(args[2]));
-            r.db('ocelotbot').table('messages').filter({user: args[1]}).filter(r.row('message').match(sentence)).sample(1).run(bot.rconnection, function(err, result){
+            r.db('ocelotbot').table('messages').filter({user: args[1]}).filter(r.row('message').match(`\\b${sentence}\\b`)).sample(1).run(bot.rconnection, function(err, result){
                 if(err){
                     bot.sendMessage({
                         to: channel,
                         message: "Error: "+err
                     });
                 }else{
-                    var date = dateformat(new Date(result[0].time), "dd/mm/yy");
-                    bot.sendMessage({
-                        to: channel,
-                        message: `> [${date}] <${result[0].user}> ${result[0].message}`
-                    });
+                    if(result[0] && result[0].message) {
+                        var date = dateformat(new Date(result[0].time), "dd/mm/yy");
+                        bot.sendMessage({
+                            to: channel,
+                            message: `> [${date}] <${result[0].user}> ${result[0].message}`
+                        });
+                    }else {
+                        bot.sendMessage({
+                            to: channel,
+                            message: "Nothing found"
+                        });
+                    }
                 }
             });
         }else{
@@ -35,11 +42,18 @@ exports.command = {
                         message: "Error: "+err
                     });
                 }else{
-                    var date = dateformat(new Date(result[0].time), "dd/mm/yy");
-                    bot.sendMessage({
-                        to: channel,
-                        message: `> [${date}] <${result[0].user}> ${result[0].message}`
-                    });
+                    if(result[0] && result[0].message) {
+                        var date = dateformat(new Date(result[0].time), "dd/mm/yy");
+                        bot.sendMessage({
+                            to: channel,
+                            message: `> [${date}] <${result[0].user}> ${result[0].message}`
+                        });
+                    }else{
+                        bot.sendMessage({
+                            to: channel,
+                            message: "Nothing found"
+                        });
+                    }
                 }
             });
         }
