@@ -12,11 +12,26 @@ exports.command = {
 	        });
 
 	        response.on('end', function () {
-	          	var data = JSON.parse(body);
-	            bot.sendMessage({
-		            to: channel,
-		            message: "\n"+data.list[0].definition+"\n```"+data.list[0].example+"```"
-		        });
+				try {
+					var data = JSON.parse(body);
+                    if(data && data.list.length > 0){
+                        var randEntry = data.list[parseInt(Math.random() * data.list.length)];
+                        bot.sendMessage({
+                            to: channel,
+                            message: "\n" + randEntry.definition + "\n```" + randEntry.example + "```"
+                        });
+                    }else{
+                        bot.sendMessage({
+                        	to: channel,
+                        	message: "No definitions found."
+                        });
+                    }
+				}catch(e){
+					bot.sendMessage({
+						to: channel,
+						message: "Recieved bad response from server: "+e
+					});
+				}
 	           	
 	        });
     	});
