@@ -1,6 +1,6 @@
 Slack BOT
 
-Command List:
+#Command List:
 *!brackets* - Brackets `!brackets in/out/outf <message>`
 
 *!commands* - Returns a list of all current commends `!commands`
@@ -13,10 +13,6 @@ Command List:
 
 *!defineud* - Get an urban dictionary definition `!defineud <word>`
 
-*!doot* - [Deprecated with move from Discord to Slack]
-
-*!fabric* - Integration with fabric.io `!fabric`
-
 *!forever* - Interface with forever `!forever [logs/restart/list] [id]` [Requires OcelotBOT to be running under forever]
 
 *!image* - Pull a random image from a subreddit `!image <subreddit>`
@@ -25,17 +21,11 @@ Command List:
 
 *!insult* - Insult a user `!insult <user>`
 
-*!peterstate* - Where's Peter? `!peterstate` [Broken]
+*!peterstate* - Where's Peter? `!peterstate`
 
 *!lastcrash* - How long since last crash `!lastcrash`
 
 *!location* - Stalk someone `!location <person>`
-
-*!m2* - Music bot `!m q`
-
-*!m-DEPRECATED* - Music controls `!m
-
-
 
 *!mgt* - Management command `!mgt eval/config set/get/save/load /add`
 
@@ -43,13 +33,11 @@ Command List:
 
 *!meme* - Memes `!meme <meme/list/add <name> <url>>`
 
-*!noot* - [Deprecated with move from Discord to Slack]
+*!nowplaying* - Show whats currently playing on Petify `!nowplaying`
 
-*!nowplaying* - Show whats currently playing `!nowplaying`
+*!ping* - Ping an address `!ping <address> [timeout] [times]`
 
-*!ping* - Ping an address `!ping <address> [timeout] [times]` [Deprecated with migration from IRC]
-
-*!pizzatrack* - Track pizza `!<id>`
+*!pizzatrack* - Track pizza `!<id>` [Unfinished]
 
 *!pornsuggest* - Suggest some porn `!pornsuggest`
 
@@ -65,9 +53,9 @@ Command List:
 
 *!serverinfo* - Get information about a source based multiplayer server `!serverinfo <server> [port]`
 
-*!stats* - Stats n shit `!stats <user>`
+*!stats* - Stats about a particular user `!stats <user>`
 
-*!time* - The time ime `!time <timezone>`
+*!time* - The time `!time <timezone>`
 
 *!topic* - Add a *hilarious* comment from one of your good buddies to the topic. `!topic [<message> *or* <username>] *or* next/set <id>`
 
@@ -75,9 +63,7 @@ Command List:
 
 *!unicode* - Convert text to magic unicode stuff `!unicode bold/italic/regional/fullwidth`
 
-*!unnoot* - [Deprecated with move from Discord to Slack]
-
-*!vote* - Vote `!vote start opt1,opt2,opt3.../1/2/3../end`
+*!vote* - Start or participate in a vote `!vote start opt1,opt2,opt3.../1/2/3../end`
 
 *!weather* - Weather at location `!weather <search>`
 
@@ -85,4 +71,6 @@ Command List:
 
 *!with* - Perform a command in batch `!with <command> (br) [args] (br) [args] (br)...`
 
-*!youtube* - Download youtube videos `!youtube <video> [radio-dir]`
+*!youtube* - Download youtube videos `!youtube <video> [radio-dir] [nopetify?]`
+
+
