@@ -35,9 +35,10 @@ exports.command = {
                                     message: "Translated "+transResult.lang+":\n>"+transResult.text
                                 });
                             }else{
+
                                 bot.sendMessage({
                                     to: channel,
-                                    message: "Error translating: "+langResult.code+": `"+body+"`"
+                                    message: "Error: "+langResult.message
                                 });
                             }
                         }
