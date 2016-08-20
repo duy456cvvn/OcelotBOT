@@ -51,7 +51,7 @@ exports.command = {
                 }else{
                     var video = {url: info.webpage_url, title: info.title, duration: info.duration};
                     sendOrEdit("Downloading `"+info.fulltitle+"` (Downloading)...\n"+generateBar(100, 0), messageID, channel, bot);
-                    download(video, bot, args[2] ? "/home/peter/"+args[2] : "/home/www-data/files.unacceptableuse.com/",channel, messageID);
+                    download(video, bot, args[2] ? "/home/peter/"+args[2] : "/home/www-data/files.unacceptableuse.com/",channel, messageID, !args[3] || args[3] !== "nopetify");
                     //queue.push(video);
                 }
             }
@@ -62,7 +62,7 @@ exports.command = {
 };
 
 
-function download(video, bot, destination, channel, messageID){
+function download(video, bot, destination, channel, messageID, petifyUpdate){
     var ytdl = youtubedl(video.url,[
         "--proxy=" + bot.config.misc.proxyURL,
         "--force-ipv4"]);
@@ -88,17 +88,21 @@ function download(video, bot, destination, channel, messageID){
                 if(destination.indexOf("files.unacceptableuse.com") > -1){
                     sendOrEdit("Downloading `"+video.title+"`...\n*Done!* Download here: http://files.unacceptableuse.com/"+encodeURIComponent(video.title.replace(illegalTitleRegex, " "))+".mp3", messageID, channel, bot);
                 }else{
-                    sendOrEdit("Downloading `"+video.title+"`...\n*Done!* Added to radio station. (Petify will update shortly)", messageID, channel, bot);
-                    var petifyUpdater = spawn("node", ['/home/peter/mp3Parser/update.js']);
-                    petifyUpdater.stdout.on('data', function petifyUpdaterLog(data){
-                        bot.log(data);
-                    });
-                    petifyUpdater.stderr.on('data', function petifyUpdaterErr(data){
-                        bot.error(data);
-                    });
-                    petifyUpdater.on('close', function petifyUpdaterClose(code){
-                        bot.log("Petify updater closed with code "+code);
-                    });
+                    if (petifyUpdate){
+                        sendOrEdit("Downloading `"+video.title+"`...\n*Done!* Added to radio station. (Petify will update shortly)", messageID, channel, bot);
+                        var petifyUpdater = spawn("node", ['/home/peter/mp3Parser/update.js']);
+                        petifyUpdater.stdout.on('data', function petifyUpdaterLog(data){
+                            bot.log(data);
+                        });
+                        petifyUpdater.stderr.on('data', function petifyUpdaterErr(data){
+                            bot.error(data);
+                        });
+                        petifyUpdater.on('close', function petifyUpdaterClose(code){
+                            bot.log("Petify updater closed with code "+code);
+                        });
+                    }else{
+                        sendOrEdit("Downloading `"+video.title+"`...\n*Done!* Added to radio station.", messageID, channel, bot);
+                    }
                 }
 
             });
