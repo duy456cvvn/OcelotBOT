@@ -51,7 +51,7 @@ bot.modules = [
     require('./autoReplies.js')(bot).init,
     require('./logging.js')(bot).init,
     require('./importantDates.js')(bot).init,
-    require('./poGoStatus.js')(bot).init,
+   // require('./poGoStatus.js')(bot).init,
  //   require('./facebook.js')(bot).init
 ];
 
