@@ -38,6 +38,7 @@ exports.command = {
                 var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))-1;
 
                 if(args[1] && args[1] === "reset"){
+                    return false;
                     erica.mad = now;
                     erica.reason = args[2] || "<No reason specified, probably something dumb>";
                     //FIXME: Re-implement radio
