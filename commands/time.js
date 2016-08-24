@@ -14,10 +14,18 @@ exports.command = {
 
             if(now.format("hh:mm") == "04:20")emoji = ":weed:";
 
-        bot.sendMessage({
-        	to: channel,
-        	message: `${emoji} The time is *${now.format("hh:mm:ss YYYY-MM-DD z")}*`
-        });
+        if(now.format("hh:mm") == "05:05"){
+            bot.sendMessage({
+                to: channel,
+                message: `${emoji} I'm going back to *${now.format("hh:mm:ss YYYY-MM-DD z")}* whether it's a 7 hour flight or a 45 minute drive.`
+            });
+        }else{
+            bot.sendMessage({
+                to: channel,
+                message: `${emoji} The time is *${now.format("hh:mm:ss YYYY-MM-DD z")}*`
+            });
+        }
+
 
         return true;
     },
