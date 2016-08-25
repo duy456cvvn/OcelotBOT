@@ -14,7 +14,12 @@ module.exports = function(bot) {
                 var now = new Date().getTime();
                 var attachments = [];
                 for(var id in scripts){
-                    request("https://scriptfodder.com/api/scripts/reviews/"+scripts[id], function sfReviewCheck(err, reponse, body){
+                    request({
+                        url: "https://scriptfodder.com/api/scripts/reviews/"+scripts[id],
+                        headers: {
+                            "User-Agent": "OcelotBOT ScriptFodder service (unacceptableuse.com)"
+                        }
+                    }, function sfReviewCheck(err, reponse, body){
                         if(err){
                            bot.log("Error checking SF Reviews for script "+scripts[id]+": "+err);
                         }else{
@@ -52,7 +57,7 @@ module.exports = function(bot) {
                 }
                 if(attachments.length > 0)
                     bot.sendAttachment(bot.config.misc.mainChannel, "You have "+attachments.length+" new reviews.", attachments)
-            }, 3600);
+            }, 36000);
         }
     };
 };
