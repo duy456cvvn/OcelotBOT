@@ -6,6 +6,7 @@ var request = require('request');
 
 module.exports = function(bot){
     return {
+        name: "Facebook Message Listener",
         init: function init(cb){
             bot.app.get('/facebook', function facebookWebhookValidate(req, res){
 

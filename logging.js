@@ -6,6 +6,7 @@ var CLIENT_EVENTS   = require('@slack/client').CLIENT_EVENTS;
 module.exports = function logging(bot){
     var userList = {};
     return {
+        name: "Message Logging",
         init: function init(cb){
             bot.log("Initialising message logging...");
 

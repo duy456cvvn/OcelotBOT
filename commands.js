@@ -4,6 +4,7 @@
 var fs = require('fs');
 module.exports = function(bot){
     return {
+        name: "Command Listener",
         init: function initCommands(cb){
             bot.commands = {};
             bot.failedModules = 0;

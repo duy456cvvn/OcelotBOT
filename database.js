@@ -73,7 +73,7 @@ module.exports = function database(bot){
                 }
             });
         },
-
+        name: "Database Manager",
         init: function databaseInit(cb) {
             databaseObject.mysqlConnect(function(){
                 rethinkdb.connect(bot.config.rethinkdb,

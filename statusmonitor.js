@@ -7,6 +7,7 @@ var async = require('async');
 
 module.exports = function(bot) {
     return {
+        name: "Web service status monitor",
         init: function init(cb) {
             bot.log("Status monitor initialized");
             var lastErrors = {

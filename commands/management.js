@@ -1,30 +1,35 @@
 /**
  * Created by Peter on 19/04/2016.
  */
-exports.command = {
-    name: "mgt",
-    desc: "Management command",
-    usage: "mgt eval/config set/get/save/load /add",
-    func: function(user, userID, channel, args, message, bot){
-        //if(channel !== bot.config.misc.debugChannel)return true;
-        if(args[1] === "eval"){
-            eval(args.slice(2).join(" "));
-            bot.sendMessage({
-                to: channel,
-                message: "Executed."
-            });
-        }else if(args[1] === "config"){
-            if(args.length < 3)return false;
 
-            if(args[2] === "set"){
+var sargs = {
+    eval: function(user, userID, channel, args, message, bot){
+        eval(args.slice(2).join(" "));
+        bot.sendMessage({
+            to: channel,
+            message: "Executed."
+        });
+    },
+    evalOutput: function(user, userID, channel, args, message, bot){
+        bot.sendMessage({
+            to: channel,
+            message:  eval(args.slice(2).join(" "))
+        });
+    },
+    config: function(user, userID, channel, args, message, bot){
+        switch(args[3]){
+            default:
+                return false;
+            case "set":
                 if(args.length < 4)return false;
-                    bot.sendMessage({
-                        to: channel,
-                        message: '`config.'+args[3]+"."+args[4]+" = "+args[5]+"`"
-                    });
-                    bot.config[args[3]][args[4]] = args[5];
-                bot.log(user+" set "+ args[3] + "." + args[4]+" to "+args[5]);
-            }else if(args[2] === "get") {
+                bot.sendMessage({
+                    to: channel,
+                    message: `\`config.${args[3]}.${args[4]} = ${args[5]}\``
+                });
+                bot.config[args[3]][args[4]] = args[5];
+                bot.log(`${user} set ${args[3]}.${args[4]} to ${args[5]}`);
+                break;
+            case "get":
                 if (!bot.config[args[3]][args[4]]) {
                     bot.sendMessage({
                         to: channel,
@@ -36,7 +41,8 @@ exports.command = {
                         message: "`config." + args[3] + "." + args[4] + " = " + bot.config[args[3]][args[4]] + "`"
                     });
                 }
-            }else if(args[2] === "save") {
+                break;
+            case "save":
                 bot.saveConfig(function saveConfig(){
                     bot.log("Configuration saved manually.");
                     bot.sendMessage({
@@ -44,8 +50,8 @@ exports.command = {
                         message: "Saved config."
                     });
                 });
-
-            }else if(args[2] === "load"){
+                break;
+            case "load":
                 bot.loadConfig(function loadConfig(){
                     bot.log("Configuration loaded manually.");
                     bot.sendMessage({
@@ -53,16 +59,16 @@ exports.command = {
                         message: "Reloaded config. (Commands with onReady events may not take update without restart)"
                     });
                 });
-
-
-            }else{
-                return false;
-            }
-        }else if(args[1] === "add") {
-            try {
-                var location = './' + args[2];
-                var newCommand;
-                require.uncache(location, function () {
+                break;
+        }
+    },
+    add: function(user, userID, channel, args, message, bot){
+        try {
+            var location = './' + args[2];
+            var newCommand;
+            var ranOnce = false;
+            require.uncache(location, function () {
+                if(!ranOnce) {
                     newCommand = require(location).command;
                     bot.commands[newCommand.name] = newCommand;
                     if (newCommand.onReady)
@@ -72,72 +78,101 @@ exports.command = {
                         to: channel,
                         message: "`Loaded command: " + newCommand.name + "`"
                     });
-                });
+                    ranOnce = true;
+                }
+            });
 
 
-            } catch (e) {
-                bot.sendMessage({
-                    to: channel,
-                    message: "`Error loading module " + args[2] + " - " + e + "`"
-                });
-            }
-        }else if(args[1] === "module"){
-            if(args.length < 3){
-                bot.sendMessage({
-                	to: channel,
-                	message: "`mgt module list/reload/remove`"
-                });
-                return true;
-            }else
-            if(args[2] === "list"){
-                var output = "*INTERACTIVE MESSAGE HANDLERS:*\n";
-                for(var intID in bot.interactiveMessages){
-                    output+= intID+"\n"
-                }
-                output+="*MESSAGE HANDLERS:*\n";
-                for(var msgID in bot.messageHandlers){
-                    output+= msgID+"\n"
-                }
-                output+="*MODULES*\n";
-                for(var i in bot.modules){
-                    output+= i+" "+bot.modules[i]+"\n"
-                }
+        } catch (e) {
+            bot.sendMessage({
+                to: channel,
+                message: "`Error loading module " + args[2] + " - " + e + "`"
+            });
+        }
+    },
+    service: function(user, userID, channel, args, message, bot){
+        switch(args[2]) {
+            default:
+                return false;
+            case "list":
+                var output = "*Running Services:*\n_Pre-load Services:_\n";
+                for(var i in bot.services.loadBefore)
+                    if(bot.services.loadBefore.hasOwnProperty(i))
+                        output += i+". "+(bot.services.loadBefore[i].name || "Legacy Service")+"\n";
+                output+= "_Post-load Services:_\n";
+                for(i in bot.services.loadAfter)
+                    if(bot.services.loadAfter.hasOwnProperty(i))
+                        output += i+". "+(bot.services.loadAfter[i].name || "Legacy Service")+"\n";
                 bot.sendMessage({
                 	to: channel,
                 	message: output
                 });
-            }else if(args[2] === "remove"){
-                if(!args[3] || !args[4]){
-                    bot.sendMessage({
-                        to: channel,
-                        message: "`mgt module remove interactiveMessages/messageHandler <name>`"
+                break;
+            case "add":
+                try {
+                    var location = './../' + args[2];
+                    var newService;
+                    var ranOnce = false;
+                    require.uncache(location, function () {
+                        if(!ranOnce){
+                            newService = require(location)(bot);
+                            bot.services.loadAfter.push(newService);
+                            bot.sendMessage({
+                                to: channel,
+                                message: "Loading service: `" + newService.name + "`..."
+                            });
+                            newService.init(function(){
+                                bot.sendMessage({
+                                    to: channel,
+                                    message: "Loaded service: `" + newService.name + "`"
+                                });
+                            });
+                            ranOnce = true
+                        }
                     });
-                }else if(bot[args[3]]){
-                    if(bot[args[3]][args[4]]){
-                        delete bot[args[3]][args[4]];
-                        bot.sendMessage({
-                        	to: channel,
-                        	message: "Removed."
-                        });
-                        bot.log(userID+" removed "+args[3]+"."+args[4]);
-                    }else{
-                        bot.sendMessage({
-                            to: channel,
-                            message: "No such property."
-                        });
-                    }
-                }else{
+                } catch (e) {
                     bot.sendMessage({
                         to: channel,
-                        message: "No such register."
+                        message: "`Error loading service " + args[2] + " - " + e + "`"
                     });
                 }
-            }
-        }else{
-            return false;
-        }
+                break;
+            case "restart":
+                if(!args[3]) {
+                    bot.sendMessage({
+                        to: channel,
+                        message: "!msg service restart [id] [loadBefore/loadAfter]"
+                    });
+                }else {
+                    if(bot.services[args[4]][args[3]]) {
+                        bot.services[args[4]][args[3]].init(function(){
+                           bot.sendMessage({
+                           	to: channel,
+                           	message: "Done (Like my motivation to continue writing this command)"
+                           });
+                        });
+                    }else {
+                        bot.sendMessage({
+                        	to: channel,
+                        	message: "Service not found."
+                        });
+                    }
 
-        return true;
+                }
+                break;
+        }
+    },
+    handler: function(user, userID, channel, args, message, bot){
+
+    }
+};
+
+exports.command = {
+    name: "mgt",
+    desc: "Management command",
+    usage: "mgt eval/config set/get/save/load /add",
+    func: function(user, userID, channel, args, message, bot){
+        return sargs[args[1]] ? (sargs[args[1]](user, userID, channel, args, message, bot) || true) : false;
     }
 };
 

@@ -9,6 +9,7 @@ var request = require('request');
 
 module.exports = function(bot) {
     return {
+        name: "ScriptFodder notifcation monitor",
         init: function (cb) {
             setInterval(function(){
                 var now = new Date().getTime();

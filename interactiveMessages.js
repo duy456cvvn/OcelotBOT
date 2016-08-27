@@ -9,6 +9,7 @@ var express         = require('express'),
 
 module.exports = function interactiveMessages(bot) {
     return {
+        name: "Interactive Message Listener",
         init: function initInteractiveMessages(cb) {
 
             bot.log("Starting HTTP Server...");

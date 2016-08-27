@@ -42,20 +42,23 @@ var bot = {};
 bot.messageHandlers = {};
 bot.lastCrash = new Date();
 
-bot.modules = [
-    require('./config.js')(bot).init,
-    require('./database.js')(bot).init,
-    require('./interactiveMessages.js')(bot).init,
-    require('./commands.js')(bot).init,
-    botInit,
-    require('./autoReplies.js')(bot).init,
-    require('./logging.js')(bot).init,
-    require('./importantDates.js')(bot).init,
-    require('./statusmonitor.js')(bot).init,
-    //require('./scriptfodder.js')(bot).init
-   // require('./poGoStatus.js')(bot).init,
- //   require('./facebook.js')(bot).init
+
+bot.services = {};
+
+bot.services.loadBefore = [
+    require('./config.js')(bot),
+    require('./database.js')(bot),
+    require('./interactiveMessages.js')(bot),
+    require('./commands.js')(bot)
 ];
+
+bot.services.loadAfter = [
+    require('./autoReplies.js')(bot),
+    require('./logging.js')(bot),
+    require('./importantDates.js')(bot),
+    require('./statusmonitor.js')(bot)
+];
+
 
 function startBot(){
     bot.log = function(message, caller){
@@ -94,8 +97,33 @@ function startBot(){
     };
 
     //Init all modules
-    bot.log("Initialising modules...");
-    async.series(bot.modules);
+    async.series([
+        function(cb){
+            bot.log("Initialising pre-load services...");
+            async.eachSeries(bot.services.loadBefore, function initLoadBefore(service, cb){
+                if(service.init){
+                    bot.log("Initialising "+(service.name || "legacy service")+"...");
+                    service.init(cb);
+                }
+            }, cb);
+        },
+        function(cb){
+            bot.log("Initialising bot...");
+            botInit(cb);
+        },
+        function(cb){
+            bot.log("Initialising post-load services...");
+            async.eachSeries(bot.services.loadAfter, function initLoadBefore(service, cb){
+                if(service.init){
+                    bot.log("Initialising "+(service.name || "legacy service")+"...");
+                    service.init(cb);
+                }
+            }, cb);
+        }
+    ], function(){
+        bot.log("Initialisation finished");
+    });
+
 }
 
 function botInit(cb){
