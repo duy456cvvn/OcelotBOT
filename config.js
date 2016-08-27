@@ -60,6 +60,7 @@ module.exports = function(bot){
     };
 
     return {
+        name: "Configuration Provider",
         init: function initConfig(cb){
             bot.loadConfig = function loadConfig(cb){
                 bot.log("Loading configuration file...");
