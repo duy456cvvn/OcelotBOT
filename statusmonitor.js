@@ -25,6 +25,7 @@ module.exports = function(bot) {
                 "https://earth.boywanders.us/": []
             };
             setInterval(function runStatusMonitor(){
+                if(!bot.config.statusChecker.enabled)return;
                // bot.log("Running status monitor");
                 var errors = {
                     "https://unacceptableuse.com": [],
