@@ -53,9 +53,16 @@ module.exports = function(bot){
             "9/2": "Happy Birthday me! 9/2/2016-FOREVER (%2016 years ago.) Also Happy Birthday Peter!",
             "29/5": "Happy Birthday OcelotBOT 1 29/5/2015-9/2/2016 (%2015 years ago.)",
             "22/7": "Happy Birthday Stevie! 22/7/2014-2/5/2015 (%2014 years ago.)",
+            "27/8": "Just testing don't mind me %2014",
             "31/8": "Happy Georgia got fingered day! 31/8/2014 (%2014 years ago.)",
             "7/9": "Happy Birthday Alex!",
             "11/9": "Happy 9/11 guys"
+        },
+        statusChecker: {
+            sites: [
+
+            ],
+            enabled: true
         }
     };
 
