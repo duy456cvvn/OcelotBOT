@@ -61,10 +61,12 @@ exports.command = {
     }
 };
 
-
+//
 function download(video, bot, destination, channel, messageID, petifyUpdate){
     var ytdl = youtubedl(video.url,[
         "--proxy=" + bot.config.misc.proxyURL,
+        "--flat-playlist",
+        "--ignore-errors",
         "--force-ipv4"]);
 
 
