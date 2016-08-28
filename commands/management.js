@@ -110,7 +110,7 @@ var sargs = {
                 break;
             case "add":
                 try {
-                    var location = './../' + args[2];
+                    var location = './../' + args[3];
                     var newService;
                     var ranOnce = false;
                     require.uncache(location, function () {
