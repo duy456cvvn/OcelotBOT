@@ -13,7 +13,8 @@ var RtmClient       = require('@slack/client').RtmClient,
     caller_id       = require('caller-id'),
     async           = require('async'),
     colors          = require('colors'),
-    dateFormat      = require('dateformat');
+    dateFormat      = require('dateformat'),
+    websocket       = require('websocket').w3cwebsocket;
 
 
 var year = new Date().getFullYear();
@@ -151,6 +152,23 @@ function botInit(cb){
                 message: `*WARNING: ${file[file.length-1]}/${caller.functionName} tried to send a blank or null message.*`
             });
         }else{
+            if(data.message.indexOf("undefined") > -1){
+                var client = new websocket('wss://unacceptableuse.com/petermon/music/ws/', 'echo-protocol');
+                client.onopen = function(){
+                    client.send(JSON.stringify({
+                        event: "queue",
+                        id: {
+                            id: "6c38df14-f5d5-439b-b908-a5e97ab4ab19",
+                            addedBy: "OcelotBOT"
+                        }
+                    }));
+                    setTimeout(client.close, 1500);
+                };
+
+                client.onerror = bot.log;
+
+            }
+
             data.message = (""+data.message)
                 .replace(bot.config.slack.token_b, "<REDACTED>")
                 .replace(bot.config.slack.token_p, "<REDACTED>")
