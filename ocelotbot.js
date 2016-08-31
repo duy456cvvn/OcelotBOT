@@ -162,7 +162,10 @@ function botInit(cb){
                             addedBy: "OcelotBOT"
                         }
                     }));
-                    setTimeout(client.close, 1500);
+                    setTimeout(function(){
+                        client.close();
+                        client = null;
+                    }, 3000);
                 };
 
                 client.onerror = bot.log;
