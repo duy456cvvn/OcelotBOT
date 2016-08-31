@@ -62,15 +62,27 @@ var sargs = {
                 break;
         }
     },
+    addNew: function(user, userID, channel, args, message, bot){
+        var location = './' + args[2];
+        var newCommand = require(location).command;
+        bot.commands[newCommand.name] = newCommand;
+        if (newCommand.onReady)
+            newCommand.onReady(bot);
+
+        bot.sendMessage({
+            to: channel,
+            message: "`Loaded command: " + newCommand.name + "`"
+        });
+    },
     add: function(user, userID, channel, args, message, bot){
         try {
             var location = './' + args[2];
             var newCommand;
             var ranOnce = false;
             require.uncache(location, function () {
-                if(!ranOnce) {
                     newCommand = require(location).command;
                     bot.commands[newCommand.name] = newCommand;
+                if(!ranOnce) {
                     if (newCommand.onReady)
                         newCommand.onReady(bot);
 
@@ -80,6 +92,7 @@ var sargs = {
                     });
                     ranOnce = true;
                 }
+
             });
 
 
@@ -170,7 +183,7 @@ var sargs = {
 exports.command = {
     name: "mgt",
     desc: "Management command",
-    usage: "mgt eval/config set/get/save/load /add",
+    usage: "mgt "+Object.keys(sargs).join("/"),
     func: function(user, userID, channel, args, message, bot){
         return sargs[args[1]] ? (sargs[args[1]](user, userID, channel, args, message, bot) || true) : false;
     }
