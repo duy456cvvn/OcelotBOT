@@ -159,7 +159,8 @@ exports.command = {
                     });
             }else{
                 var messages = resp.messages;
-                if(messages[index].user === user){
+                bot.log(messages[index].user+", "+user+", "+userID);
+                if(messages[index].user === userID){
                     bot.sendMessage({
                     	to: channel,
                     	message: "_topicing something you said is like laughing at your own joke_ - Neil 2015"
