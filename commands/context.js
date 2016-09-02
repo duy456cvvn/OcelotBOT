@@ -2,7 +2,7 @@
 * Copyright UnacceptableUse 2016
  */
 
-var poemMatch = /(.*) (.*)Roses are red\\nViolets are blue\\n>(.*)\\n - (.*) [0-9]{4}/;
+var poemMatch = /Roses are red\\nViolets are blue\\n>(.*)\\n - (.*) [0-9]{4}/;
 var r = require('rethinkdb');
 exports.command = {
     name: "context",
