@@ -90,7 +90,7 @@ exports.command = {
                                     }else{
                                         bot.sendMessage({
                                         	to: channel,
-                                        	message: "Could not match message to poem regex: "+JSON.stringify(message.text)
+                                        	message: "Could not match message to poem regex: "+JSON.stringify(message.text)+" | Match: ```\n"+JSON.stringify(match, null, 4)+"\n```"
                                         });
                                     }
                                     break;
