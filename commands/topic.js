@@ -73,17 +73,22 @@ exports.command = {
                 bot.updateTopic(channel);
             }else if(args[1] === "count") {
                 r.db("ocelotbot").table("topics").getField("username").distinct().run(bot.rconnection, function userCountQuery(err, result) {
+                    var counts = {};
                     var out = "Topic counts by username:\n";
                     async.each(result, function (val, cb) {
                         r.db('ocelotbot').table('topics').filter({username: val}).count().run(bot.rconnection, function getCountForUser(err, count) {
-                            if (err) {
-                                out += val + ": *ERROR* " + err + "\n";
-                            } else {
-                                out += "*" + val + "*: " + count + "\n"
-                            }
+                           if(err){
+                               counts["ERR "+err] = 0;
+                           }else{
+                               counts[val] = count;
+                           }
                             cb();
                         });
                     }, function (err) {
+                        var sortedKeys = Object.keys(counts).sort(function(a,b){return counts[b]-counts[a]});
+                        for(var i in sortedKeys){
+                            out += "*" + sortedKeys[i] + "*: " + counts[sortedKeys[i]]+ "\n"
+                        }
                         if (err) {
                             bot.sendMessage({
                                 to: channel,
