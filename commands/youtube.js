@@ -97,10 +97,10 @@ function download(video, bot, destination, channel, messageID, petifyUpdate){
                             bot.log(data);
                         });
                         petifyUpdater.stderr.on('data', function petifyUpdaterErr(data){
-                            bot.error(data);
+                            //bot.error(data);
                         });
                         petifyUpdater.on('close', function petifyUpdaterClose(code){
-                            bot.log("Petify updater closed with code "+code);
+                           // bot.log("Petify updater closed with code "+code);
                         });
                     }else{
                         sendOrEdit("Downloading `"+video.title+"`...\n*Done!* Added to radio station.", messageID, channel, bot);
