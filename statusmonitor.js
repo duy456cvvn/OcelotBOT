@@ -9,31 +9,33 @@ module.exports = function(bot) {
     var object = {
         errors: {
             "https://unacceptableuse.com": [],
-            "https://boywanders.us": [],
-            "https://ocelotworks.com": [],
             "http://files.unacceptableuse.com": [],
+            "https://petermaguire.xyz": [],
             "http://unacc.eu": [],
+            "https://boywanders.us": [],
+            "https://earth.boywanders.us/": [],
+            "https://ocelotworks.com": [],
             "https://docs.ocelotworks.com": [],
             "https://dvd604.pw": [],
-            "http://vpn.tekno.pw": [],
             "https://tekno.pw": [],
-            "https://alexmcgrath.com": [],
-            "https://petermaguire.xyz": [],
-            "https://earth.boywanders.us/": []
+            "http://vpn.tekno.pw": [],
+            "https://blog.tekno.pw": [],
+            "https://alexmcgrath.com": []
         },
         lastErrors: {
             "https://unacceptableuse.com": [],
-            "https://boywanders.us": [],
-            "https://ocelotworks.com": [],
             "http://files.unacceptableuse.com": [],
+            "https://petermaguire.xyz": [],
             "http://unacc.eu": [],
+            "https://boywanders.us": [],
+            "https://earth.boywanders.us/": [],
+            "https://ocelotworks.com": [],
             "https://docs.ocelotworks.com": [],
             "https://dvd604.pw": [],
-            "http://vpn.tekno.pw": [],
             "https://tekno.pw": [],
-            "https://alexmcgrath.com": [],
-            "https://petermaguire.xyz": [],
-            "https://earth.boywanders.us/": []
+            "http://vpn.tekno.pw": [],
+            "https://blog.tekno.pw": [],
+            "https://alexmcgrath.com": []
         },
         name: "Web service status monitor",
         init: function init(cb) {
@@ -64,7 +66,7 @@ module.exports = function(bot) {
                                     if(object.errors[id].length > 0){
                                         errorCount++;
                                         msg+=id+":\n";
-                                        msg+="- "+object.errors[id].join("\n")+"\n";
+                                        msg+=object.errors[id].join("\n")+"\n";
                                     }
                                 }
                             }
