@@ -186,6 +186,13 @@ exports.command = {
 		if(args.length < 3)return false;
 		var input = message.substring(message.indexOf(args[1])+args[1].length+1);
 		if(args[1] === "in"){
+            if(userID === "U1DNDKZDW" || userID === "U232Q4WQJ"){
+                bot.sendMessage({
+                    to: channel,
+                    message: "lol no"
+                });
+                return true;
+            }
 			bot.sendMessage({
 	            to: channel,
 	            message: eval(input)
