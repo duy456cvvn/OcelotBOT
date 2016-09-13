@@ -84,7 +84,7 @@ function download(video, bot, destination, channel, messageID, petifyUpdate){
             .on('progress', function(progress){
                 var timeSplit = progress.timemark.split(":"); //hh:mm:ss.ms
                 var currentSeconds = (timeSplit[0] * 3600) + (timeSplit[1] * 60) + parseInt(timeSplit[2]);
-                sendOrEdit("Downloading `"+video.title+"` (Converting)...\n"+generateBar(totalSeconds, currentSeconds), messageID, channel, bot);
+                sendOrEdit("Downloading `"+video.title+"` (Converting)...\n"+(video.url == "https://www.youtube.com/watch?v=-Tdu4uKSZ3M" && totalSeconds > 30 ? "--[To be continued]-->" : generateBar(totalSeconds, currentSeconds)), messageID, channel, bot);
             })
             .on('end', function(){
                 if(destination.indexOf("files.unacceptableuse.com") > -1){
