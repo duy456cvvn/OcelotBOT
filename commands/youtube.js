@@ -152,6 +152,7 @@ function downloadPlaylist(videos, bot, destination, channel, messageID){
                         var video = videos[i];
                         var ytdl = youtubedl(video.url, [
                             "--proxy=" + bot.config.misc.proxyURL,
+                            "--ignore-errors",
                             "--force-ipv4"]);
 
                         ytdl.on('info', function (info) {
