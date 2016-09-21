@@ -1,16 +1,41 @@
 /**
  * Created by Peter on 07/07/2016.
  */
-
+var request = require('request');
 module.exports = function(bot){
     return {
         name: "Autoreplies Listener",
         init: function(cb){
 
             bot.registerMessageHandler("autoreply", function handleAutoReply(message, channelID){
+
+                if(message.startsWith("<@U1M9SE59T>")){
+                    request({
+                        url: 'https://www.reddit.com/r/gonewild/comments.json',
+                        headers: {
+                            'User-Agent': 'OcelotBOT link parser by /u/UnacceptableUse'
+                        }
+                    }, function sexyResponse(err, resp, body){
+                        if(err){
+                           bot.log(err);
+                        }else{
+                            try {
+                                var data = JSON.parse(body);
+                                if(data && data.data && data.data.children && data.data.children.length > 1){
+                                    bot.sendMessage({
+                                        to: channelID,
+                                        message: data.data.children[parseInt(Math.random() * data.data.children.length)].data.body
+                                    });
+                                }
+                            }catch(e){
+                                bot.log(e);
+                            }
+                        }
+                    });
+                }
+
                 message = message.toLowerCase();
 
-                bot.log(message);
 
                 if(message.indexOf("ass") > -1 && message.toLowerCase().indexOf("-") === -1){
                     var words = message.toLowerCase().split(" ");
