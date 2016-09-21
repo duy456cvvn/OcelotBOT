@@ -9,6 +9,9 @@ module.exports = function(bot){
 
             bot.registerMessageHandler("autoreply", function handleAutoReply(message, channelID){
                 message = message.toLowerCase();
+
+                bot.log(message);
+
                 if(message.indexOf("ass") > -1 && message.toLowerCase().indexOf("-") === -1){
                     var words = message.toLowerCase().split(" ");
                     for(var i in words){
@@ -50,6 +53,13 @@ module.exports = function(bot){
                     bot.sendMessage({
                         to: channelID,
                         message: "*hot damn*"
+                    });
+                }
+
+                if(message.indexOf("alot") > -1){
+                    bot.sendMessage({
+                    	to: channelID,
+                    	message: "http://thewritepractice.com/wp-content/uploads/2012/05/Alot-vs-a-lot1-600x450.png"
                     });
                 }
             });
