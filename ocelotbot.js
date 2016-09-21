@@ -54,7 +54,7 @@ bot.services.loadBefore = [
 ];
 
 bot.services.loadAfter = [
-    require('./autoReplies.js')(bot),
+    require('./autoreplies.js')(bot),
     require('./logging.js')(bot),
     require('./importantDates.js')(bot),
     require('./statusmonitor.js')(bot)
