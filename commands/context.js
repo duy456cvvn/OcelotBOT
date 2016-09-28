@@ -32,6 +32,7 @@ exports.command = {
                         if (messages.hasOwnProperty(i)) {
                             var message = messages[i];
                             if (message.user == "U1M9SE59T") { //TODO: get this dynamically
+
                                 if (message.text.startsWith("Roses are red")) {
                                     var match = message.text.match(poemMatch);
                                     if (match && match.length > 0) {
