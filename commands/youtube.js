@@ -5,7 +5,7 @@ var youtubedl 	= require('youtube-dl'),
     async       = require('async'),
     spawn       = require('child_process').spawn;
 
-var illegalTitleRegex = /(?![A-Za-z0-9 \(\)\[\]!'.\-&+$%^])/gm;
+var illegalTitleRegex = /([\s\(\)\[\]\/!'\.\-&+$%^])/gm;
 
 exports.command = {
 	name: "youtube",
