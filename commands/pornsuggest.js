@@ -11,10 +11,18 @@ exports.command = {
 	        });
 	        response.on('end', function () {
 	          	var names = JSON.parse(body);
-	          	bot.sendMessage({
-	            	to: channel,
-	            	message: "Feeling horny? Try *"+(names[parseInt(Math.random() * names.length)].keyword)+"*"
-    			});
+				if(names[0].message){
+                    bot.sendMessage({
+                        to: channel,
+                        message: names[0].message
+                    });
+                }else{
+                    bot.sendMessage({
+                        to: channel,
+                        message: "Feeling horny? Try *"+(names[parseInt(Math.random() * names.length)].keyword)+"*"
+                    });
+                }
+
 	      	});
 			
 		});
