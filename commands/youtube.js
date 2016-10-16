@@ -103,7 +103,8 @@ function download(video, bot, destination, channel, messageID, petifyUpdate){
                            // bot.log("Petify updater closed with code "+code);
                         });
                     }else{
-                        sendOrEdit("Downloading `"+video.title+"`...\n*Done!* Added to radio station.", messageID, channel, bot);
+                        sendOrEdit("Downloading `"+video.title+"`...\n*Done!* Added to radio station.\n*Note that Petify 2 will not use this command and instead videos will be downloaded here: https://unacceptableuse.com/petify/add*", messageID, channel, bot);
+
                     }
                 }
 
