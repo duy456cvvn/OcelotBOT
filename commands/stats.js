@@ -42,62 +42,54 @@ exports.command = {
         r.db('ocelotbot').table('messages').filter({user: target}).run(bot.rconnection, function(err, cursor){
            if(err){
                output+= "Error getting messages: "+err;
-           }else{
-               cursor.toArray(function(err, array){
+           }else {
+               var totalMessages = 0;
+               var totalWords = 0;
+               var totalChars = 0;
+               var uniqueWords = {};
+               var channels = {};
+               cursor.each(function (err, entry) {
+                   totalMessages++;
+                   var message = entry.message;
+                   var channel_ = entry.channel;
+                   var words = message.split(" ");
+                   totalWords += words.length;
+                   totalChars += message.length;
 
-                   if(err){
-                       output+= "Error converting cursor to array: "+err
-                   }else{
-                       var totalWords = 0;
-                       var totalChars = 0;
-                       var uniqueWords = {};
-                       var channels = {};
-                       for(var i in array){
-                           if(array.hasOwnProperty(i)){
-                               var entry = array[i];
-                               var message = entry.message;
-                               var channel_ = entry.channel;
-                               var words = message.split(" ");
-                               totalWords += words.length;
-                               totalChars += message.length;
-
-                               for(var j in words){
-                                   if(words.hasOwnProperty(j)){
-                                       words[j] = words[j].toLowerCase().trim();
-                                       if(words[j].length < 3  || commonWords.indexOf(words[j]) > -1)continue;
-                                       if(uniqueWords[words[j]]){
-                                           uniqueWords[words[j]]++;
-                                       }else{
-                                           uniqueWords[words[j]] = 1;
-                                       }
-                                   }
-                               }
-
-                               if(channels[channel_]){
-                                   channels[channel_]++
-                               }else{
-                                   channels[channel_] = 1;
-                               }
-
+                   for (var j in words) {
+                       if (words.hasOwnProperty(j)) {
+                           words[j] = words[j].toLowerCase().trim();
+                           if (words[j].length < 3 || commonWords.indexOf(words[j]) > -1)continue;
+                           if (uniqueWords[words[j]]) {
+                               uniqueWords[words[j]]++;
+                           } else {
+                               uniqueWords[words[j]] = 1;
                            }
                        }
-
-                       var uniqueWordsSorted = Object.keys(uniqueWords).sort(function(a,b){return uniqueWords[a]-uniqueWords[b]});
-                       var channelsSorted = Object.keys(channels).sort(function(a,b){return channels[a]-channels[b]});
-
-
-
-                       output+= "- *"+array.length+"* total messages.\n";
-                       output+= "- *"+totalWords+"* total words (*"+Object.keys(uniqueWords).length+"* unique).\n";
-                       output+= "- *"+parseInt(totalWords/array.length)+"* words per message.\n";
-                       output+= "- *"+totalChars+"* total characters.\n";
-                       output+= "- At 44 words per minute (average), this would've taken *"+parseInt((totalWords/44)/60)+"* hours to type.\n";
-                       output+= "- At 101 words per minute (peter speed), this would've taken *"+parseInt((totalWords/101)/60)+"* hours to type.\n";
-                       output+= "- The most used word is *"+uniqueWordsSorted[uniqueWordsSorted.length-1]+"* with *"+uniqueWords[uniqueWordsSorted[uniqueWordsSorted.length-1]]+"* uses.\n";
-                       output+= "- Their favourite channel is *"+channelsSorted[channelsSorted.length-1]+"* with *"+channels[channelsSorted[channelsSorted.length-1]]+"* messages.\n";
-
-
                    }
+
+                   if (channels[channel_]) {
+                       channels[channel_]++
+                   } else {
+                       channels[channel_] = 1;
+                   }
+               }, function () {
+                   var uniqueWordsSorted = Object.keys(uniqueWords).sort(function (a, b) {
+                       return uniqueWords[a] - uniqueWords[b]
+                   });
+                   var channelsSorted = Object.keys(channels).sort(function (a, b) {
+                       return channels[a] - channels[b]
+                   });
+
+
+                   output += `- *${totalMessages}* total messages.\n`;
+                   output += `- *${totalWords}* total words (*${Object.keys(uniqueWords).length}* unique).\n`;
+                   output += `- *${parseInt(totalWords / totalMessages)}* words per message.\n`;
+                   output += `- *${totalChars}* total characters.\n`;
+                   output += `- At *44* words per minute, this would've taken *${parseInt((totalWords / 44) / 60)}* hours to type.\n`;
+                   output += `- All their messages in a text file would take *${parseInt(totalChars / 1024)}* kb\n`;
+                   output += `- The most used word is *'${uniqueWordsSorted[uniqueWordsSorted.length - 1]}'* with *${uniqueWords[uniqueWordsSorted[uniqueWordsSorted.length - 1]]}* uses.\n`;
+                   output += `- Their favourite channel is *${channelsSorted[channelsSorted.length - 1]}* with *${channels[channelsSorted[channelsSorted.length - 1]]}* messages.\n`;
 
 
                    bot.editMessage({
@@ -107,8 +99,6 @@ exports.command = {
                    });
                });
            }
-
-
         });
 
 
