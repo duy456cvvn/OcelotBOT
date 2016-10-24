@@ -7,13 +7,13 @@ exports.command = {
 		if(args.length < 2){
 			return false;
 		}
-		if(userID === "U1DNDKZDW" || userID === "U232Q4WQJ"){
-            bot.sendMessage({
-            	to: channel,
-            	message: "lol no"
-            });
-            return true;
-        }
+        //if(userID === "U1DNDKZDW" || userID === "U232Q4WQJ"){
+        //    bot.sendMessage({
+        //    	to: channel,
+        //    	message: "lol no"
+        //    });
+        //    return true;
+        //}
 		if(args[1] === "list"){
 			forever.list(false, function(err, info){
 				var output = "\n*RUNNING FOREVER PROGRAMS:*\n";

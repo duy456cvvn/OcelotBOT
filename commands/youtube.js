@@ -104,7 +104,6 @@ function download(video, bot, destination, channel, messageID, petifyUpdate){
                         });
                     }else{
                         sendOrEdit("Downloading `"+video.title+"`...\n*Done!* Added to radio station.\n*Note that Petify 2 will not use this command and instead videos will be downloaded here: https://unacceptableuse.com/petify/add*", messageID, channel, bot);
-
                     }
                 }
 

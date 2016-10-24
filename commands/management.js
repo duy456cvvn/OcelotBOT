@@ -4,13 +4,13 @@
 
 var sargs = {
     eval: function(user, userID, channel, args, message, bot){
-        if(userID === "U1DNDKZDW" || userID === "U232Q4WQJ"){
-            bot.sendMessage({
-                to: channel,
-                message: "lol no"
-            });
-            return true;
-        }
+        //if(userID === "U1DNDKZDW" || userID === "U232Q4WQJ"){
+        //    bot.sendMessage({
+        //        to: channel,
+        //        message: "lol no"
+        //    });
+        //    return true;
+        //}
         eval(args.slice(2).join(" "));
         bot.sendMessage({
             to: channel,
@@ -18,13 +18,13 @@ var sargs = {
         });
     },
     evalOutput: function(user, userID, channel, args, message, bot){
-        if(userID === "U1DNDKZDW" || userID === "U232Q4WQJ"){
-            bot.sendMessage({
-                to: channel,
-                message: "lol no"
-            });
-            return true;
-        }
+        //if(userID === "U1DNDKZDW" || userID === "U232Q4WQJ"){
+        //    bot.sendMessage({
+        //        to: channel,
+        //        message: "lol no"
+        //    });
+        //    return true;
+        //}
         bot.sendMessage({
             to: channel,
             message:  eval(args.slice(2).join(" "))

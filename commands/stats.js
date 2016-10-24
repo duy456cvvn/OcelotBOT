@@ -46,6 +46,8 @@ exports.command = {
                var totalMessages = 0;
                var totalWords = 0;
                var totalChars = 0;
+               var emojis = {};
+               var totalEmojis = 0;
                var uniqueWords = {};
                var channels = {};
                cursor.each(function (err, entry) {
@@ -59,6 +61,14 @@ exports.command = {
                    for (var j in words) {
                        if (words.hasOwnProperty(j)) {
                            words[j] = words[j].toLowerCase().trim();
+                           if(words[j].startsWith(":") && words[j].endsWith(":")){
+                               totalEmojis++;
+                               if(emojis[words[j]])
+                                   emojis[words[j]]++;
+                               else
+                                   emojis[words[j]] = 1;
+                           }
+
                            if (words[j].length < 3 || commonWords.indexOf(words[j]) > -1)continue;
                            if (uniqueWords[words[j]]) {
                                uniqueWords[words[j]]++;
@@ -81,6 +91,10 @@ exports.command = {
                        return channels[a] - channels[b]
                    });
 
+                   var emojisSorted = Object.keys(emojis).sort(function (a, b) {
+                       return emojis[a] - emojis[b]
+                   });
+
 
                    output += `- *${totalMessages}* total messages.\n`;
                    output += `- *${totalWords}* total words (*${Object.keys(uniqueWords).length}* unique).\n`;
@@ -89,6 +103,7 @@ exports.command = {
                    output += `- At *44* words per minute, this would've taken *${parseInt((totalWords / 44) / 60)}* hours to type.\n`;
                    output += `- All their messages in a text file would take *${parseInt(totalChars / 1024)}* kb\n`;
                    output += `- The most used word is *'${uniqueWordsSorted[uniqueWordsSorted.length - 1]}'* with *${uniqueWords[uniqueWordsSorted[uniqueWordsSorted.length - 1]]}* uses.\n`;
+                   output += `- Their favourite emoji is *${emojisSorted[emojisSorted.length-1]}*, having used it *${emojis[emojisSorted[emojisSorted.length-1]]}* times. They have used *${emojisSorted.length}* different emojis, *${totalEmojis}* total times.\n`;
                    output += `- Their favourite channel is *${channelsSorted[channelsSorted.length - 1]}* with *${channels[channelsSorted[channelsSorted.length - 1]]}* messages.\n`;
 
 
