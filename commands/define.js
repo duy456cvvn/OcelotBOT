@@ -14,23 +14,27 @@ exports.command = {
                         var output = "*Synonyms of "+val+":*\n";
                         var updatedAttachment = info.original_message.attachments[0];
                         updatedAttachment.actions = [];
-                        for(var i in data.results){
-                            if(data.results.hasOwnProperty(i)){
-                                output+="- "+data.results[i].headword+"\n";
-                                updatedAttachment.actions.push({
-                                    type: "button",
-                                    name: "define",
-                                    value: data.results[i].headword,
-                                    text: "Define "+data.results[i].headword
-                                });
+                        if(data.results.length > 0){
+                            for(var i in data.results){
+                                if(data.results.hasOwnProperty(i)){
+                                    output+="- "+data.results[i].headword+"\n";
+                                    updatedAttachment.actions.push({
+                                        type: "button",
+                                        name: "define",
+                                        value: data.results[i].headword,
+                                        text: "Define "+data.results[i].headword
+                                    });
+                                }
                             }
+
+                            updatedAttachment.text = output;
+
+                            bot.web.chat.update(info.original_message.ts, info.channel.id, "", {
+                                attachments: [updatedAttachment]
+                            });
+                        }else{
+                            bot.web.chat.update(info.original_message.ts, info.channel.id, "There are no synonyms.");
                         }
-
-                        updatedAttachment.text = output;
-
-                        bot.web.chat.update(info.original_message.ts, info.channel.id, "", {
-                            attachments: [updatedAttachment]
-                        });
                     }
                 });
             }else if(name === "define"){
