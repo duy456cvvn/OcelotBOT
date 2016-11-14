@@ -40,6 +40,8 @@ var WS_CLOSE_CODES = {
 
 var bot = {};
 
+var botWillReconnect = false;
+
 bot.messageHandlers = {};
 bot.lastCrash = new Date();
 
@@ -235,7 +237,13 @@ function botInit(cb){
     bot.log("Waiting for bot to start...");
     bot.rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, function rtmAuthEvent(data){
         bot.log("RTM Client authenticated.");
-        cb();
+        if(botWillReconnect){
+            bot.log("Reconnecting...");
+            startBot();
+        }else{
+            botWillReconnect = true;
+            cb();
+        }
     });
 
     bot.rtm.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, function rtmOpenEvent(data){
@@ -299,6 +307,18 @@ function busInit(){
 process.on('uncaughtException', function uncaughtException(err){
     bot.error(err.stack);
     bot.lastCrash = new Date();
+
+    if(!bot.rtm.connected){
+        bot.log("Last crash caused disconnect, waiting 10 seconds for a revival then killing bot.");
+        setTimeout(function(){
+            if(!bot.rtm.connected){
+                bot.log("Bot is still dead after 10 seconds, restarting...");
+                process.exit(1);
+            }else{
+                bot.log("Bot successfully reconnected in time and lived to shitpost another day.");
+            }
+        }, 10000);
+    }
 });
 
 startBot();
