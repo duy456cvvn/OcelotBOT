@@ -9,7 +9,7 @@
     "body-parser": "^1.15.2",
     "caller-id": "^0.1.0",
     "dateformat": "^1.0.12",
-    "express": "^",
+    "express": "^4.14.0",
     "forever": "^0.15.2",
     "lame": "^1.2.4",
     "markov": "0.0.7",
