@@ -1,6 +1,7 @@
 /*
 * Copyright Ocelotworks 2016 - I should be doing homework right now
  */
+const os = require('os');
 exports.command = {
     name: "status",
     desc: "Ocelotworks Service Status",
@@ -16,7 +17,8 @@ exports.command = {
         }
 
         output += (bot.rconnection  ? ":white_check_mark:" : ":red_circle:")+" RethinkDB\n";
-        output += (bot.connection  ? ":white_check_mark:" : ":red_circle:")+" MySQL\n";
+        //output += (bot.connection  ? ":white_check_mark:" : ":red_circle:")+" MySQL\n";
+        output += (os.loadavg()[0] >= 4 ? ":warning: Earth (High CPU Usage)" : ":white_check_mark: Earth");
 
         bot.sendMessage({
         	to: channel,

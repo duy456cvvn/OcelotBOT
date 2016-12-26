@@ -11,7 +11,8 @@ module.exports = function(bot){
                 var date = new Date();
                 if(bot.config.importantDates[date.getDate()+"/"+(date.getMonth()+1)]){
                     var message = bot.config.importantDates[date.getDate()+"/"+(date.getMonth()+1)];
-                    var year = yearRegex.exec(message)[0];
+                    var hasYear = yearRegex.exec(message);
+                    var year = hasYear ? hasYear[0] : null;
                     if(year)
                         message = message.replace(year, date.getFullYear()-year.substring(1));
                     bot.sendMessage({

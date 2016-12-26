@@ -44,8 +44,8 @@ exports.command = {
 			if(args.length < 3)return false;
 		    var logText = "```";
 		    forever.tail(args[2],{length: 40, stream: false} ,function(err, logs){
-		        if(err) 
-		        	logText = err; 
+		        if(err)
+		        	logText = err;
 		        else
 		        	logText += logs.line+"\n";
 		    });
@@ -57,7 +57,7 @@ exports.command = {
 		    }, 500);
 		}else{
 			return false;
-		}	
+		}
         return true;
 	},
 	test: function(test){

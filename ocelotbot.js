@@ -60,6 +60,8 @@ bot.services.loadAfter = [
     require('./logging.js')(bot),
     require('./importantDates.js')(bot),
     require('./statusmonitor.js')(bot)
+  //  require('./scriptfodder.js')(bot),
+   // require('./ucas.js')(bot)
 ];
 
 
@@ -76,8 +78,8 @@ function startBot(){
         var output = origin+message;
         console.log(`[${dateFormat(new Date(), "dd/mm/yy hh:MM")}]`+output);
         if(bot.config.misc.logChannelEnabled && bot.rtm && bot.rtm.connected){
-            bot.sendMessage({
-                to: bot.config.misc.logChannel,
+                bot.sendMessage({
+                    to: bot.config.misc.logChannel,
                 message: output
             });
         }
@@ -146,9 +148,11 @@ function botInit(cb){
 
 
     bot.sendMessage = function(data, cb){
+        var caller = caller_id.getData();
+        var file = caller.filePath ? caller.filePath.split("/") : ["unknown"];
         if(!data.message || data.message == ""){
-            var caller = caller_id.getData();
-            var file = caller.filePath ? caller.filePath.split("/") : ["unknown"];
+            // var caller = caller_id.getData();
+            // var file = caller.filePath ? caller.filePath.split("/") : ["unknown"];
             bot.sendMessage({
                 to: data.to,
                 message: `*WARNING: ${file[file.length-1]}/${caller.functionName} tried to send a blank or null message.*`
@@ -284,12 +288,17 @@ function botInit(cb){
         var channelID = messageData.channel;
         var user = "<"+messageData.user+">";
         var userID = messageData.user;
+        //bot.log(JSON.stringify(messageData));
         if(message) {
-            for(var i in bot.messageHandlers){
-                if(bot.messageHandlers.hasOwnProperty(i)){
-                    bot.messageHandlers[i](message, channelID, user, userID);
-                }
-            }
+           if(messageData.ts && messageData.ts < bot.lastCrash.getTime()/1000){
+               console.log("Ignoring message because it was sent before the bot started ("+messageData.ts+" < "+bot.lastCrash.getTime()/1000+")");
+           }else {
+               for (var i in bot.messageHandlers) {
+                   if (bot.messageHandlers.hasOwnProperty(i)) {
+                       bot.messageHandlers[i](message, channelID, user, userID);
+                   }
+               }
+           }
         }
     });
 }
@@ -306,18 +315,20 @@ function busInit(){
 
 process.on('uncaughtException', function uncaughtException(err){
     bot.error(err.stack);
+    bot.error(JSON.stringify(err));
     bot.lastCrash = new Date();
 
-    if(!bot.rtm.connected){
-        bot.log("Last crash caused disconnect, waiting 10 seconds for a revival then killing bot.");
-        setTimeout(function(){
-            if(!bot.rtm.connected){
-                bot.log("Bot is still dead after 10 seconds, restarting...");
-                process.exit(1);
-            }else{
-                bot.log("Bot successfully reconnected in time and lived to shitpost another day.");
-            }
-        }, 10000);
+    if(bot.rtm && !bot.rtm.connected){
+        process.exit(1);
+        // bot.log("Last crash caused disconnect, waiting 10 seconds for a revival then killing bot.");
+        // setTimeout(function(){
+        //     if(!bot.rtm.connected){
+        //         bot.log("Bot is still dead after 10 seconds, restarting...");
+        //         process.exit(1);
+        //     }else{
+        //         bot.log("Bot successfully reconnected in time and lived to shitpost another day.");
+        //     }
+        // }, 10000);
     }
 });
 

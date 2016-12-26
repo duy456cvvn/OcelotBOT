@@ -25,7 +25,9 @@
     "sourcequery": "0.0.2",
     "throttle": "^1.0.3",
     "websocket": "^1.0.23",
-    "youtube-dl": "^1.11.1"
+    "youtube-dl": "^1.11.1",
+    "request": "latest",
+    "htmlparser": "latest"
   },
   "devDependencies": {
     "ava": "^0.15.2"

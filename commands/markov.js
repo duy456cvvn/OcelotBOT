@@ -50,17 +50,38 @@ exports.command = {
                             });
 
                         }, function(){
-                            async.retry(10, function(cb){
-                                var chain = m.forward(args[4] ? args[4] : m.pick(), length);
-                                if(chain.length < 2)cb("narp");
-                                else cb(null, chain.join(" "))
-                            }, function(err, result){
-                                bot.editMessage({
-                                    channel: channel,
-                                    messageID: messageID,
-                                    message: "> "+(err ? "Insufficient data for meaningful answer" : result)
-                                });
+
+                            var messages = [
+                                m.forward(args[4] ? args[4] : m.pick(), length).join(" "),
+                                m.forward(args[4] ? args[4] : m.pick(), length).join(" "),
+                                m.forward(args[4] ? args[4] : m.pick(), length).join(" "),
+                                m.forward(args[4] ? args[4] : m.pick(), length).join(" "),
+                                m.forward(args[4] ? args[4] : m.pick(), length).join(" "),
+                                m.forward(args[4] ? args[4] : m.pick(), length).join(" "),
+                                m.forward(args[4] ? args[4] : m.pick(), length).join(" "),
+                                m.forward(args[4] ? args[4] : m.pick(), length).join(" "),
+                                m.forward(args[4] ? args[4] : m.pick(), length).join(" "),
+                                m.forward(args[4] ? args[4] : m.pick(), length).join(" "),
+                            ];
+
+                            bot.editMessage({
+                                channel: channel,
+                                messageID: messageID,
+                                message: "> "+ messages.join("\n>")
                             });
+
+
+                            // async.retry(10, function(cb){
+                            //     var chain = m.forward(args[4] ? args[4] : m.pick(), length);
+                            //     if(chain.length < 2)cb(chain);
+                            //     else cb(null, chain.join(" "))
+                            // }, function(err, result){
+                            //     bot.editMessage({
+                            //         channel: channel,
+                            //         messageID: messageID,
+                            //         message: "> "+(err ? "Insufficient data for meaningful answer ("+err+")" : result)
+                            //     });
+                            // });
 
                         });
                     }

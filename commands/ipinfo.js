@@ -15,13 +15,14 @@ exports.command = {
                 var data = JSON.parse(body);
                 bot.sendMessage({
                     to: channel,
-                    message: `*Country:* ${data.city}, ${data.region}, ${data.country} (${data.loc})\n*Hostname:* ${data.hostname}\n*Organisation:* ${data.org}`
+                    message: `*Country:* ${data.city ? data.city : "Unknown"}, ${data.region ? data.region : "Unknown"}, ${data.country ? data.country : "Unknown"} (${data.loc ? data.loc : "Unknown"})\n*Hostname:* ${data.hostname ? data.hostname : "Unknown"}\n*Organisation:* ${data.org ? data.org : "Unknown"}`
                 });
             }catch(e){
                 bot.sendMessage({
                     to: channel,
-                    message: "Error: "+e+"\n"+body
+                    message: "Please enter a valid IP address"
                 });
+                bot.log(e+", "+body);
             }
         });
 

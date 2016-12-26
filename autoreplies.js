@@ -2,36 +2,80 @@
  * Created by Peter on 07/07/2016.
  */
 var request = require('request');
+var r = require('rethinkdb');
+var markov = require('markov');
+var async = require('async');
 module.exports = function(bot){
     return {
         name: "Autoreplies Listener",
         init: function(cb){
+            var seeded = false;
+            var m = markov();
+            bot.log("Generating markov chain");
+            r.db("ocelotbot").table("messages").pluck("message").sample(250).run(bot.rconnection, function markovQuery(err, cursor){
+                if(err){
+                    bot.editMessage({
+                        channel: channel,
+                        messageID: messageID,
+                        message: "Error: "+err
+                    });
+                }else{
+                    bot.log("Retrieved messages");
+                    cursor.toArray(function(err, array){
+                        if(err){
+                            bot.editMessage({
+                                channel: channel,
+                                messageID: messageID,
+                                message: "Error: "+err
+                            });
+                        }else{
+                            async.eachSeries(array, function(row, cb){
+                                m.seed(row.message, cb);
+                            }, function(){
+                              bot.log("Finished seeding");
+                            });
+                        }
+                    });
+                }
+            });
 
             bot.registerMessageHandler("autoreply", function handleAutoReply(message, channelID){
 
                 if(message.startsWith("<@U1M9SE59T>")){
-                    request({
-                        url: 'https://www.reddit.com/r/gonewild/comments.json',
-                        headers: {
-                            'User-Agent': 'OcelotBOT link parser by /u/UnacceptableUse'
-                        }
-                    }, function sexyResponse(err, resp, body){
-                        if(err){
-                           bot.log(err);
-                        }else{
-                            try {
-                                var data = JSON.parse(body);
-                                if(data && data.data && data.data.children && data.data.children.length > 1){
-                                    bot.sendMessage({
-                                        to: channelID,
-                                        message: data.data.children[parseInt(Math.random() * data.data.children.length)].data.body
-                                    });
-                                }
-                            }catch(e){
-                                bot.log(e);
+                    if(message == "<@U1M9SE59T> toggle markov")seeded = !seeded;
+                    if(seeded){
+                        setTimeout(function(){
+                            bot.sendMessage({
+                                to: channelID,
+                                message: m.respond(message, 500).join(" ")
+                            });
+                        }, Math.random()*500);
+
+                    }else{
+                        request({
+                            url: 'https://www.reddit.com/r/gonewild/comments.json',
+                            headers: {
+                                'User-Agent': 'OcelotBOT link parser by /u/UnacceptableUse'
                             }
-                        }
-                    });
+                        }, function sexyResponse(err, resp, body){
+                            if(err){
+                                bot.log(err);
+                            }else{
+                                try {
+                                    var data = JSON.parse(body);
+                                    if(data && data.data && data.data.children && data.data.children.length > 1){
+                                        bot.sendMessage({
+                                            to: channelID,
+                                            message: data.data.children[parseInt(Math.random() * data.data.children.length)].data.body
+                                        });
+                                    }
+                                }catch(e){
+                                    bot.log(e);
+                                }
+                            }
+                        });
+                    }
+
                 }
 
                 message = message.toLowerCase();
@@ -69,6 +113,7 @@ module.exports = function(bot){
                     });
                 }
                 if (message === "test") {
+
                     bot.sendMessage({
                         to: channelID,
                         message: "icles"
