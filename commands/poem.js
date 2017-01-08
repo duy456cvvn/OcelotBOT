@@ -10,7 +10,7 @@ exports.command = {
         }, function(err, resp){
             if(!err) {
                 messageID = resp.ts;
-                bot.connection.query('SELECT message, user, time FROM Messages WHERE message REGEXP ".*([to]o|u|[uei]w|2)$" AND (LENGTH(message) - LENGTH(REPLACE(message, " ", ""))) > 5 LIMIT 1', function(err, result) {
+                bot.connection.query('SELECT message, user, time FROM Messages WHERE message REGEXP ".*([to]o|u|[uei]w|2)$" AND (LENGTH(message) - LENGTH(REPLACE(message, " ", ""))) > 5 ORDER BY RAND() LIMIT 1', function(err, result) {
                     if(err) {
                         bot.editMessage({
                             channel: channel,
