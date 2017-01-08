@@ -57,17 +57,15 @@ exports.command = {
                         }
                         channels[chan]++;
 
-                        var emojiRegex = message.match(/:[^:]+:/g),
-                            emojiCount = emojiRegex.length;
-
-                        if(emojiCount > 0) {
+                        var emojiRegex = message.match(/:[^:]+:/g);
+                        if(emojiRegex && emojiRegex.length > 0) {
                             emojiRegex.forEach(function(e) {
                                 if(!(e in emojis)) {
                                     emojis[e] = 0;
                                 }
                                 emojis[e]++;
                             });
-                            totalEmojis += emojiCount;
+                            totalEmojis += emojiRegex.length;
                         }
                     });
 
