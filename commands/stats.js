@@ -9,114 +9,98 @@ exports.command = {
     name: "stats",
     desc: "Stats n shit",
     usage: "stats <user>",
-    func: function(user, userID, channel, args, message, bot){
+    func: function(user, userID, channel, args, message, bot) {
+        if(args.length == 2) {            
+            var target = args[1].toLowerCase();
 
-        var target;
-        if(args.length < 2){
+            var messageID;
+            bot.sendMessage({
+                to: channel,
+                message: "Gathering stats (This might take a while)..."
+            }, function(err, resp) {
+                if(!err) {
+                    messageID = resp.ts
+                }
+            });
+             
+            var output = [`*Overview for ${target}*:`],
+                totalMessages = 0,
+                totalWords = 0,
+                totalChars = 0,
+                emojis = {},
+                totalEmojis = 0,
+                uniqueWords = {},
+                channels = {};
+
+            bot.connection.query('SELECT * FROM Messages WHERE user = ?', [target], function(err, result) {
+                if(err) {
+                    output.push(`Error getting messages: ${err}`);
+                } else {
+                    totalMessages = result.length;
+                    result.forEach(function(row) {
+                        var message = row.message,
+                            chan = row.channel,
+                            words = message.split(' ');
+
+                        totalWords += words.length;
+                        totalChars += message.length;
+                        words.forEach(function(w) {
+                            if (words[j].length > 3 && commonWords.indexOf(words[j]) == -1) {
+                                if(!(w in uniqueWords)) {
+                                    uniqueWords[w] = 0;
+                                }
+                                uniqueWords[w]++;
+                            }
+                        });
+
+                        if(!(chan in channels)) {
+                            channels[chan] = 0;
+                        }
+                        channels[chan]++;
+
+                        var emojiRegex = message.match(/:[^:]+:/g);
+                        emojiRegex.forEach(function(e) {
+                            if(!(e in emojis)) {
+                                emojis[e] = 0;
+                            }
+                            emojis[e]++;
+                        });
+                        totalEmojis += emojiRegex.length;
+                    });
+
+                    var uniqueWordsSorted = Object.keys(uniqueWords).sort(function(a, b) {
+                        return uniqueWords[a] - uniqueWords[b]
+                    });
+                    var channelsSorted = Object.keys(channels).sort(function(a, b) {
+                        return channels[a] - channels[b]
+                    });
+
+                    var emojisSorted = Object.keys(emojis).sort(function(a, b) {
+                        return emojis[a] - emojis[b]
+                    });
+
+                    output = output.concat([
+                        `- *${totalMessages}* total messages.`,
+                        `- *${totalWords}* total words (*${Object.keys(uniqueWords).length}* unique).`,
+                        `- *${parseInt(totalWords / totalMessages)}* words per message.`,
+                        `- *${totalChars}* total characters.`,
+                        `- At *44* words per minute, this would've taken *${parseInt((totalWords / 44) / 60)}* hours to type.`,
+                        `- All their messages in a text file would take *${parseInt(totalChars / 1024)}* kb`,
+                        `- The most used word is *'${uniqueWordsSorted[uniqueWordsSorted.length - 1]}'* with *${uniqueWords[uniqueWordsSorted[uniqueWordsSorted.length - 1]]}* uses.`,
+                        `- Their favourite emoji is *${emojisSorted[emojisSorted.length-1]}*, having used it *${emojis[emojisSorted[emojisSorted.length-1]]}* times. They have used *${emojisSorted.length}* different emojis, *${totalEmojis}* total times.`,
+                        `- Their favourite channel is *${channelsSorted[channelsSorted.length - 1]}* with *${channels[channelsSorted[channelsSorted.length - 1]]}* messages.`
+                    ]);
+
+                    bot.editMessage({
+                        channel: channel,
+                        messageID: messageID,
+                        message: output.join('\n')
+                    });
+                }
+            });
+        } else {
             return false;
-            //bot.web.users.info(target, function(err, user){
-            //    if(err){
-            //        bot.sendMessage({
-            //            to: channel,
-            //            message: "Error getting user information:\n "+err
-            //        });
-            //    }else{
-            //        target = user.user.name;
-            //    }
-            //});
-        }else{
-            target = args[1];
         }
-
-        target = target.toLowerCase();
-        var messageID;
-        bot.sendMessage({
-            to: channel,
-            message: "Gathering stats (This might take a while)..."
-        }, function(err, resp){
-            if(!err)
-                messageID = resp.ts
-        });
-
-        var output = "*Overview for "+target+"*:\n";
-        r.db('ocelotbot').table('messages').filter({user: target}).run(bot.rconnection, function(err, cursor){
-           if(err){
-               output+= "Error getting messages: "+err;
-           }else {
-               var totalMessages = 0;
-               var totalWords = 0;
-               var totalChars = 0;
-               var emojis = {};
-               var totalEmojis = 0;
-               var uniqueWords = {};
-               var channels = {};
-               cursor.each(function (err, entry) {
-                   totalMessages++;
-                   var message = entry.message;
-                   var channel_ = entry.channel;
-                   var words = message.split(" ");
-                   totalWords += words.length;
-                   totalChars += message.length;
-
-                   for (var j in words) {
-                       if (words.hasOwnProperty(j)) {
-                           words[j] = words[j].toLowerCase().trim();
-                           if(words[j].startsWith(":") && words[j].endsWith(":")){
-                               totalEmojis++;
-                               if(emojis[words[j]])
-                                   emojis[words[j]]++;
-                               else
-                                   emojis[words[j]] = 1;
-                           }
-
-                           if (words[j].length < 3 || commonWords.indexOf(words[j]) > -1)continue;
-                           if (uniqueWords[words[j]]) {
-                               uniqueWords[words[j]]++;
-                           } else {
-                               uniqueWords[words[j]] = 1;
-                           }
-                       }
-                   }
-
-                   if (channels[channel_]) {
-                       channels[channel_]++
-                   } else {
-                       channels[channel_] = 1;
-                   }
-               }, function () {
-                   var uniqueWordsSorted = Object.keys(uniqueWords).sort(function (a, b) {
-                       return uniqueWords[a] - uniqueWords[b]
-                   });
-                   var channelsSorted = Object.keys(channels).sort(function (a, b) {
-                       return channels[a] - channels[b]
-                   });
-
-                   var emojisSorted = Object.keys(emojis).sort(function (a, b) {
-                       return emojis[a] - emojis[b]
-                   });
-
-
-                   output += `- *${totalMessages}* total messages.\n`;
-                   output += `- *${totalWords}* total words (*${Object.keys(uniqueWords).length}* unique).\n`;
-                   output += `- *${parseInt(totalWords / totalMessages)}* words per message.\n`;
-                   output += `- *${totalChars}* total characters.\n`;
-                   output += `- At *44* words per minute, this would've taken *${parseInt((totalWords / 44) / 60)}* hours to type.\n`;
-                   output += `- All their messages in a text file would take *${parseInt(totalChars / 1024)}* kb\n`;
-                   output += `- The most used word is *'${uniqueWordsSorted[uniqueWordsSorted.length - 1]}'* with *${uniqueWords[uniqueWordsSorted[uniqueWordsSorted.length - 1]]}* uses.\n`;
-                   output += `- Their favourite emoji is *${emojisSorted[emojisSorted.length-1]}*, having used it *${emojis[emojisSorted[emojisSorted.length-1]]}* times. They have used *${emojisSorted.length}* different emojis, *${totalEmojis}* total times.\n`;
-                   output += `- Their favourite channel is *${channelsSorted[channelsSorted.length - 1]}* with *${channels[channelsSorted[channelsSorted.length - 1]]}* messages.\n`;
-
-
-                   bot.editMessage({
-                       channel: channel,
-                       messageID: messageID,
-                       message: output
-                   });
-               });
-           }
-        });
-
-
 
         return true;
     }
