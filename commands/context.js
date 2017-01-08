@@ -3,7 +3,7 @@
  */
 
 
-var poemMatch = /Roses are red\nViolets are blue\n&gt;([^\n]+)\n - ([^ ]+) [0-9]{4}/;
+var poemMatch = /Roses are red\nViolets are blue\n&gt;([^\n]+)\n-([^ ]+) [0-9]{4}/;
 exports.command = {
     name: "context",
     desc: "Get the context of a ",
