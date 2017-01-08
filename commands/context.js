@@ -20,7 +20,7 @@ exports.command = {
                     if(result.length > 0) {
                         var row = result[0];
                         if(row.id) {
-                            bot.connection.query('SELECT * FROM Messages WHERE id BETWEEN ? AND ?', [row.id - 5, row.id + 5], function(err, result) {
+                            bot.connection.query('SELECT * FROM Messages WHERE id BETWEEN ? AND ?', [row.id - 5, row.id + 5], function(err, res) {
                                 if(err) {
                                     bot.sendMessage({
                                         to: channel,
@@ -28,40 +28,31 @@ exports.command = {
                                     });
                                 } else {
                                     bot.log('Found some context. fuckin woo');
-                                    result.toArray(function(err, res) {
-                                        if(err) {
-                                            bot.sendMessage({
-                                                to: channel,
-                                                message: `Error getting context: _${err}_`
-                                            });
-                                        } else {
-                                            var output = [];
-                                            for(var i in res) {
-                                                if(res.hasOwnProperty(i)) {
-                                                    var msg = res[i],
-                                                        contextMessage = `<${msg.user}> ${msg.message}`;
+                                    var output = [];
+                                    for(var i in res) {
+                                        if(res.hasOwnProperty(i)) {
+                                            var msg = res[i],
+                                                contextMessage = `<${msg.user}> ${msg.message}`;
 
-                                                    if(msg.message == message) {
-                                                        contextMessage = `*${contextMessage}*`;
-                                                    }
-
-                                                    output.push(`>${contextMessage}`);
-                                                }
+                                            if(msg.message == message) {
+                                                contextMessage = `*${contextMessage}*`;
                                             }
 
-                                            if(output.length > 0) {
-                                                bot.sendMessage({
-                                                    to: channel,
-                                                    message: output.join('\n')
-                                                });
-                                            } else {
-                                                bot.sendMessage({
-                                                    to: channel,
-                                                    message: `Unable to find context for: _<${user}> ${message}_`
-                                                });
-                                            }
+                                            output.push(`>${contextMessage}`);
                                         }
-                                    });
+                                    }
+
+                                    if(output.length > 0) {
+                                        bot.sendMessage({
+                                            to: channel,
+                                            message: output.join('\n')
+                                        });
+                                    } else {
+                                        bot.sendMessage({
+                                            to: channel,
+                                            message: `Unable to find context for: _<${user}> ${message}_`
+                                        });
+                                    }
                                 }
                             });
                         } else {
@@ -122,7 +113,7 @@ exports.command = {
                                 }
                             } else if(message.user == "U0LAVH43A" && message.text.indexOf("set the channel topic:") > -1) {
                                 bot.log("Found topic message");
-                                bot.connection.query('SELECT topic, username FROM Topics WHERE topic = ?', [bot.currentTopic], function(err, result) {
+                                bot.connection.query('SELECT topic, username FROM Topics WHERE id = ?', [bot.currentTopic], function(err, result) {
                                     if(err || result.length == 0) {
                                         bot.sendMessage({
                                             to: channel,
