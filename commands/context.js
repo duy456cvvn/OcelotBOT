@@ -2,7 +2,7 @@
 * Copyright UnacceptableUse 2016
  */
 
-
+var dateformat = require('dateformat');
 var poemMatch = /Roses are red\nViolets are blue\n&gt;([^\n]+)\n-([^ ]+) [0-9]{4}/;
 exports.command = {
     name: "context",
@@ -32,7 +32,8 @@ exports.command = {
                                     for(var i in res) {
                                         if(res.hasOwnProperty(i)) {
                                             var msg = res[i],
-                                                contextMessage = `<${msg.user}> ${msg.message}`;
+                                                date = dateformat(new Date(row.time), 'dd/mm/yy UTC:HH:MM:ss Z'),
+                                                contextMessage = `[${date}] <${msg.user}> ${msg.message}`;
 
                                             if(msg.message == message) {
                                                 contextMessage = `*${contextMessage}*`;
