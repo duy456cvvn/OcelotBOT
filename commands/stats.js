@@ -11,7 +11,7 @@ exports.command = {
     func: function(user, userID, channel, args, message, bot) {
         if(args.length == 2) {            
             var target = args[1].toLowerCase();
-            
+
             bot.sendMessage({
                 to: channel,
                 message: "Gathering stats (This might take a while)..."
@@ -32,7 +32,7 @@ exports.command = {
                             output.push(`Error getting messages: ${err}`);
                         } else {
                             totalMessages = result.length;
-                            bot.log(`Total Messages: ${totalMessages}`);
+
                             result.forEach(function(row) {
                                 var message = row.message,
                                     chan = row.channel,
@@ -66,8 +66,6 @@ exports.command = {
                                 }
                             });
 
-                            bot.log("Finished parsing messages")
-
                             var uniqueWordsSorted = Object.keys(uniqueWords).sort(function(a, b) {
                                 return uniqueWords[a] - uniqueWords[b]
                             });
@@ -90,9 +88,7 @@ exports.command = {
                                 `- Their favourite emoji is *${emojisSorted[emojisSorted.length-1]}*, having used it *${emojis[emojisSorted[emojisSorted.length-1]]}* times. They have used *${emojisSorted.length}* different emojis, *${totalEmojis}* total times.`,
                                 `- Their favourite channel is *${channelsSorted[channelsSorted.length - 1]}* with *${channels[channelsSorted[channelsSorted.length - 1]]}* messages.`
                             ]);
-
-                            bot.log(`Okay, done. The message ID is ${messageID}. Here's the message: ${output.join('\n')}`);
-
+                            
                             bot.editMessage({
                                 channel: channel,
                                 messageID: messageID,
