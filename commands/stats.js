@@ -54,7 +54,7 @@ exports.command = {
                                 }
                                 channels[chan]++;
 
-                                var emojiRegex = message.match(/:[^:]+:/g);
+                                var emojiRegex = message.match(/:[^:\s]+:/g);
                                 if(emojiRegex && emojiRegex.length > 0) {
                                     emojiRegex.forEach(function(e) {
                                         if(!(e in emojis)) {
@@ -88,7 +88,7 @@ exports.command = {
                                 `- Their favourite emoji is *${emojisSorted[emojisSorted.length-1]}*, having used it *${emojis[emojisSorted[emojisSorted.length-1]]}* times. They have used *${emojisSorted.length}* different emojis, *${totalEmojis}* total times.`,
                                 `- Their favourite channel is *${channelsSorted[channelsSorted.length - 1]}* with *${channels[channelsSorted[channelsSorted.length - 1]]}* messages.`
                             ]);
-                            
+
                             bot.editMessage({
                                 channel: channel,
                                 messageID: messageID,
