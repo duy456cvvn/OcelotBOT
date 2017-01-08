@@ -32,7 +32,7 @@ exports.command = {
                                     for(var i in res) {
                                         if(res.hasOwnProperty(i)) {
                                             var msg = res[i],
-                                                date = dateformat(new Date(msg.time), 'dd/mm/yy UTC:HH:MM:ss Z'),
+                                                date = dateformat(new Date(msg.time), 'UTC:dd/mm/yy HH:MM:ss Z'),
                                                 contextMessage = `[${date}] <${msg.user}> ${msg.message}`;
 
                                             if(msg.message == message) {
