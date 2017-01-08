@@ -5,3 +5,4 @@ reminders.json
 commands/temp/
 topic.dat
 node_modules/
+.vscode/

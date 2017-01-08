@@ -15,11 +15,7 @@ module.exports = function(bot) {
             bot.log('Generating markov chain');
             bot.connection.query('SELECT message FROM Messages ORDER BY RAND() LIMIT 250', function(err, result) {
                 if(err) {
-                    bot.editMessage({
-                        channel: channel,
-                        messageID: messageID,
-                        messsage: `Error: ${err}`
-                    });
+                    bot.error(`Error: ${err}`);
                 } else {
                     bot.log('Retrieved messages');
                     async.eachSeries(result, function(row, cb) {
