@@ -24,7 +24,7 @@ exports.command = {
                                     'Roses are red',
                                     'Violets are blue',
                                     `>${row.message}`,
-                                    ` - ${row.user} ${new Date(row.time).getFullYear()}`
+                                    `-${row.user} ${new Date(row.time).getFullYear()}`
                                 ];
 
                             bot.editMessage({
