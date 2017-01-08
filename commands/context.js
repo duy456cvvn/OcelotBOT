@@ -9,103 +9,106 @@ exports.command = {
     name: "context",
     desc: "Get the context of a ",
     usage: "context [message].",
-    func: function(user, userID, channel, args, message, bot){
-
-
+    func: function(user, userID, channel, args, message, bot) {
         function printContextOf(message, user){
-            r.db('ocelotbot').table('messages').filter({
-                message: message,
-                user: user
-            }).limit(1).nth(0).run(bot.rconnection, function(err, result) {
-                if (err) {
+            bot.connection.query('SELECT id FROM Messages WHERE message = ? AND user = ? LIMIT 1', [message, user], function(err, result) {
+                if(err) {
                     bot.sendMessage({
                         to: channel,
                         message: `Error getting original message timestamp from message <${user}> ${message}\n${err}`
                     });
                 } else {
-                    if (result && result.time) {
-                        r.db('ocelotbot').table('messages').filter(function(message) {
-                            return message('time').le(result.time + 20000).and(message('time').ge(result.time - 20000))
-                        }).orderBy('time').limit(10).run(bot.rconnection, function(err, result) {
-                            if (err) {
-                                bot.sendMessage({
-                                    to: channel,
-                                    message: "Error getting context: " + err
-                                });
-                            } else {
-                                bot.log("Found some context. fuckin woo");
-                                result.toArray(function(err, resArr) {
-                                    if (err) {
-                                        bot.sendMessage({
-                                            to: channel,
-                                            message: `Error getting context: _${err}_`
-                                        });
-                                    } else {
-                                        var output = [];
-                                        for(var i in resArr) {
-                                            if(resArr.hasOwnProperty(i)) {
-                                                var msg = resArr[i],
-                                                    contextMessage = `<${msg.user}> ${msg.message}`;
-
-                                                if(msg.message == message)
-                                                    contextMessage = `*${contextMessage}*`;
-
-                                                output.push(`>${contextMessage}`);
-                                            }
-                                        }
-                                        if(output.length > 0) {
+                    if(result.length > 0) {
+                        var row = result[0];
+                        if(row.id) {
+                            bot.connection.query('SELECT * FROM Messages WHERE id BETWEEN ? AND ?', [row.id - 5, row.id + 5], function(err, result) {
+                                if(err) {
+                                    bot.sendMessage({
+                                        to: channel,
+                                        message: `Error getting context: ${err}`
+                                    });
+                                } else {
+                                    bot.log('Found some context. fuckin woo');
+                                    result.toArray(function(err, res) {
+                                        if(err) {
                                             bot.sendMessage({
                                                 to: channel,
-                                                message: output.join('\n')
+                                                message: `Error getting context: _${err}_`
                                             });
                                         } else {
-                                            bot.sendMessage({
-                                                to: channel,
-                                                message: `Unable to find context for: _<${user}> ${message}_`
-                                            });
-                                        }``
-                                    }
-                                });
+                                            var output = [];
+                                            for(var i in res) {
+                                                if(res.hasOwnProperty(i)) {
+                                                    var msg = res[i],
+                                                        contextMessage = `<${msg.user}> ${msg.message}`;
 
-                            }
-                        });
+                                                    if(msg.message == message) {
+                                                        contextMessage = `*${contextMessage}*`;
+                                                    }
+
+                                                    output.push(`>${contextMessage}`);
+                                                }
+                                            }
+
+                                            if(output.length > 0) {
+                                                bot.sendMessage({
+                                                    to: channel,
+                                                    message: output.join('\n')
+                                                });
+                                            } else {
+                                                bot.sendMessage({
+                                                    to: channel,
+                                                    message: `Unable to find context for: _<${user}> ${message}_`
+                                                });
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        } else {
+                            bot.sendMessage({
+                                to: channel,
+                                message: `Could not determine timestamp for message. (${row.id})`
+                            });
+                        }
                     } else {
                         bot.sendMessage({
                             to: channel,
-                            message: "Could not determine timestamp for message. (" + (result ? result.id : "no result") + ")"
+                            message: `Message not found in DB`
                         });
                     }
                 }
             });
         }
 
-
-        if(args.length < 2){
+        if(args.length < 2) {
             bot.web_p.channels.history(channel, {count: 40}, function(err, resp) {
-                if(err || !resp.ok){
+                if(err || !resp.ok) {
                     if(!resp.ok && resp.error === "missing_scope"){
                         bot.sendMessage({
                             to: channel,
                             message: JSON.stringify(resp)
                         });
+
                         bot.sendMessage({
                             to: channel,
                             message: `The bot needs to be granted the permission \`${resp.needed}\` to use this command without arguments.`
                         });
-                    }else
+                    } else {
                         bot.sendMessage({
                             to: channel,
-                            message: "Couldn't retrieve messages "+(err ? err : JSON.stringify(resp))
+                            message: `Couldn't retrieve messages ${(err ? err : JSON.stringify(resp))}`
                         });
-                }else{
+                    }
+                } else {
                     var messages = resp.messages;
-                    for (var i in messages) {
-                        if (messages.hasOwnProperty(i)) {
+                    for(var i in messages) {
+                        if(messages.hasOwnProperty(i)) {
                             var message = messages[i];
-                            if (message.user == "U1M9SE59T") { //TODO: get this dynamically
-                                if (message.text.startsWith("Roses are red")) {
+                            if(message.user == "U1M9SE59T") { //TODO: get this dynamically
+                                if(message.text.startsWith("Roses are red")) {
                                     var match = message.text.match(poemMatch);
-                                    if (match && match.length > 0) {
+                                    if(match && match.length > 0) {
                                         var text = match[1];
                                         var user = match[2];
                                         bot.log(`Matched it, trying to find it in the database... | User: ${user} | Message: ${text}`);
@@ -118,18 +121,20 @@ exports.command = {
                                     }
                                     break;
                                 }
-                            }else if(message.user == "U0LAVH43A" && message.text.indexOf("set the channel topic:") > -1){
+                            } else if(message.user == "U0LAVH43A" && message.text.indexOf("set the channel topic:") > -1) {
                                 bot.log("Found topic message");
-                                r.db("ocelotbot").table("topics").get(bot.currentTopic).run(bot.rconnection, function getTopicQuery(err, result) {
-                                    if (err) {
+                                bot.connection.query('SELECT topic, username FROM Topics WHERE topic = ?', [bot.currentTopic], function(err, result) {
+                                    if(err || result.length == 0) {
                                         bot.sendMessage({
                                             to: channel,
-                                            message: "Error getting topic: " + err
+                                            message: `Error getting topic: ${err}`
                                         });
                                     } else {
-                                        printContextOf(result.topic, result.username);
+                                        var row = result[0];
+                                        printContextOf(row.topic, row.username);
                                     }
                                 });
+
                                 break;
                             }
                         }
@@ -137,6 +142,7 @@ exports.command = {
                 }
             });
         }
+        
         return true;
     }
 };
