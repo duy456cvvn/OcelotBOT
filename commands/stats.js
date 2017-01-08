@@ -57,14 +57,18 @@ exports.command = {
                         }
                         channels[chan]++;
 
-                        var emojiRegex = message.match(/:[^:]+:/g);
-                        emojiRegex.forEach(function(e) {
-                            if(!(e in emojis)) {
-                                emojis[e] = 0;
-                            }
-                            emojis[e]++;
-                        });
-                        totalEmojis += emojiRegex.length;
+                        var emojiRegex = message.match(/:[^:]+:/g),
+                            emojiCount = emojiRegex.length;
+
+                        if(emojiCount > 0) {
+                            emojiRegex.forEach(function(e) {
+                                if(!(e in emojis)) {
+                                    emojis[e] = 0;
+                                }
+                                emojis[e]++;
+                            });
+                            totalEmojis += emojiCount;
+                        }
                     });
 
                     var uniqueWordsSorted = Object.keys(uniqueWords).sort(function(a, b) {
