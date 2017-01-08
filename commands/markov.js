@@ -5,7 +5,7 @@ exports.command = {
 	name: "markov",
 	desc: "Generate a markov chain based on a user",
 	usage: "markov <user> [sample] [length] [key]",
-	func: function(user, userID, channel, args, message, bot){
+	func: function(user, userID, channel, args, message, bot) {
 		if(args.length < 2) {
             return false;
         }
