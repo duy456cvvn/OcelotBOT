@@ -17,7 +17,7 @@ exports.command = {
         var username = args[1];
         if(args[2]) {
             var sentence = message.substring(message.indexOf(args[2]));
-            bot.connection.query(`SELECT * FROM Messages WHERE user = ? AND message REGEXP "\b${mysql.escape(sentence)}\b" ORDER BY RAND() LIMIT 1`, [username], function(err, result) {
+            bot.connection.query(`SELECT * FROM Messages WHERE user = ? AND message REGEXP "[[:<:]]${mysql.escape(sentence)}[[:>:]]" ORDER BY RAND() LIMIT 1`, [username], function(err, result) {
                 if(err) {
                     bot.sendMessage({
                         to: channel,
