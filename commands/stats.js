@@ -44,7 +44,7 @@ exports.command = {
                         totalWords += words.length;
                         totalChars += message.length;
                         words.forEach(function(w) {
-                            if (words[j].length > 3 && commonWords.indexOf(words[j]) == -1) {
+                            if (w.length > 3 && commonWords.indexOf(w) == -1) {
                                 if(!(w in uniqueWords)) {
                                     uniqueWords[w] = 0;
                                 }
