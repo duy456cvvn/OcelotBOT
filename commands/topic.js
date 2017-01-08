@@ -1,6 +1,6 @@
 var fs = require('fs');
-var r = require('rethinkdb');
 var async = require("async");
+
 exports.command = {
 	name: "topic",
 	desc: "Add a *hilarious* comment from one of your good buddies to the topic.",
