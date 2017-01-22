@@ -40,6 +40,13 @@ module.exports = function interactiveMessages(bot) {
                 });
             });
 
+            bot.app.get('/stats', function(req, res){
+                res.header('Access-Control-Allow-Origin', '*');
+                res.header('Access-Control-Allow-Methods', 'GET');
+                res.header('Access-Control-Allow-Headers', '*');
+                res.json({uptime: process.uptime()});
+            });
+
             bot.app.get('/slack/interactive', function getSlackEndpoint(req, res){
                 bot.log("Received GET Request to slack endpoint");
             });
