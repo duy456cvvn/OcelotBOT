@@ -176,7 +176,7 @@ exports.command = {
                             if(err) {
                                 bot.sendMessage({
                                     to: channel,
-                                    message: `Error adding topid: ${err}`
+                                    message: `Error adding topic: ${err}`
                                 });
                             } else {
                                 bot.lastTopic = result.insertId;
