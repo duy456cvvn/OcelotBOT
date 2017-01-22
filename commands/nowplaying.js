@@ -22,10 +22,15 @@ exports.command = {
                                 message: data.err
                             });
                         } else {
-                            bot.sendMessage({
-                                to: channel,
-                                message: "Now Playing: *" + data.artist_name + " - " + data.title + "*"
+                            bot.web.chat.postMessage(channel,  ":petify: Now Playing: *<https://unacceptableuse.com/petify/song/"+data.song_id+"/-|" + data.artist_name + " - " + data.title + ">*", {
+                                parse: true,
+                                unfurl_media: true,
+                                unfurl_links: true
                             });
+                            // bot.sendMessage({
+                            //     to: channel,
+                            //     message: "Now Playing: *" + data.artist_name + " - " + data.title + "*\n<https://unacceptableuse.com/petify/song/"+data.song_id+"/-"+"|Listen Here>"
+                            // });
                         }
                     }catch(e){
                         bot.sendMessage({
