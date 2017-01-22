@@ -40,9 +40,9 @@ module.exports = function(bot) {
                             new Date().getTime()
                         ];
 
-                    bot.connection.query('INSERT INTO Messages (channel, user, message, time) VALUES (?, ?, ?, ?)', args, function(err, result) {
+                    bot.connection.query('INSERT INTO `stevie`.`Messages` (channel, user, message, time) VALUES (?, ?, ?, ?)', args, function(err, result) {
                         if(err) {
-                            bot.error(`Error logging message: ${err}`);
+                            bot.error(`Error fuck logging message: ${err}`);
                         }
 
                         if(!userInList) {
