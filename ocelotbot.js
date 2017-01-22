@@ -59,7 +59,7 @@ bot.services.loadAfter = [
     require('./autoreplies.js')(bot),
     require('./logging.js')(bot),
     require('./importantDates.js')(bot),
-    require('./statusmonitor.js')(bot)
+   // require('./statusmonitor.js')(bot)
   //  require('./scriptfodder.js')(bot),
    // require('./ucas.js')(bot)
 ];
@@ -159,22 +159,22 @@ function botInit(cb){
             });
         }else{
             if(data.message.indexOf("undefined") > -1){
-                var client = new websocket('wss://unacceptableuse.com/petermon/music/ws/', 'echo-protocol');
-                client.onopen = function(){
-                    client.send(JSON.stringify({
-                        event: "queue",
-                        id: {
-                            id: "6c38df14-f5d5-439b-b908-a5e97ab4ab19",
-                            addedBy: "OcelotBOT"
-                        }
-                    }));
-                    setTimeout(function(){
-                        client.close();
-                        client = null;
-                    }, 3000);
-                };
+                // var client = new websocket('wss://unacceptableuse.com/petermon/music/ws/', 'echo-protocol');
+                // client.onopen = function(){
+                //     client.send(JSON.stringify({
+                //         event: "queue",
+                //         id: {
+                //             id: "6c38df14-f5d5-439b-b908-a5e97ab4ab19",
+                //             addedBy: "OcelotBOT"
+                //         }
+                //     }));
+                //     setTimeout(function(){
+                //         client.close();
+                //         client = null;
+                //     }, 3000);
+                // };
 
-                client.onerror = bot.log;
+                //client.onerror = bot.log;
 
             }
 
