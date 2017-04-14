@@ -5,7 +5,8 @@
 var express         = require('express'),
     bodyparser      = require('body-parser'),
     fs              = require('fs'),
-    https           = require('https');
+    https           = require('https'),
+    os              = require('os');
 
 module.exports = function interactiveMessages(bot) {
     return {
@@ -44,7 +45,7 @@ module.exports = function interactiveMessages(bot) {
                 res.header('Access-Control-Allow-Origin', '*');
                 res.header('Access-Control-Allow-Methods', 'GET');
                 res.header('Access-Control-Allow-Headers', '*');
-                res.json({uptime: process.uptime()});
+                res.json({uptime: process.uptime(), earthUptime: os.uptime()});
             });
 
             bot.app.get('/slack/interactive', function getSlackEndpoint(req, res){

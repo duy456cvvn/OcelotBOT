@@ -29,6 +29,7 @@ module.exports = function database(bot){
             }
             else {
                 bot.log("Connected to MySQL");
+                bot.connection.query("USE stevie", function(){});
                 databaseObject.mysqlRetries = 0;
             }
         },

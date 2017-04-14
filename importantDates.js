@@ -27,6 +27,26 @@ module.exports = function(bot){
                     cb();
             });
 
+
+            bot.connection.query('SELECT COUNT(*) FROM Messages', function(err, result) {
+                if(result && result[0] && result[0]["COUNT(*)"]){
+                    bot.log("Got message count of "+result[0]["COUNT(*)"]);
+                    var messageCount = result[0]["COUNT(*)"];
+                    bot.registerMessageHandler("Message milestone counter", function(message, channelID, user, userID) {
+                       messageCount++;
+                       if(messageCount == 200000){
+                           bot.sendMessage({
+                               to: channelID,
+                               message: ":tada: :tada: :tada: Congratulations "+user+", you just sent the *200,000th Message!* :tada: :tada: :tada:\n"+
+                                        "I hope that _'"+message+"'_ is a message you are proud of."
+                           });
+                       }
+                    });
+                }else{
+                    bot.log(err);
+                }
+            });
+
         }
     }
 };

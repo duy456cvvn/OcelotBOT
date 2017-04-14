@@ -20,8 +20,8 @@ exports.command = {
             }
         });
 
-        var sample = args[3] && !isNaN(args[3]) ? parseInt(args[3]) : 100;
-        var length = args[2] && !isNaN(args[3]) ? parseInt(args[2]) : 35;
+        var sample = args[3] && !isNaN(args[3]) ? parseInt(args[3]) : bot.config.markov.defaultSample;
+        var length = args[2] && !isNaN(args[3]) ? parseInt(args[2]) : bot.config.markov.defaultLength;
 
         bot.connection.query('SELECT message FROM Messages WHERE user = ? LIMIT ?', [args[1], sample], function(err, result) {
             if(err) {

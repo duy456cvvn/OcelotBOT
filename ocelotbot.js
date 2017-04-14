@@ -59,6 +59,7 @@ bot.services.loadAfter = [
     require('./autoreplies.js')(bot),
     require('./logging.js')(bot),
     require('./importantDates.js')(bot),
+   require('./petify.js')(bot)
    // require('./statusmonitor.js')(bot)
   //  require('./scriptfodder.js')(bot),
    // require('./ucas.js')(bot)
@@ -270,8 +271,6 @@ function botInit(cb){
 
     bot.rtm.on(CLIENT_EVENTS.RTM.DISCONNECT, function disconnectEventEvent(data){
         bot.error("RTM Client disconnected, not attempting to reconnect.");
-        bot.log(data);
-
     });
 
     bot.rtm.on(CLIENT_EVENTS.RTM.ATTEMPTING_RECONNECT, function attemptingReconnectEvent(data){
@@ -314,7 +313,6 @@ function busInit(){
 
 
 process.on('uncaughtException', function uncaughtException(err){
-    bot.error(err.stack);
     bot.error(JSON.stringify(err));
     bot.lastCrash = new Date();
 

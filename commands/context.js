@@ -20,7 +20,7 @@ exports.command = {
                     if(result.length > 0) {
                         var row = result[0];
                         if(row.id) {
-                            bot.connection.query('SELECT * FROM Messages WHERE id BETWEEN ? AND ?', [row.id - 5, row.id + 5], function(err, res) {
+                            bot.connection.query('SELECT * FROM Messages WHERE id BETWEEN ? AND ?', [row.id - bot.config.contextAmount, row.id + bot.config.contextAmount], function(err, res) {
                                 if(err) {
                                     bot.sendMessage({
                                         to: channel,
@@ -96,7 +96,7 @@ exports.command = {
                     for(var i in messages) {
                         if(messages.hasOwnProperty(i)) {
                             var message = messages[i];
-                            if(message.user == "U1M9SE59T") { //TODO: get this dynamically
+                            if(message.user === bot.config.slack.botUserId) { //TODO: get this dynamically
                                 if(message.text.startsWith("Roses are red")) {
                                     var match = message.text.match(poemMatch);
                                     if(match && match.length > 0) {
@@ -112,10 +112,10 @@ exports.command = {
                                     }
                                     break;
                                 }
-                            } else if(message.user == "U0LAVH43A" && message.text.indexOf("set the channel topic:") > -1) {
+                            } else if(message.user === bot.config.slack.topicUserId && message.text.indexOf("set the channel topic:") > -1) {
                                 bot.log("Found topic message");
                                 bot.connection.query('SELECT topic, username FROM Topics WHERE id = ?', [bot.currentTopic], function(err, result) {
-                                    if(err || result.length == 0) {
+                                    if(err || result.length === 0) {
                                         bot.sendMessage({
                                             to: channel,
                                             message: `Error getting topic: ${err}`

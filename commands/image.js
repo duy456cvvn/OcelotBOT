@@ -12,7 +12,7 @@ exports.command = {
         request({
             url: `https://api.reddit.com/r/${args[1]}`,
             headers: {
-                'User-Agent': "OcelotBOT link parser by /u/UnacceptableUse"
+                'User-Agent': bot.config.misc.redditUserAgent
             }
         }, function(err, resp, body){
             if(err){

@@ -5,7 +5,7 @@ exports.command = {
 	usage: "defineud <word>",
 	func: function(user, userID, channel, args, message, bot){
 		var term = encodeURIComponent(args.slice(1).join(" "));
-		http.get("http://api.urbandictionary.com/v0/define?term="+term, function (response) {
+		http.get(bot.config.udEndpoint+term, function (response) {
 	        var body = "";
 	        response.on('data', function (chunk) {
 	            body += chunk;
