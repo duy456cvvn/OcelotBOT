@@ -19,36 +19,43 @@ exports.command = {
                 message: "Error contacting weather API."
                });
            }else{
-               bot.log("Got weather for "+search);
-               var data = JSON.parse(body);
-               var attachments = [{
-                   fallback: `${data.name}: ${data.weather[0].main} - ${data.weather[0].description} ${data.main.temp}C`,
-                   color: exports.command.colourFromTemperature(data.main.temp),
-                   author_name: data.weather[0].main,
-                   author_link: "http://openweathermap.org/find?utf8=%E2%9C%93&q="+search,
-                   author_icon: "http://openweathermap.org/img/w/"+data.weather[0].icon+".png",
-                   title: data.name,
-                   text: data.weather[0].description,
-                   fields:[
-                       {
-                           title: "Temperature",
-                           value: data.main.temp+"C",
-                           short: true
-                       },
-                       {
-                           title: "High/Low",
-                           value: data.main.temp_max+"C/"+data.main.temp_min+"C",
-                           short: true
-                       },
-                       {
-                           title: "Winds",
-                           value: data.wind.speed+" mph",
-                           short: true
-                       }
-                   ]
-               }];
+               if(data && data.weather && data.weather[0] && data.weather[0].main) {
+                   bot.log("Got weather for " + search);
+                   var data = JSON.parse(body);
+                   var attachments = [{
+                       fallback: `${data.name}: ${data.weather[0].main} - ${data.weather[0].description} ${data.main.temp}C`,
+                       color: exports.command.colourFromTemperature(data.main.temp),
+                       author_name: data.weather[0].main,
+                       author_link: "http://openweathermap.org/find?utf8=%E2%9C%93&q=" + search,
+                       author_icon: "http://openweathermap.org/img/w/" + data.weather[0].icon + ".png",
+                       title: data.name,
+                       text: data.weather[0].description,
+                       fields: [
+                           {
+                               title: "Temperature",
+                               value: data.main.temp + "C",
+                               short: true
+                           },
+                           {
+                               title: "High/Low",
+                               value: data.main.temp_max + "C/" + data.main.temp_min + "C",
+                               short: true
+                           },
+                           {
+                               title: "Winds",
+                               value: data.wind.speed + " mph",
+                               short: true
+                           }
+                       ]
+                   }];
 
-               bot.sendAttachment(channel, "", attachments);
+                   bot.sendAttachment(channel, "", attachments);
+               }else{
+                   bot.sendMessage({
+                       to: channel,
+                       message: "Couldn't find weather for that location."
+                   });
+               }
            }
 
 
