@@ -19,7 +19,7 @@ exports.command = {
                         if (data.err) {
                             bot.sendMessage({
                                 to: channel,
-                                message: data.err
+                                message: "Error getting data from Petify:\n```\n"+JSON.stringify(data.err)+"\n```"
                             });
                         } else {
                             bot.web.chat.postMessage(channel,  ":petify: Now Playing: *<https://unacceptableuse.com/petify/song/"+data.song_id+"/-|" + data.artist_name + " - " + data.title + ">*", {
