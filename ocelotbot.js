@@ -59,7 +59,7 @@ bot.services.loadAfter = [
     require('./autoreplies.js')(bot),
     require('./logging.js')(bot),
     require('./importantDates.js')(bot),
-   require('./petify.js')(bot)
+ //  require('./petify.js')(bot)
    // require('./statusmonitor.js')(bot)
   //  require('./scriptfodder.js')(bot),
    // require('./ucas.js')(bot)
