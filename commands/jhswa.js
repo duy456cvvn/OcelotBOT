@@ -99,7 +99,8 @@ const euph = [
     "scarred his parents",
     "done the deed",
     "hid the salami",
-    "http://unacc.eu/85cd9880.png"
+    "http://unacc.eu/85cd9880.png",
+    "let off the spunklear bomb inside hiroshicunt"
 ];
 exports.command = {
     name: "jhswa",
