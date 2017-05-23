@@ -1,4 +1,4 @@
-var http = require('http');
+var http = require('https');
 var o = [
     "straight",
     "gay",
@@ -9,28 +9,35 @@ exports.command = {
 	desc: "Suggest some porn",
 	usage: "pornsuggest",
 	func: function(user, userID, channel, args, message, bot){
-		http.get("http://www.pornmd.com/randomwords?orientation="+o[parseInt(Math.random() * o.length)], function(response){
+		http.get("https://www.pornmd.com/getliveterms?orientation="+o[parseInt(Math.random() * o.length)], function(response){
 			var body = "";
 	        response.on('data', function (chunk) {
 	            body += chunk;
 	        });
 	        response.on('end', function () {
-	          	//var names = JSON.parse(body);
-                //if(names[0].message){
-                //    bot.sendMessage({
-                //        to: channel,
-                //        message: names[0].message
-                //    });
-                //}else{
-                //    bot.sendMessage({
-                //        to: channel,
-                //        message: "Feeling horny? Try *"+(names[parseInt(Math.random() * names.length)].keyword)+"*"
-                //    });
-                //}
-                bot.sendMessage({
-                    to: channel,
-                    message: "Feeling horny? Try *"+(body.replace(/"/g,""))+"*"
-                });
+	            try {
+                    var names = JSON.parse(body);
+                    if (names[0].message) {
+                        bot.sendMessage({
+                            to: channel,
+                            message: names[0].message
+                        });
+                    } else {
+                        bot.sendMessage({
+                            to: channel,
+                            message: "Feeling horny? Try *" + (names[parseInt(Math.random() * names.length)].keyword) + "*"
+                        });
+                    }
+                }catch(e){
+                    bot.sendMessage({
+                        to: channel,
+                        message: "Feeling horny? Try *" + e + "*"
+                    });
+                }
+                // bot.sendMessage({
+                //     to: channel,
+                //     message: "Feeling horny? Try *"+(body.replace(/"/g,""))+"*"
+                // });
 	      	});
 			
 		});
