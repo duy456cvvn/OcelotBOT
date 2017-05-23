@@ -9,7 +9,7 @@ exports.command = {
 	desc: "Suggest some porn",
 	usage: "pornsuggest",
 	func: function(user, userID, channel, args, message, bot){
-		http.get("https://www.pornmd.com/getliveterms?orientation="+o[parseInt(Math.random() * o.length)], function(response){
+		http.get("https://www.pornmd.com/getliveterms?country="+(args[1] ? args[1] : "in")+"&orientation="+o[parseInt(Math.random() * o.length)], function(response){
 			var body = "";
 	        response.on('data', function (chunk) {
 	            body += chunk;
