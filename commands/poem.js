@@ -9,7 +9,8 @@ exports.command = {
             message: "Generating Poem (This will take forever)"
         }, function(err, resp){
             if(!err) {
-                messageID = resp.ts;
+                messageID = resp.ts || resp.id;
+                console.log(messageID);
                 bot.connection.query('SELECT message, user, time FROM Messages WHERE message REGEXP ".*([to]o|u|[uei]w|2)$" AND (LENGTH(message) - LENGTH(REPLACE(message, " ", ""))) > 5 ORDER BY RAND() LIMIT 1', function(err, result) {
                     if(err) {
                         bot.editMessage({
@@ -27,8 +28,9 @@ exports.command = {
                                     `-${row.user} ${new Date(row.time).getFullYear()}`
                                 ];
 
+                            
                             bot.editMessage({
-                                channel: channel,
+                                channelID: channel,
                                 messageID: messageID,
                                 message: message.join('\n')
                             });

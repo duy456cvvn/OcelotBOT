@@ -13,7 +13,7 @@ exports.command = {
 	usage: "youtube <video> [radio-dir]",
 	func: function(user, userID, channel, args, message, bot){
 		if(args.length < 2)return false;
-        var url = args[1].substring(1, args[1].length-1);
+        var url = bot.isDiscord ? args[1] : args[1].substring(1, args[1].length-1) ;
         var messageID = "";
         bot.sendMessage({
         	to: channel,

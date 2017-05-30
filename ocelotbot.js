@@ -240,7 +240,7 @@ function botInit(cb){
         };
 
         bot.editMessage = function(data, cb){
-            bot.web.chat.update(data.messageID, data.channel, data.message, cb ? cb : null)
+            bot.web.chat.update(data.messageID, data.channel || data.channelID, data.message, cb ? cb : null)
         };
 
         /**
@@ -344,10 +344,13 @@ function botInit(cb){
 
 
     }else{
-        bot.sendAttachment = function(channel, text){
+
+
+        bot.registerInteractiveMessage = function noop(){};
+        bot.sendAttachment = function(channel, text, attachments){
             bot.sendMessage({
                 to: channel,
-                message: text
+                message: text+"\n"+attachments[0].fallback
             });
         };
 
