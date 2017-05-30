@@ -31,7 +31,7 @@ exports.command = {
                             }else{
                                 bot.sendMessage({
                                     to: channel,
-                                    message: "Now Playing: *" + data.artist_name + " - " + data.title + "*\nhttps://unacceptableuse.com/petify/song/"+data.song_id+"/-"
+                                    message: "Now Playing: *" + data.artist_name + " - " + data.title + "*\nhttps://unacceptableuse.com/petify/song/"+data.song_id+"/-%7C"
                                 });
                             }
 
