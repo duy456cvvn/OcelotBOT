@@ -1,4 +1,8 @@
 var forever = require('forever');
+
+
+const nums = [":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:"];
+
 exports.command = {
 	name: "forever",
 	desc: "Interface with forever",
@@ -15,11 +19,14 @@ exports.command = {
         //    return true;
         //}
 		if(args[1] === "list"){
+		    var now = new Date().getTime();
 			forever.list(false, function(err, info){
 				var output = "\n*RUNNING FOREVER PROGRAMS:*\n";
 				for(var i in info){
 					var program = info[i];
-					output += ("["+i+"] *"+(program.uid)+"*: "+(program.running ? "RUNNING" : "STOPPED")+" ("+program.restarts+" restarts"+")\n")
+					output += `${nums[i]} ${program.running ? ":white_check_mark:" : ":negative_squared_cross_mark: "} *${program.uid}* - ${prettySeconds((now - program.ctime)/1000)} - *${program.restarts} restarts*\n`;
+					//output += ("["+i+"] *"+(program.uid)+"*: "+(program.running ? "RUNNING" : "STOPPED")+" ("+program.restarts+" restarts"+")\n")
+
 				}
 	        	bot.sendMessage({
 		            to: channel,
@@ -83,4 +90,36 @@ exports.command = {
         //    t.true(exports.command.func(null, null, "", ["forever", "logs", "0"], "", bot));
         //});
 	}
+};
+
+function quantify(data, unit, value) {
+    if (value) {
+
+        data.push(value + unit + ' ');
+    }
+
+    return data;
+}
+
+function prettySeconds(seconds) {
+
+    var prettyString = '',
+        data = [];
+
+    if (typeof seconds === 'number') {
+
+        data = quantify(data, 'd',    parseInt(seconds / 86400));
+        data = quantify(data, 'h',   parseInt((seconds % 86400) / 3600));
+        data = quantify(data, 'm', parseInt((seconds % 3600) / 60));
+        data = quantify(data, 's', Math.floor(seconds % 60));
+
+        var length = data.length,
+            i;
+
+        for (i = 0; i < length; i++) {
+            prettyString += data[i];
+        }
+    }
+
+    return prettyString;
 };
