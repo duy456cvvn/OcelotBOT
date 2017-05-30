@@ -7,7 +7,7 @@ exports.command = {
 	    if(bot.isDiscord){
             bot.sendMessage({
                 to: channel,
-                message: ""
+                message: "https://github.com/Ocelotworks/OcelotBOT/blob/master/commands.md"
             });
         }else{
             var msg = "";
