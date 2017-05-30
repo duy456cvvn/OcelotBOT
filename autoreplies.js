@@ -12,22 +12,22 @@ module.exports = function(bot) {
             var seeded = false,
                 m = markov();
 
-            bot.log('Generating markov chain');
-            bot.connection.query('SELECT message FROM Messages ORDER BY RAND() LIMIT 250', function(err, result) {
-                if(err) {
-                    bot.error(`Error: ${err}`);
-                } else {
-                    bot.log('Retrieved messages');
-                    async.eachSeries(result, function(row, cb) {
-                        m.seed(row.message, cb);
-                    }, function() {
-                        bot.log('Finished seeding');
-                    });
-                }
-            });
+            // bot.log('Generating markov chain');
+            // bot.connection.query('SELECT message FROM Messages ORDER BY RAND() LIMIT 250', function(err, result) {
+            //     if(err) {
+            //         bot.error(`Error: ${err}`);
+            //     } else {
+            //         bot.log('Retrieved messages');
+            //         async.eachSeries(result, function(row, cb) {
+            //             m.seed(row.message, cb);
+            //         }, function() {
+            //             bot.log('Finished seeding');
+            //         });
+            //     }
+            // });
 
             bot.registerMessageHandler("autoreply", function(message, channelID) {
-                if(message.startsWith("<@U1M9SE59T>")) {
+                if(message.startsWith("<@U1M9SE59T>") || message.startsWith("<@146293573422284800>")) {
                     if(message == "<@U1M9SE59T> toggle markov") {
                         seeded = !seeded;
                     }
@@ -69,20 +69,20 @@ module.exports = function(bot) {
                 message = message.toLowerCase();
 
 
-                if(message.indexOf("ass") > -1 && message.toLowerCase().indexOf("-") === -1) {
-                    var words = message.toLowerCase().split(" ");
-                    for(var i in words) {
-                        if(words.hasOwnProperty(i)) {
-                            if(words[i] === "ass" && words.length > parseInt(i)+1){
-                                bot.sendMessage({
-                                    to: channelID,
-                                    message: "*ass-"+words[parseInt(i)+1]+"*"
-                                });
-                                break;
-                            }
-                        }
-                    }
-                }
+                // if(message.indexOf("ass") > -1 && message.toLowerCase().indexOf("-") === -1) {
+                //     var words = message.toLowerCase().split(" ");
+                //     for(var i in words) {
+                //         if(words.hasOwnProperty(i)) {
+                //             if(words[i] === "ass" && words.length > parseInt(i)+1){
+                //                 bot.sendMessage({
+                //                     to: channelID,
+                //                     message: "*ass-"+words[parseInt(i)+1]+"*"
+                //                 });
+                //                 break;
+                //             }
+                //         }
+                //     }
+                // }
 
                 var ogIndex = message.indexOf("ack");
                 if(ogIndex > -1 && (ogIndex > 0 ? message.indexOf(" ack ") > -1 : true)) { //ack test

@@ -22,15 +22,20 @@ exports.command = {
                                 message: "Error getting data from Petify:\n```\n"+JSON.stringify(data.err)+"\n```"
                             });
                         } else {
-                            bot.web.chat.postMessage(channel,  ":petify: Now Playing: *<https://unacceptableuse.com/petify/song/"+data.song_id+"/-|" + data.artist_name + " - " + data.title + ">*", {
-                                parse: true,
-                                unfurl_media: true,
-                                unfurl_links: true
-                            });
-                            // bot.sendMessage({
-                            //     to: channel,
-                            //     message: "Now Playing: *" + data.artist_name + " - " + data.title + "*\n<https://unacceptableuse.com/petify/song/"+data.song_id+"/-"+"|Listen Here>"
-                            // });
+                            if(!bot.isDiscord){
+                                bot.web.chat.postMessage(channel,  ":petify: Now Playing: *<https://unacceptableuse.com/petify/song/"+data.song_id+"/-|" + data.artist_name + " - " + data.title + ">*", {
+                                    parse: true,
+                                    unfurl_media: true,
+                                    unfurl_links: true
+                                });
+                            }else{
+                                bot.sendMessage({
+                                    to: channel,
+                                    message: "Now Playing: *" + data.artist_name + " - " + data.title + "*\nhttps://unacceptableuse.com/petify/song/"+data.song_id+"/-"
+                                });
+                            }
+
+
                         }
                     }catch(e){
                         bot.sendMessage({
