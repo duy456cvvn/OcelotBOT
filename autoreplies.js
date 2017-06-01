@@ -27,7 +27,7 @@ module.exports = function(bot) {
             // });
 
             bot.registerMessageHandler("autoreply", function(message, channelID) {
-                if(message.startsWith("<@U1M9SE59T>") || message.startsWith("<@146293573422284800>")) {
+                if(message.startsWith("<@U1M9SE59T>") || message.indexOf("146293573422284800>") > -1) {
                     if(message == "<@U1M9SE59T> toggle markov") {
                         seeded = !seeded;
                     }
