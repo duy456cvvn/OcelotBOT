@@ -9,7 +9,7 @@ exports.command = {
 		const insults = bot.config.insults;
 		bot.sendMessage({
             to: channel,
-            message: args[1]+", "+insults[parseInt(Math.random() * insults.length)]
+            message: message.substring(8)+", "+insults[parseInt(Math.random() * insults.length)]
         });
         return true;
 	},
