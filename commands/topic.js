@@ -6,35 +6,38 @@ exports.command = {
 	desc: "Add a *hilarious* comment from one of your good buddies to the topic.",
 	usage: "topic [<message> *or* <username>] *or* next/set <id>",
 	onReady: function(bot){
-        bot.topicCounter = 0;
-        bot.currentTopic = "";
-        bot.lastTopic = "";
+	    if(!bot.isDiscord) {
+            bot.topicCounter = 0;
+            bot.currentTopic = "";
+            bot.lastTopic = "";
 
-		bot.updateTopic = function(channel) {
-            //TODO: Use .sample here
-            bot.connection.query('SELECT * FROM Topics ORDER BY RAND() LIMIT 1', function(err, result) {
-                if(err) {
-                    bot.error(`Error getting topic list: ${err}`);
-                } else {
-                    var newTopic = result[0];
+            bot.updateTopic = function (channel) {
+                //TODO: Use .sample here
+                bot.connection.query('SELECT * FROM Topics ORDER BY RAND() LIMIT 1', function (err, result) {
+                    if (err) {
+                        bot.error(`Error getting topic list: ${err}`);
+                    } else {
+                        var newTopic = result[0];
 
-                    bot.currentTopic = newTopic.id;
-                    bot.log(`Changing topic to ID ${newTopic.id}`);
-                    bot.web_p.channels.setTopic(channel, `<${newTopic.username}> ${newTopic.topic}`);
+                        bot.currentTopic = newTopic.id;
+                        bot.log(`Changing topic to ID ${newTopic.id}`);
+                        bot.web_p.channels.setTopic(channel, `<${newTopic.username}> ${newTopic.topic}`);
+                    }
+                });
+            };
+
+            bot.registerMessageHandler('topic', function topicUpdate(message, channelID) {
+                bot.topicCounter++;
+
+                if (bot.topicCounter > bot.config.topic.threshold) {
+                    bot.updateTopic(channelID);
+                    bot.topicCounter = 0;
                 }
             });
-		};
-
-        bot.registerMessageHandler('topic', function topicUpdate(message, channelID){
-            bot.topicCounter++;
-
-            if(bot.topicCounter > bot.config.topic.threshold){
-                bot.updateTopic(channelID);
-                bot.topicCounter = 0;
-            }
-        });
+        }
 	},
 	func: function(user, userID, channel, args, message, bot){
+	    if(bot.isDiscord)return true;
 		var index = args.length < 2 ? 1 : parseInt(args[1]);
 		bot.log(`Index: ${index}`);
 
