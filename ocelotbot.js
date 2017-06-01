@@ -348,10 +348,34 @@ function botInit(cb){
 
         bot.registerInteractiveMessage = function noop(){};
         bot.sendAttachment = function(channel, text, attachments){
+            var attachment = attachments[0];
+            for(var i in attachment.fields){
+                attachment.fields[i].name = attachment.fields[i].title;
+                delete attachment.fields[i].title;
+                attachment.fields[i].inline = attachment.fields[i].short;
+                delete attachment.fields[i].short;
+            }
             bot.sendMessage({
                 to: channel,
-                message: text+"\n"+attachments[0].fallback
+                message: text,
+                embed: {
+                    color: parseInt("0x"+attachment.color.substring(1)),
+                    title: attachment.title,
+                    description: attachment.text,
+                    image: {
+                        url: attachment.author_icon
+                    },
+                    fields: attachment.fields,
+                    author: {
+                        name: attachment.author_name,
+                        url: attachment.author_link,
+                        icon_url: attachment.author_icon
+                    }
+                }
+            }, function(){
+                console.log(arguments);
             });
+
         };
 
         bot.sendButtons = function(channel, text, fallback){
@@ -362,7 +386,7 @@ function botInit(cb){
         };
 
         bot.on('message', function(user, userID, channelID, message, event){
-            if(message) {
+            if(message && userID != "146293573422284800") {
                 for (var i in bot.messageHandlers) {
                     if (bot.messageHandlers.hasOwnProperty(i)) {
                         bot.messageHandlers[i](message, channelID, user, userID);
@@ -370,7 +394,14 @@ function botInit(cb){
                 }
             }
         });
-        if(cb)cb();
+        if(cb)
+            cb();
+
+        // bot.on('ready', function(){
+        //     if(cb)
+        //         cb();
+        // });
+
     }
 
 }
