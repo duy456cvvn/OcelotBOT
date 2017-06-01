@@ -4,6 +4,7 @@ exports.command = {
 	desc: "Pull a random image from a subreddit",
 	usage: "image <subreddit>",
 	func: function(user, userID, channel, args, message, bot){
+	    if(bot.isDiscord)return true;
 		if(args.length < 2){
 			return false;
 		}
