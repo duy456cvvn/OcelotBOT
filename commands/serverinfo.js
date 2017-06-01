@@ -54,20 +54,19 @@ exports.command = {
 				});
 			}else{
 
-				bot.sendAttachment(channel, "\n", [{
-					fallback:   `_\n*${info.name}* (${info.players}+${info.bots}/${info.maxplayers}) steam://connect/${args[1]}:${args[2]}\n`+
-                                `\`map\`: ${info.map}\n`+
-                                `\`game\`: ${info.game}\n`+
-                                `\`version\`:${info.version}\n`+
-                                `\`folder\`: ${info.folder}`,
+				bot.sendAttachment(channel, `steam://connect/${args[1]}:${args[2]}`, [{
+                    fallback:   `_\n*${info.name}* (${info.players}+${info.bots}/${info.maxplayers}) steam://connect/${args[1]}:${args[2]}\n`+
+                    `\`map\`: ${info.map}\n`+
+                    `\`game\`: ${info.game}\n`+
+                    `\`version\`:${info.version}\n`+
+                    `\`folder\`: ${info.folder}`,
                     color: gameColours[info.folder] ? gameColours[info.folder] : "#45a569",
-                    author_name: info.name,
-                    author_link: `steam://connect/${args[1]}:${args[2]}`,
-                    author_icon: `https://unacceptableuse.com/ocelotbot/${info.folder}.png`,
+                    title: info.name,
+                    description: "aaaaaaaaa",
                     fields: [
                         {
                             title: "Players",
-                            value: `${info.players}+${info.bots}/${info.maxplayers}`,
+                            value: `${info.bots}+${info.players}/${info.maxplayers}`,
                             short: true
                         },
                         {
@@ -96,6 +95,8 @@ exports.command = {
                         }
                     ]
 				}]);
+
+
 
 
 			}
