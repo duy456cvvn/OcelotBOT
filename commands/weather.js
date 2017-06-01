@@ -19,9 +19,9 @@ exports.command = {
                 message: "Error contacting weather API."
                });
            }else{
+               var data = JSON.parse(body);
                if(data && data.weather && data.weather[0] && data.weather[0].main) {
                    bot.log("Got weather for " + search);
-                   var data = JSON.parse(body);
                    var attachments = [{
                        fallback: `${data.name}: ${data.weather[0].main} - ${data.weather[0].description} ${data.main.temp}C`,
                        color: exports.command.colourFromTemperature(data.main.temp),
@@ -49,12 +49,14 @@ exports.command = {
                        ]
                    }];
 
+
                    bot.sendAttachment(channel, "", attachments);
                }else{
                    bot.sendMessage({
                        to: channel,
-                       message: "Couldn't find weather for that location."
+                       message: "Couldn't find weather for '"+search+"'."
                    });
+
                }
            }
 
