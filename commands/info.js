@@ -47,7 +47,7 @@ exports.command = {
 
 		}
 
-		bot.sendMessage({
+        bot.sendMessage({
             to: channel,
             message: message
         });
