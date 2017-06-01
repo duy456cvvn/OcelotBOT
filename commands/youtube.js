@@ -20,7 +20,7 @@ exports.command = {
         	message: "Retrieving video information..."
         }, function messageResponse(err, resp){
             if(!err) {
-                messageID = resp.ts;
+                messageID = resp.ts || resp.id;
             }
             else
                 bot.sendMessage({
