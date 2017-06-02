@@ -106,6 +106,11 @@ if(isDiscord){
 
 
 function startBot(){
+
+    if(isDiscord){
+        bot.registerInteractiveMessage = function noop(){};
+    }
+
     bot.log = function(message, caller){
         if(!caller)
              caller = caller_id.getData();
@@ -279,6 +284,13 @@ function botInit(cb){
             bot.web.chat.postMessage(channel, text, {attachments: attachments}, cb);
         };
 
+        bot.addReaction = function(data, cb){
+            bot.web.reactions.add(data.reactionName, {
+                channel: data.channelID,
+                timestamp: data.messageID
+            }, cb);
+        };
+
         bot.rtm.start();
         bot.log("Waiting for bot to start...");
         bot.rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, function rtmAuthEvent(data){
@@ -328,14 +340,14 @@ function botInit(cb){
             var channelID = messageData.channel;
             var user = "<"+messageData.user+">";
             var userID = messageData.user;
-            //bot.log(JSON.stringify(messageData));
+
             if(message) {
                 if(messageData.ts && messageData.ts < bot.lastCrash.getTime()/1000){
                     console.log("Ignoring message because it was sent before the bot started ("+messageData.ts+" < "+bot.lastCrash.getTime()/1000+")");
                 }else {
                     for (var i in bot.messageHandlers) {
                         if (bot.messageHandlers.hasOwnProperty(i)) {
-                            bot.messageHandlers[i](message, channelID, user, userID);
+                            bot.messageHandlers[i](message, channelID, user, userID, messageData);
                         }
                     }
                 }
@@ -346,8 +358,7 @@ function botInit(cb){
     }else{
 
 
-        bot.registerInteractiveMessage = function noop(){};
-        bot.sendAttachment = function(channel, text, attachments){
+        bot.sendAttachment = function(channel, text, attachments, cb){
             var attachment = attachments[0];
             for(var i in attachment.fields){
                 attachment.fields[i].name = attachment.fields[i].title;
@@ -372,9 +383,7 @@ function botInit(cb){
                         icon_url: attachment.author_icon
                     }
                 }
-            }, function(){
-                console.log(arguments);
-            });
+            }, cb);
 
         };
 
@@ -389,18 +398,27 @@ function botInit(cb){
             if(message && userID != "146293573422284800") {
                 for (var i in bot.messageHandlers) {
                     if (bot.messageHandlers.hasOwnProperty(i)) {
-                        bot.messageHandlers[i](message, channelID, user, userID);
+                        bot.messageHandlers[i](message, channelID, user, userID, event);
                     }
                 }
             }
         });
-        if(cb)
-            cb();
 
-        // bot.on('ready', function(){
-        //     if(cb)
-        //         cb();
-        // });
+        bot.on('disconnect', function(err, code){
+           console.log("Disconnected: "+err+" "+code);
+           console.log("Reconnecting in 1 second");
+           setTimeout(function(){
+               console.log("Reconnecting...");
+               bot.connect();
+           }, 5000);
+        });
+
+
+
+        bot.on('ready', function(){
+            if(cb)
+                cb();
+        });
 
     }
 
