@@ -26,7 +26,7 @@ module.exports = function(bot) {
             //     }
             // });
 
-            bot.registerMessageHandler("autoreply", function(message, channelID) {
+            bot.registerMessageHandler("autoreply", function(message, channelID, user, userID, event) {
                 if(message.startsWith("<@U1M9SE59T>") || message.indexOf("146293573422284800>") > -1) {
                     if(message == "<@U1M9SE59T> toggle markov") {
                         seeded = !seeded;
@@ -119,6 +119,32 @@ module.exports = function(bot) {
                     bot.sendMessage({
                     	to: channelID,
                     	message: "http://thewritepractice.com/wp-content/uploads/2012/05/Alot-vs-a-lot1-600x450.png"
+                    });
+                }
+                if(message === "the more you know"){
+                    bot.addReaction({
+                        channelID: channelID,
+                        messageID: event.d ? event.d.id : event.ts,
+                        reaction: "🌈",
+                        reactionName: "rainbow"
+                    }, function(){
+                        setTimeout(function(){
+                            bot.addReaction({
+                                channelID: channelID,
+                                messageID: event.d ? event.d.id : event.ts,
+                                reaction: "⭐",
+                                reactionName: "star"
+                            });
+                        }, 200);
+                    });
+                }
+
+                if(message.indexOf("shit bot") > -1){
+                    bot.addReaction({
+                        channelID: channelID,
+                        messageID: event.d ? event.d.id : event.ts,
+                        reaction: "👎",
+                        reactionName: "thumbsdown"
                     });
                 }
             });
