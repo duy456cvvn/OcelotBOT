@@ -406,11 +406,12 @@ function botInit(cb){
 
         bot.on('disconnect', function(err, code){
            console.log("Disconnected: "+err+" "+code);
-           console.log("Reconnecting in 1 second");
-           setTimeout(function(){
-               console.log("Reconnecting...");
-               bot.connect();
-           }, 5000);
+           // console.log("Reconnecting in 1 second");
+           // setTimeout(function(){
+           //     console.log("Reconnecting...");
+           //     bot.connect();
+           // }, 5000);
+            process.kill(1);
         });
 
 
