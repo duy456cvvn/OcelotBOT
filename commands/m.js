@@ -60,25 +60,25 @@ exports.command = {
                 }else{
                     bot.log("Joined queue channel");
 
-                    bot.getAudioContext(bot.queueChannel, function (err, stream) {
-                        if (err) {
-                            console.log(err);
-                        } else {
-                            (function andAgain() {
-                                var songNames = Object.keys(songList);
-                                var song = songNames[parseInt(Math.random() * songNames.length)];
-                                console.log(songList[song]);
-                                stream.playAudioFile(songList[song]);
-
-                                stream.once('fileEnd', function () {
-                                    bot.log("Song ended (AutoDJ)");
-                                    isPlaying = false;
-                                    andAgain();
-                                });
-                            })();
-                        }
-                    });
-                    //playNextInQueue(bot.queueChannel, bot, "318432654880014347");
+                    // bot.getAudioContext(bot.queueChannel, function (err, stream) {
+                    //     if (err) {
+                    //         console.log(err);
+                    //     } else {
+                    //         (function andAgain() {
+                    //             var songNames = Object.keys(songList);
+                    //             var song = songNames[parseInt(Math.random() * songNames.length)];
+                    //             console.log(songList[song]);
+                    //             stream.playAudioFile(songList[song]);
+                    //
+                    //             stream.once('fileEnd', function () {
+                    //                 bot.log("Song ended (AutoDJ)");
+                    //                 isPlaying = false;
+                    //                 andAgain();
+                    //             });
+                    //         })();
+                    //     }
+                    // });
+                    playNextInQueue(bot.queueChannel, bot, "318432654880014347");
                 }
 
             });
