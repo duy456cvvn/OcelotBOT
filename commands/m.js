@@ -91,9 +91,14 @@ exports.command = {
     func: function(user, userID, channel, args, message, bot){
         if(args.length < 2)return false;
         if(args[1] === "q"){
-            if(args.length < 3)return false;
-            var arg = args.slice(2).join(" ");
-            enqueue(arg, bot, channel);
+            bot.sendMessage({
+                to: channel,
+                message: "Fuck you"
+            });
+            return true;
+            // if(args.length < 3)return false;
+            // var arg = args.slice(2).join(" ");
+            // enqueue(arg, bot, channel);
         }else if(args[1] === "lq"){
             if(queue.length === 0){
                 bot.sendMessage({
