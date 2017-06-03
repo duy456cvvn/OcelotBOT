@@ -32,13 +32,13 @@ module.exports = function(bot){
                 }
             }
 
-            bot.registerMessageHandler("command", function handleCommand(message, channelID, user, userID){
+            bot.registerMessageHandler("command", function handleCommand(message, channelID, user, userID, event){
                 if (message.startsWith(bot.config.misc.commandPrefix)) {
                     var args = message.split(" ");
                     var command = args[0].replace(bot.config.misc.commandPrefix, "").toLowerCase();
                     if (bot.commands[command]) {
                         try {
-                            if (!bot.commands[command].func(user, userID, channelID, args, message, bot)) {
+                            if (!bot.commands[command].func(user, userID, channelID, args, message, bot, event)) {
                                 bot.sendMessage({
                                     to: channelID,
                                     message: "*Invalid Usage:*\n!" + bot.commands[command].usage
@@ -46,6 +46,7 @@ module.exports = function(bot){
                             }
                         } catch (e) {
                             bot.sendMessage({to: channelID, message: "Error performing command: " + e.toString()});
+                            console.log(e.stack);
                         }
                     }
                 }
