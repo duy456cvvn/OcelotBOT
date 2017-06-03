@@ -411,7 +411,7 @@ function botInit(cb){
            //     console.log("Reconnecting...");
            //     bot.connect();
            // }, 5000);
-            process.kill(1);
+            process.exit(1);
         });
 
 
