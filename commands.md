@@ -60,5 +60,12 @@
 
 *!youtube* - Download youtube videos `!youtube <video>`
 
+*!trivia* - Asks trivia questions `!trivia`
+
+*!expand* - E x p a n d s `!expand [word]`
+
+*!spell* - Spell a word with reactions `!spell [word]`
+
+
 
 Also responds to @ocelotbot <message>
