@@ -43,7 +43,7 @@ exports.command = {
             }
         });
 
-        request(`https://www.abuseipdb.com/check/${args[1]}/json?key=${bot.config.abuseIPDBKey}&days=365`, function(err, resp, body){
+        request(`https://www.abuseipdb.com/check/${args[1]}/json?key=${bot.config.misc.abuseIPDBKey}&days=365`, function(err, resp, body){
             try{
                 var data = JSON.parse(body);
                 if(data.length > 0){
