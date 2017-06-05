@@ -66,6 +66,9 @@
 
 *!spell* - Spell a word with reactions `!spell [word]`
 
+*!invite* - Generates an invite link so you can invite it to your own server. `!invite`
+
+*!numberfact* - Gets a neat-o fact about the input number `!numberact <number>`
 
 
-Also responds to @ocelotbot <message>
+Also responds to @ocelotbot <message> IF the bot has a nickname
