@@ -47,7 +47,14 @@ module.exports = function(bot){
                         } catch (e) {
                             bot.sendMessage({to: channelID, message: "Error performing command: " + e.toString()});
                             console.log(e.stack);
+                        }finally{
+                            bot.connection.query('INSERT INTO `stevie`.`commandlog` (userID, channelID, command) VALUES (?, ?, ?)', [userID, channelID, message], function(err, result) {
+                                if(err) {
+                                    bot.error(`Error logging command: ${err}`);
+                                }
+                            });
                         }
+
                     }
                 }
             });
