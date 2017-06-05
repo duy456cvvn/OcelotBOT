@@ -199,7 +199,14 @@ exports.command = {
     desc: "Management command",
     usage: "mgt "+Object.keys(sargs).join("/"),
     func: function(user, userID, channel, args, message, bot){
-        return sargs[args[1]] ? (sargs[args[1]](user, userID, channel, args, message, bot) || true) : false;
+        if(bot.isDiscord && userID !== "139871249567318017"){
+            bot.sendMessage({
+                to: channel,
+                message: "Nice try."
+            })
+        }else{
+            return sargs[args[1]] ? (sargs[args[1]](user, userID, channel, args, message, bot) || true) : false;
+        }
     }
 };
 

@@ -184,6 +184,13 @@ exports.command = {
 	usage: "brackets in/out/outf <message>",
 	func: function(user, userID, channel, args, message, bot){
 		if(args.length < 3)return false;
+		if(bot.isDiscord && userID !== "139871249567318017"){
+            bot.sendMessage({
+                to: channel,
+                message: "lol no"
+            });
+            return true;
+        }
 		var input = message.substring(message.indexOf(args[1])+args[1].length+1);
 		if(args[1] === "in"){
             if(userID === "U1DNDKZDW" || userID === "U232Q4WQJ"){
