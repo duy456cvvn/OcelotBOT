@@ -203,7 +203,8 @@ exports.command = {
             bot.sendMessage({
                 to: channel,
                 message: "Nice try."
-            })
+            });
+            return true;
         }else{
             return sargs[args[1]] ? (sargs[args[1]](user, userID, channel, args, message, bot) || true) : false;
         }
