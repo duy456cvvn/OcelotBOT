@@ -6,53 +6,46 @@ exports.command = {
 	usage: "nowplaying",
 	func: function(user, userID, channel, args, message, bot){
 	    var target = args[1] ? args[1].replace("<@", "").replace(">", "") : userID;
-        if(bot.config.petify.users[target]){
-            request(`https://unacceptableuse.com/petify/api/${bot.config.petify.apiKey}/nowPlaying/${bot.config.petify.users[target]}`, function(err, resp, body){
-                if(err){
-                    bot.sendMessage({
-                        to: channel,
-                        message: err
-                    });
-                }else{
-                    try {
-                        var data = JSON.parse(body);
-                        if (data.err) {
-                            bot.sendMessage({
-                                to: channel,
-                                message: "Error getting data from Petify:\n```\n"+JSON.stringify(data.err)+"\n```"
-                            });
-                        } else {
-                            if(!bot.isDiscord){
-                                bot.web.chat.postMessage(channel,  ":petify: Now Playing: *<https://unacceptableuse.com/petify/song/"+data.song_id+"/-|" + data.artist_name + " - " + data.title + ">*", {
-                                    parse: true,
-                                    unfurl_media: true,
-                                    unfurl_links: true
-                                });
-                            }else{
-                                bot.sendMessage({
-                                    to: channel,
-                                    message: "Now Playing: *" + data.artist_name + " - " + data.title + "*\nhttps://unacceptableuse.com/petify/song/"+data.song_id+"/-%7C"
-                                });
-                            }
-
-
-                        }
-                    }catch(e){
+        request(`https://unacceptableuse.com/petify/api/${bot.config.petify.apiKey}/nowPlaying/${bot.config.petify.users[target] ? bot.config.petify.users[target] : bot.config.petify.users["139871249567318017"]}`, function(err, resp, body){
+            if(err){
+                bot.sendMessage({
+                    to: channel,
+                    message: err
+                });
+            }else{
+                try {
+                    var data = JSON.parse(body);
+                    if (data.err) {
                         bot.sendMessage({
                             to: channel,
-                            message: "Error: "+e
+                            message: "Error getting data from Petify:\n```\n"+JSON.stringify(data.err)+"\n```"
                         });
-                        bot.log(body);
+                    } else {
+                        if(!bot.isDiscord){
+                            bot.web.chat.postMessage(channel,  ":petify: Now Playing: *<https://unacceptableuse.com/petify/song/"+data.song_id+"/-|" + data.artist_name + " - " + data.title + ">*", {
+                                parse: true,
+                                unfurl_media: true,
+                                unfurl_links: true
+                            });
+                        }else{
+                            bot.sendMessage({
+                                to: channel,
+                                message: "Now Playing: *" + data.artist_name + " - " + data.title + "*\nhttps://unacceptableuse.com/petify/song/"+data.song_id+"/-%7C"
+                            });
+                        }
+
+
                     }
+                }catch(e){
+                    bot.sendMessage({
+                        to: channel,
+                        message: "Error: "+e
+                    });
+                    bot.log(body);
                 }
-            });
-        }else{
-            bot.sendMessage({
-                to: channel,
-                message: "You don't use Petify, so I don't give a shit what you're listening to. :peter_sad:"
-            });
-            bot.log("User ID:"+userID);
-        }
+            }
+        });
+
 
 
 		return true;
