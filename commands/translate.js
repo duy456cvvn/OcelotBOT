@@ -38,7 +38,7 @@ exports.command = {
 
                                 bot.sendMessage({
                                     to: channel,
-                                    message: "Error: "+langResult.message
+                                    message: "Error: "+langResult.message+"\nYou must supply an output language i.e 'en'"
                                 });
                             }
                         }
