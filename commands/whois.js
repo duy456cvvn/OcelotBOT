@@ -15,10 +15,34 @@ exports.command = {
 		            message: "An error occurred: "+err
 		        });
 			}else{
-				bot.sendMessage({
-		            to: channel,
-		            message: "```\n"+data+ "....\n```"
-		        });
+			    data = data.replace(/%.*$/mgi, "");
+				if(bot.isDiscord){
+                    bot.sendMessage({
+                        to: channel,
+                        message: "",
+                        embed: {
+                            color: 16646398,
+                            title: "",
+                            description: data.length > 2000 ? data.substring(0, 2000)+"..." : data,
+                            author: {
+                                name: "Whois data for "+args[1],
+                            }
+                        }
+                    }, function(err){
+                        if(err){
+                            bot.sendMessage({
+                                to: channel,
+                                message: JSON.stringify(err)
+                            });
+                        }
+                    });
+				}else{
+                    bot.sendMessage({
+                        to: channel,
+                        message: "```\n"+data+ "....\n```"
+                    });
+				}
+
 			}
 		});
 
