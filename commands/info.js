@@ -7,21 +7,27 @@ exports.command = {
 
 		var message = "\n";
 
-		if(args[1] == "bot"){
+		if(args[1] === "bot"){
 			message += "*BOT INFO:*\n";
+            message += "**Created By**: <@139871249567318017> (Big P#1843)\n";
 			message += "`name`: "+process.title+"\n";
 			message += "`platform`: "+process.platform+"\n";
-			message += "`env`: "+process.env.path+"\n";
 			message += "`pid`: "+process.pid+"\n";
-			message += "`uptime`: "+process.uptime()/60+" minutes \n";
-			message += "`dependancies`: "+JSON.stringify(Object.keys(process.versions))+"\n";
-			message += "**Servers:**\n";
-			for(var serverID in bot.servers){
-				var server = bot.servers[serverID];
-				message += "`"+serverID+"`: "+server.name+"\n";
-	   	 	}
-		}else if(args[1] == "server"){
-			var serverID = bot.serverFromChannel(channel);
+			message += "`uptime`: "+parseInt(process.uptime()/60)+" minutes \n";
+			message += "`users`: " + Object.keys(bot.users).length+"\n";
+            message += "`channels`: " + Object.keys(bot.channels).length+"\n";
+			if(userID == "139871249567318017"){
+                message += "**Servers:**\n";
+                for(var serverID in bot.servers){
+                    var server = bot.servers[serverID];
+                    message += "`"+serverID+"`: "+server.name+"\n";
+                }
+            }else{
+                message += "`servers`: " + Object.keys(bot.servers).length+"\n";
+            }
+
+		}else if(args[1] === "server"){
+			var serverID = bot.channels[channel].guild_id;
 			var server = bot.servers[serverID];
 			message += "*SERVER INFO:*\n";
 			message += "`name`: "+server.name+"\n";
