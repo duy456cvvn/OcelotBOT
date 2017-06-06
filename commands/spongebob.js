@@ -28,18 +28,22 @@ exports.command = {
             }else{
                 bot.sendMessage({
                     to: channel,
-                    message: "NYI"
+                    message: output
                 });
             }
         };
 
         if(!args[1]){
-            bot.getMessages({
-                channelID: channel,
-                limit: 2
-            }, function(err, resp){
-                   doSponge(err || resp[1].content);
-            });
+            if(bot.isDiscord){
+                bot.getMessages({
+                    channelID: channel,
+                    limit: 2
+                }, function(err, resp){
+                    doSponge(err || resp[1].content);
+                });
+            }else{
+                return false;
+            }
         }else{
             doSponge(args[1]);
         }
