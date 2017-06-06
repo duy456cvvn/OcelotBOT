@@ -10,7 +10,8 @@ var fs              = require('fs'),
     async           = require('async'),
     colors          = require('colors'),
     dateFormat      = require('dateformat'),
-    websocket       = require('websocket').w3cwebsocket;
+    websocket       = require('websocket').w3cwebsocket,
+    request         = require('request');
 
 
 var isDiscord = process.argv.indexOf("discord") > -1;
@@ -417,6 +418,20 @@ function botInit(cb){
 
 
         bot.on('ready', function(){
+
+            if(bot.isDiscord){
+                request.post({
+                    headers: {
+                        "Authorization": bot.config.misc.discordBotsKey,
+                        "Content-Type": "application/json"
+                    },
+                    url: "https://bots.discord.pw/api/bots/146293573422284800/stats",
+                    body: '{"server_count": 102}'
+                }, function(err, resp, body){
+                    console.log(body);
+                });
+            }
+
             if(cb)
                 cb();
         });
