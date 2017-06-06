@@ -147,6 +147,14 @@ module.exports = function(bot) {
                         reactionName: "thumbsdown"
                     });
                 }
+
+                if(message.indexOf("peter") > -1 && bot.isDiscord){
+
+                    bot.sendMessage({
+                        to: channelID,
+                        message: "<:peter:321679281061363712>"
+                    });
+                }
             });
 
             if(callback) {
