@@ -70,5 +70,9 @@
 
 *!numberfact* - Gets a neat-o fact about the input number `!numberact <number>`
 
+*!flip* - Flip a coin`!flip`
+
+*!spongebob* - MAkEs a SpoNGeBoB MeME `!spongebob [text]`
+
 
 Also responds to @ocelotbot <message> IF the bot has a nickname
