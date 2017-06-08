@@ -426,7 +426,17 @@ function botInit(cb){
                         "Content-Type": "application/json"
                     },
                     url: "https://bots.discord.pw/api/bots/146293573422284800/stats",
-                    body: '{"server_count": 102}'
+                    body: '{"server_count": '+Object.keys(bot.servers).length+'}'
+                }, function(err, resp, body){
+                    console.log(body);
+                });
+                request.post({
+                    headers: {
+                        "Authorization": bot.config.misc.discordBotsOrgKey,
+                        "Content-Type": "application/json"
+                    },
+                    url: "https://discordbots.org/api/bots/146293573422284800/stats",
+                    body: '{"server_count": '+Object.keys(bot.servers).length+'}'
                 }, function(err, resp, body){
                     console.log(body);
                 });
@@ -454,18 +464,20 @@ process.on('uncaughtException', function uncaughtException(err){
     console.log(JSON.stringify(err));
     bot.lastCrash = new Date();
 
-    if(bot.rtm && !bot.rtm.connected){
-        process.exit(1);
-        // bot.log("Last crash caused disconnect, waiting 10 seconds for a revival then killing bot.");
-        // setTimeout(function(){
-        //     if(!bot.rtm.connected){
-        //         bot.log("Bot is still dead after 10 seconds, restarting...");
-        //         process.exit(1);
-        //     }else{
-        //         bot.log("Bot successfully reconnected in time and lived to shitpost another day.");
-        //     }
-        // }, 10000);
-    }
+    process.exit(1);
+
+    // if(bot.rtm && !bot.rtm.connected){
+    //
+    //     // bot.log("Last crash caused disconnect, waiting 10 seconds for a revival then killing bot.");
+    //     // setTimeout(function(){
+    //     //     if(!bot.rtm.connected){
+    //     //         bot.log("Bot is still dead after 10 seconds, restarting...");
+    //     //         process.exit(1);
+    //     //     }else{
+    //     //         bot.log("Bot successfully reconnected in time and lived to shitpost another day.");
+    //     //     }
+    //     // }, 10000);
+    // }
 });
 
 
