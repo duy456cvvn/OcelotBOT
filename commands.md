@@ -74,5 +74,8 @@
 
 *!spongebob* - MAkEs a SpoNGeBoB MeME `!spongebob [text]`
 
+*!holiday* - Find out if there is a holiday today `!holiday [country]`
+
+
 
 Also responds to @ocelotbot <message> IF the bot has a nickname
