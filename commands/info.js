@@ -16,7 +16,7 @@ exports.command = {
 			message += "`uptime`: "+parseInt(process.uptime()/60)+" minutes \n";
 			message += "`users`: " + Object.keys(bot.users).length+"\n";
             message += "`channels`: " + Object.keys(bot.channels).length+"\n";
-			if(userID == "139871249567318017"){
+			if(userID == "139871249567318017" && args[3]){
                 message += "**Servers:**\n";
                 for(var serverID in bot.servers){
                     var server = bot.servers[serverID];
