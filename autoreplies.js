@@ -148,13 +148,24 @@ module.exports = function(bot) {
                     });
                 }
 
-                if(message.indexOf("peter") > -1 && bot.isDiscord){
-
-                    bot.sendMessage({
-                        to: channelID,
-                        message: "<:peter:321679281061363712>"
+                if(message.indexOf("xd") > -1){
+                    bot.addReaction({
+                        channelID: channelID,
+                        messageID: event.d ? event.d.id : event.ts,
+                        reaction: "🇽",
+                        reactionName: "x"
+                    }, function(){
+                        setTimeout(function(){
+                            bot.addReaction({
+                                channelID: channelID,
+                                messageID: event.d ? event.d.id : event.ts,
+                                reaction: "🇩",
+                                reactionName: "d"
+                            });
+                        }, 500);
                     });
                 }
+
             });
 
             if(callback) {
