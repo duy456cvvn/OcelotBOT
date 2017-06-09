@@ -123,7 +123,7 @@ function startBot(){
 
         var output = origin+message;
         console.log(`[${dateFormat(new Date(), "dd/mm/yy hh:MM")}]`+output);
-        if(bot.config.misc.logChannelEnabled && bot.rtm && bot.rtm.connected){
+        if(!bot.isDiscord && bot.config.misc.logChannelEnabled && bot.rtm && bot.rtm.connected){
                 bot.sendMessage({
                     to: bot.config.misc.logChannel,
                 message: output
