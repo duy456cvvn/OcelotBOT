@@ -45,13 +45,8 @@ exports.command = {
                 return false;
             }
         }else{
-            doSponge(args[1]);
+            doSponge(message.substring(10));
         }
-
-
-
-
-
 
         return true;
     }
