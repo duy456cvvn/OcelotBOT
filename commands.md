@@ -46,7 +46,7 @@
 
 *!time* - The time in `!time <timezone>`
 
-*!translate* - Translate something `!translate <to> <sentence>`
+*!translate* - Translate something `!translate <country-code> <sentence>`
 
 *!unicode* - Convert text to magic unicode stuff `!unicode bold/italic/regional/fullwidth`
 
