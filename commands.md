@@ -2,11 +2,7 @@
 
 *!commands* - This command `!commands`
 
-*!context* - Get the context of a  `!context [message].`
-
 *!currency* - Convert a currency `!currency <currency> <currency>`
-
-*!dsem* - Days since Erica was mad `!*DEPRECATED* dsem [reset] [reason]`
 
 *!define* - Define something `!define`
 
@@ -23,8 +19,6 @@
 *!ipinfo* - Get IP information `!ipinfo <ip>`
 
 *!lastcrash* - How long since last crash `!lastcrash`
-
-*!mgt* - Management command `!mgt eval/evalOutput/config/addNew/add/service/handler`
 
 *!meme* - Memes `!meme <meme/list/add <name> <url>>`
 
@@ -50,13 +44,11 @@
 
 *!unicode* - Convert text to magic unicode stuff `!unicode bold/italic/regional/fullwidth`
 
-*!vote* - Vote `!vote start opt1,opt2,opt3.../1/2/3../end`
-
 *!weather* - Weather at location `!weather <search>`
 
 *!whois* - WHOIS lookup a domain `!whois <domain>`
 
-*!with* - Perform a command in batch `!with <command> (br) [args] (br) [args] (br)...`
+*!with* - Perform a command in batch `!with <command> (new line) [args] (new line) [args] (new line)...`
 
 *!youtube* - Download youtube videos `!youtube <video>`
 
@@ -74,7 +66,7 @@
 
 *!spongebob* - MAkEs a SpoNGeBoB MeME `!spongebob [text]`
 
-*!holiday* - Find out if there is a holiday today `!holiday [country]`
+*!holiday* - Find out if there is a holiday today `!holiday [country-code]`
 
 
 
