@@ -49,40 +49,41 @@ exports.command = {
     "rm <index> - **Removes the song at the index from the queue.**\n",
     onReady: function(bot){
 
+        if(bot.isDiscord) {
+            setTimeout(function () {
+                bot.queueChannel = "318433556282212352";
 
-        setTimeout(function(){
-            bot.queueChannel = "318433556282212352";
+                bot.joinVoiceChannel(bot.queueChannel, function (err) {
+                    if (err) {
+                        console.log("Error joining voice channel: ");
+                        console.log(err);
+                    } else {
+                        bot.log("Joined queue channel");
 
-            bot.joinVoiceChannel(bot.queueChannel, function(err){
-                if(err){
-                    console.log("Error joining voice channel: ");
-                    console.log(err);
-                }else{
-                    bot.log("Joined queue channel");
+                        bot.getAudioContext(bot.queueChannel, function (err, stream) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                (function andAgain() {
+                                    var songNames = Object.keys(songList);
+                                    var song = songNames[parseInt(Math.random() * songNames.length)];
+                                    console.log(songList[song]);
+                                    stream.playAudioFile(songList[song]);
 
-                    // bot.getAudioContext(bot.queueChannel, function (err, stream) {
-                    //     if (err) {
-                    //         console.log(err);
-                    //     } else {
-                    //         (function andAgain() {
-                    //             var songNames = Object.keys(songList);
-                    //             var song = songNames[parseInt(Math.random() * songNames.length)];
-                    //             console.log(songList[song]);
-                    //             stream.playAudioFile(songList[song]);
-                    //
-                    //             stream.once('fileEnd', function () {
-                    //                 bot.log("Song ended (AutoDJ)");
-                    //                 isPlaying = false;
-                    //                 andAgain();
-                    //             });
-                    //         })();
-                    //     }
-                    // });
-                    playNextInQueue(bot.queueChannel, bot, "318432654880014347");
-                }
+                                    stream.once('fileEnd', function () {
+                                        bot.log("Song ended (AutoDJ)");
+                                        isPlaying = false;
+                                        andAgain();
+                                    });
+                                })();
+                            }
+                        });
+                        // playNextInQueue(bot.queueChannel, bot, "318432654880014347");
+                    }
 
-            });
-        }, 10000);
+                });
+            }, 10000);
+        }
 
 
 
