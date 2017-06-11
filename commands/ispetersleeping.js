@@ -11,7 +11,7 @@ exports.command = {
                     fallback: "...",
                     color: "#4d41ef",
                     title: "Peter's last known statistics",
-                    text: `Last heard from petermon at *${peter.timestamp}*`,
+                    text: `Last heard from petermon at ${peter.timestamp}`,
                     fields: [
                         {
                             title: "Phone Battery",
