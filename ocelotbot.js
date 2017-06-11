@@ -415,7 +415,13 @@ function botInit(cb){
             process.exit(1);
         });
 
-
+        bot.on('guildCreate', function(){
+           bot.setPresence({
+               game: {
+                   name: "in "+Object.keys(bot.servers).length+" servers"
+               }
+           });
+        });
 
         bot.on('ready', function(){
 
