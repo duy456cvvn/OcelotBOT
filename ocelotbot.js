@@ -415,13 +415,24 @@ function botInit(cb){
             process.exit(1);
         });
 
-        bot.on('guildCreate', function(){
-           bot.setPresence({
-               game: {
-                   name: "in "+Object.keys(bot.servers).length+" servers"
-               }
-           });
-        });
+        setTimeout(function(){
+            bot.on('guildCreate', function(){
+                bot.setPresence({
+                    game: {
+                        name: "in "+Object.keys(bot.servers).length+" servers"
+                    }
+                });
+            });
+
+            bot.on('guildDelete', function(){
+                bot.setPresence({
+                    game: {
+                        name: "in "+Object.keys(bot.servers).length+" servers"
+                    }
+                });
+            });
+        }, 1000);
+
 
         bot.on('ready', function(){
 
