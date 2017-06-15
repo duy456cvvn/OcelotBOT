@@ -9,7 +9,7 @@ exports.command = {
     usage: "realshit [url]",
     func: function(user, userID, channel, args, message, bot){
 
-
+        if(bot.isDiscord)return true;
         var doRealShit = function(url){
 
         };
