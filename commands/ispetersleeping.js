@@ -1,16 +1,27 @@
 var request = require('request');
+
 exports.command = {
 	name: "peterstate",
 	desc: "Where's Peter?",
 	usage: "peterstate",
 	func: function(user, userID, channel, args, message, bot){
+
+        const states = {
+            "Unknown": ":interrobang: Unknown?",
+            "Home": (bot.isDiscord ? ":house_abandoned:" : ":derelict_house_building:") + " Sat at home, on his own probably.",
+            "Outside": ":walking: Outside, probably busy.",
+            "College": ":school: At College, probably in an exam.",
+            "Sleeping": ":zzz: Asleep. Shhh.",
+            "Abbeys": ":ok_hand: :point_left: At Abbey's house. Probably boning."
+        };
+
         bot.connection.query("SELECT * FROM pm_status ORDER BY timestamp DESC LIMIT 1", function(err, result){
             var peter = result[0];
             bot.sendAttachment(channel, "", [
                 {
                     fallback: "...",
                     color: "#4d41ef",
-                    title: "Peter's last known statistics",
+                    title: `Peter's last state was: ${states[peter.state] || peter.state}`,
                     text: `Last heard from petermon at ${peter.timestamp}`,
                     fields: [
                         {
