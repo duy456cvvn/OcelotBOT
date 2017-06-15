@@ -27,7 +27,7 @@ exports.command = {
         }
     },
     func: function(user, userID, channel, args, message, bot){
-
+        return true;
         if(args.length < 3)
             return false;
 

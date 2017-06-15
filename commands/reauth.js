@@ -6,7 +6,7 @@ exports.command = {
     desc: "Generate an auth URL",
     usage: "reauth [permission][",
     func: function(user, userID, channel, args, message, bot){
-
+        if(bot.isDiscord)return true;
 
         bot.sendMessage({
             to: channel,

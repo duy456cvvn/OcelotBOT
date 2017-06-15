@@ -57,6 +57,7 @@ exports.command = {
                 startedBy = userID;
                 var output = "*<@"+startedBy+"> started a vote:*\n";
                 var buttons = [];
+                var fields = [];
                 for(var i in options){
                     votes[i] = 0;
                     output+= (parseInt(i)+1)+". `"+options[i]+"`\n[\u2588";
@@ -74,10 +75,17 @@ exports.command = {
                             style: "primary"
                         }
                     );
+
+                    fields.push({
+                        value: "Vote :"+i+":",
+                        text: "For "+options[i]+":"
+                    });
                     //[{"name": "a", "text": "Test", "value": "dick"}]
                 }
 
-                bot.web.chat.postMessage(channel, output, {attachments: [
+
+
+                bot.sendAttachment(channel, output, {attachments: [
                     {
                         text: "Vote Here:",
                         fallback: "Vote using !vote <num>",
@@ -85,16 +93,16 @@ exports.command = {
                         color: "#fefefe",
                         attachment_type: "default",
                         actions: buttons,
+                        fields: bot.isDiscord ? fields : undefined,
                         "mrkdwn_in": ["text"]
                     }
-                ],
-                    as_user: true
-                }, function(err, data){
+                ]}, function(err, data){
                     if(!err){
-                        currentVoteStamp = data.ts;
+                        currentVoteStamp = data.ts || data.id;
                         currentVoteChannel = channel;
                     }
                 });
+
 
 
            // }

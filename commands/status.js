@@ -16,8 +16,8 @@ exports.command = {
                     output += (statusMonitor.errors.length > 0 ? ":red_circle: " : ":white_check_mark: ")+i+"\n"
         }
 
-        output += (bot.rconnection  ? ":white_check_mark:" : ":red_circle:")+" RethinkDB\n";
-        //output += (bot.connection  ? ":white_check_mark:" : ":red_circle:")+" MySQL\n";
+       // output += (bot.rconnection  ? ":white_check_mark:" : ":red_circle:")+" RethinkDB\n";
+        output += (bot.connection  ? ":white_check_mark:" : ":red_circle:")+" MySQL\n";
         output += (os.loadavg()[0] >= 4 ? ":warning: Earth (High CPU Usage)" : ":white_check_mark: Earth");
 
         bot.sendMessage({

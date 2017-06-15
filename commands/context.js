@@ -9,6 +9,7 @@ exports.command = {
     desc: "Get the context of a ",
     usage: "context [message].",
     func: function(user, userID, channel, args, message, bot) {
+        if(bot.isDiscord)return true;
         function printContextOf(message, user){
             bot.connection.query('SELECT id FROM Messages WHERE message = ? AND user = ? LIMIT 1', [message, user], function(err, result) {
                 if(err) {

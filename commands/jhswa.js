@@ -107,6 +107,7 @@ exports.command = {
     desc: "Just Had Sex With Abbey",
     usage: "jhswa [times]",
     func: function(user, userID, channel, args, message, bot){
+        if(bot.isDiscord)return true;
         var abbey = {times: 0, total: 0, lastFuck: 0, record: 0, sexTimes: []};
         var now = new Date().getTime();
 

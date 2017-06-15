@@ -10,7 +10,7 @@ var illegalTitleRegex = /([\s\(\)\[\]\/!'\.\-&+$%^])/gm;
 exports.command = {
 	name: "youtube",
 	desc: "Download youtube videos",
-	usage: "youtube <video> [radio-dir]",
+	usage: "youtube <video URL>",
 	func: function(user, userID, channel, args, message, bot){
 		if(args.length < 2)return false;
         var url = bot.isDiscord ? args[1] : args[1].substring(1, args[1].length-1) ;
@@ -196,7 +196,7 @@ function sendOrEdit(text, messageID, channel, bot){
             messageID: messageID,
             message: text
         }, function(err, resp){
-            if(err  || !resp.ok){
+            if(err ){
                 bot.sendMessage({
                     to: channel,
                     message: text

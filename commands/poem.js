@@ -3,6 +3,7 @@ exports.command = {
     desc: "Get an urban dictionary definition",
     usage: "defineud <word>",
     func: function(user, userID, channel, args, message, bot){
+        if(bot.isDiscord)return true;
         var messageID = 0;
         bot.sendMessage({
             to: channel,

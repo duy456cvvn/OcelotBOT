@@ -7,6 +7,7 @@ exports.command = {
     desc: "Messags Before Ethan Mentions Bri",
     usage: "mbemb [messages]",
     func: function(user, userID, channel, args, message, bot){
+        if(bot.isDiscord)return true;
         var ethan = {total: 0, record: 0, count: 0};
 
         fs.readFile('ethan.json', function(err, data) {

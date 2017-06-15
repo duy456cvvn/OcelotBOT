@@ -6,6 +6,7 @@ exports.command = {
 	desc: "Generate a markov chain based on a user",
 	usage: "markov <user> [sample] [length] [key]",
 	func: function(user, userID, channel, args, message, bot) {
+        if(bot.isDiscord)return true;
 		if(args.length < 2) {
             return false;
         }
