@@ -13,18 +13,18 @@ exports.command = {
             to: channel,
             message: "Pinging...."
         }, function(err, resp){
-        	messageID = resp.ts;
-			 ping.promise.probe(args[1].replace("<","").replace(">", "").split("|")[1])
+        	messageID = resp.ts || resp.id;
+			 ping.promise.probe(bot.isDiscord ? args[1].replace("<","").replace(">", "") : args[1].replace("<","").replace(">", "").split("|")[1])
 				.then(function (res) {
 					if(res.alive){
 						bot.editMessage({
-						    channel: channel,
+						    channelID: channel,
 						    messageID: messageID,
 						    message: "Recieved response: \n```"+res.output+"\n```"
 						});
 					}else{
 						bot.editMessage({
-						    channel: channel,
+						    channelID: channel,
 						    messageID: messageID,
 						    message: "Recieved no response from host."
 						});
