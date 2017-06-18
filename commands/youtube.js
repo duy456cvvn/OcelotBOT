@@ -192,16 +192,11 @@ function downloadPlaylist(videos, bot, destination, channel, messageID){
 function sendOrEdit(text, messageID, channel, bot){
     if(messageID !== 0){
         bot.editMessage({
-            channel: channel,
+            channelID: channel,
             messageID: messageID,
             message: text
         }, function(err, resp){
-            if(err ){
-                bot.sendMessage({
-                    to: channel,
-                    message: text
-                });
-            }
+
         });
     }else{
         bot.sendMessage({
