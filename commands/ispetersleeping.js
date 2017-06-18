@@ -25,6 +25,16 @@ exports.command = {
                     text: `Last heard from petermon at ${peter.timestamp}`,
                     fields: [
                         {
+                            title: "Heart Rate",
+                            value: peter.peter_heartrate+" BPM",
+                            short: true
+                        },
+                        {
+                            title: "Room Temperature",
+                            value: peter.inside_temp+" C",
+                            short: true
+                        },
+                        {
                             title: "Phone Battery",
                             value: peter.jimmy_battery+"%",
                             short: true
