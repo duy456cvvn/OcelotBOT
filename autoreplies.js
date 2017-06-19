@@ -5,6 +5,25 @@ var request = require('request');
 var markov = require('markov');
 var async = require('async');
 
+
+const alots = {
+    "care about this alot": "https://3.bp.blogspot.com/_D_Z-D2tzi14/S8TTPQCPA6I/AAAAAAAACwA/ZHZH-Bi8OmI/s400/ALOT2.png",
+    "alot of fire": "https://3.bp.blogspot.com/_D_Z-D2tzi14/S8TWUJ0APWI/AAAAAAAACwI/014KRxexoQ0/s320/ALOT3.png",
+    "alot of mist": "https://3.bp.blogspot.com/_D_Z-D2tzi14/S8TWtWhXOfI/AAAAAAAACwQ/vCeUMPnMXno/s320/ALOT9.png",
+    "alot of straw": "https://3.bp.blogspot.com/_D_Z-D2tzi14/S8TW0Y2bL_I/AAAAAAAACwY/MGdywFA2tbg/s320/ALOT8.png",
+    "alot of cans": "https://1.bp.blogspot.com/_D_Z-D2tzi14/S8TZcKXqR-I/AAAAAAAACwg/F7AqxDrPjhg/s320/ALOT13.png",
+    "alot of beer": "https://1.bp.blogspot.com/_D_Z-D2tzi14/S8TZcKXqR-I/AAAAAAAACwg/F7AqxDrPjhg/s320/ALOT13.png",
+    "sad alot": "https://2.bp.blogspot.com/_D_Z-D2tzi14/S8Tdnn-NE0I/AAAAAAAACww/khYjZePN50Y/s400/ALOT4.png",
+    "charging alot": "https://4.bp.blogspot.com/_D_Z-D2tzi14/S8TfVzrqKDI/AAAAAAAACw4/AaBFBmKK3SA/s320/ALOT5.png",
+    "hear that alot": "https://2.bp.blogspot.com/_D_Z-D2tzi14/S8TiTtIFjpI/AAAAAAAACxQ/HXLdiZZ0goU/s320/ALOT14.png",
+    "get that alot": "https://2.bp.blogspot.com/_D_Z-D2tzi14/S8TiTtIFjpI/AAAAAAAACxQ/HXLdiZZ0goU/s320/ALOT14.png",
+    "like this alot": "https://3.bp.blogspot.com/_D_Z-D2tzi14/S8TffVGLElI/AAAAAAAACxA/trH1ch0Y3tI/s320/ALOT6.png",
+    "alot more dangerous": "https://1.bp.blogspot.com/_D_Z-D2tzi14/S8TflwXvTgI/AAAAAAAACxI/qgd1wYcTWV8/s320/ALOT12.png",
+    "alot": "https://4.bp.blogspot.com/_D_Z-D2tzi14/S8TRIo4br3I/AAAAAAAACv4/Zh7_GcMlRKo/s400/ALOT.png"
+};
+
+var alotRateLimit = {};
+
 module.exports = function(bot) {
     return {
         name: 'Autoreplies Listener',
@@ -115,55 +134,82 @@ module.exports = function(bot) {
                     });
                 }
 
+
+
                 if(message.indexOf("alot") > -1) {
-                    bot.sendMessage({
-                    	to: channelID,
-                    	message: "http://thewritepractice.com/wp-content/uploads/2012/05/Alot-vs-a-lot1-600x450.png"
-                    });
+                    var now = new Date();
+                    if(!alotRateLimit[channelID] || now-alotRateLimit[channelID] > 500){
+                        for(var i in alots){
+                            if(message.indexOf(i) > -1){
+                                if(bot.isDiscord){
+                                    bot.sendMessage({
+                                        to: channelID,
+                                        message: "",
+                                        embed:{
+                                            image: {
+                                                url: alots[i]
+                                            }
+                                        }
+                                    });
+                                }else{
+                                    bot.sendMessage({
+                                        to: channelID,
+                                        message: alots[i]
+                                    });
+                                }
+                                break;
+                            }
+                        }
+                        alotRateLimit[channelID] = now;
+                    }
+
                 }
                 if(message === "the more you know"){
-                    bot.addReaction({
+
+                    bot.spellQueue.push({
                         channelID: channelID,
                         messageID: event.d ? event.d.id : event.ts,
                         reaction: "🌈",
-                        reactionName: "rainbow"
-                    }, function(){
-                        setTimeout(function(){
-                            bot.addReaction({
-                                channelID: channelID,
-                                messageID: event.d ? event.d.id : event.ts,
-                                reaction: "⭐",
-                                reactionName: "star"
-                            });
-                        }, 200);
+                        reactionName: "rainbow",
+                        time: new Date()
                     });
+                    bot.spellQueue.push({
+                        channelID: channelID,
+                        messageID: event.d ? event.d.id : event.ts,
+                        reaction: "⭐",
+                        reactionName: "star",
+                        time: new Date()
+                    });
+                    bot.processSpellQueue();
                 }
 
                 if(message.indexOf("shit bot") > -1){
-                    bot.addReaction({
+                    bot.spellQueue.push({
                         channelID: channelID,
                         messageID: event.d ? event.d.id : event.ts,
                         reaction: "👎",
-                        reactionName: "thumbsdown"
+                        reactionName: "thumbsdown",
+                        time: new Date()
                     });
+                    bot.processSpellQueue();
                 }
 
                 if(message.indexOf("xd") > -1){
-                    bot.addReaction({
+                    bot.spellQueue.push({
                         channelID: channelID,
                         messageID: event.d ? event.d.id : event.ts,
                         reaction: "🇽",
-                        reactionName: "x"
-                    }, function(){
-                        setTimeout(function(){
-                            bot.addReaction({
-                                channelID: channelID,
-                                messageID: event.d ? event.d.id : event.ts,
-                                reaction: "🇩",
-                                reactionName: "d"
-                            });
-                        }, 500);
+                        reactionName: "x",
+                        time: new Date()
                     });
+                    bot.spellQueue.push({
+                        channelID: channelID,
+                        messageID: event.d ? event.d.id : event.ts,
+                        reaction: "🇩",
+                        reactionName: "d",
+                        time: new Date()
+                    });
+                    bot.processSpellQueue();
                 }
 
             });
