@@ -73,7 +73,8 @@ var botWillReconnect = false;
 
 bot.messageHandlers = {};
 bot.lastCrash = new Date();
-
+bot.bannedUsers = [];
+bot.bannedChannels = [];
 
 bot.services = {};
 
@@ -396,7 +397,7 @@ function botInit(cb){
         };
 
         bot.on('message', function(user, userID, channelID, message, event){
-            if(message && userID != "146293573422284800") {
+            if(message && userID != "146293573422284800" && bot.bannedUsers.indexOf(userID) === -1 && bot.bannedChannels.indexOf(channelID) === -1) {
                 for (var i in bot.messageHandlers) {
                     if (bot.messageHandlers.hasOwnProperty(i)) {
                         bot.messageHandlers[i](message, channelID, user, userID, event);

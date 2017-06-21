@@ -2,6 +2,8 @@
  * Created by Peter on 19/04/2016.
  */
 
+
+var async = require('async');
 var sargs = {
     eval: function(user, userID, channel, args, message, bot){
         //if(userID === "U1DNDKZDW" || userID === "U232Q4WQJ"){
@@ -29,6 +31,103 @@ var sargs = {
             to: channel,
             message:  eval(args.slice(2).join(" "))
         });
+    },
+    channelInfo: function(user, userID, channel, args, message, bot){
+        var targetChannel = bot.channels[args[2]];
+        var server = bot.servers[targetChannel.guild_id];
+        bot.sendMessage({
+            to: channel,
+            message: `Channel **${targetChannel.name}** belongs to **${server.name}**`
+        })
+    },
+    servers: function(user, userID, channel, args, message, bot){
+        var output = "";
+        for(var i in bot.servers){
+            var name = bot.servers[i].name;
+            if(output.length +name.length+1 >= 1000){
+                bot.sendMessage({
+                    to: channel,
+                    message: output
+                });
+                output = name;
+            }else{
+                output += "\n"+name;
+            }
+        }
+        bot.sendMessage({
+            to: channel,
+            message: output
+        });
+    },
+    ban: function(user, userID, channel, args, message, bot){
+        var ban = args[2].replace(/[@<>!]/g, "");
+        bot.bannedUsers.push(ban);
+        bot.sendMessage({
+          to: channel,
+          message: ":wave: Bye Bye <@"+ban+">"
+        });
+    },
+    banChannel: function(user, userID, channel, args, message, bot){
+        var ban = args[2].replace(/[#<>!]/g, "");
+        bot.bannedChannels.push(ban);
+        bot.sendMessage({
+            to: channel,
+            message: ":wave: Bye Bye <#"+ban+">"
+        });
+    },
+    botFarms: function(user, userID, channel, args, message, bot){
+        var data = {};
+        for(var serverID in bot.servers){
+            var server = bot.servers[serverID];
+            data[serverID] = {
+                name: server.name,
+                bots: 0,
+                users: 0,
+                total: server.member_count
+            };
+            for(var memberID in server.members){
+                if(bot.users[memberID].bot){
+                    data[serverID].bots++;
+                }else{
+                    data[serverID].users++;
+                }
+            }
+        }
+
+        setTimeout(function(){
+            var output = "**Potential Bot Farms:**\n";
+
+            var outputs = [];
+
+            for(var serverID in data){
+                var server = data[serverID];
+                var ratio = server.bots/server.users;
+                if(ratio > 1){
+                    if(server.bots+server.users !== server.total){
+                        output+= `(MISMATCH ${server.total} members.) **${server.name}** (${serverID}) has **${server.bots} bots** and **${server.users} users**. (${ratio.toFixed(2)} ratio)\n`
+                    }else{
+                        output+= `**${server.name}** (${serverID}) has **${server.bots} bots** and **${server.users} users**. (${ratio.toFixed(2)} ratio)\n`
+                    }
+                    if(output.length > 1000){
+                        outputs.push(output);
+                        output = "-\n";
+                    }
+                }
+            }
+            outputs.push(output);
+
+            async.eachSeries(outputs, function(output, cb){
+                bot.sendMessage({
+                    to: channel,
+                    message: output
+                }, function(){
+                    setTimeout(cb, 500);
+                })
+            });
+        }, 1000);
+
+
+
     },
     config: function(user, userID, channel, args, message, bot){
         switch(args[3]){
