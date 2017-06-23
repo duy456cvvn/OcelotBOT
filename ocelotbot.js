@@ -28,7 +28,7 @@ if(isDiscord){
 
 var year = new Date().getFullYear();
 
-var WS_CLOSE_CODES = {
+const WS_CLOSE_CODES = {
     1000: "CLOSE_NORMAL",
     1001: "CLOSE_GOING_AWAY",
     1002: "CLOSE_PROTOCOL ERROR",
