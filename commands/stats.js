@@ -61,6 +61,7 @@ exports.command = {
     desc: "Stats n shit",
     usage: "stats <user>",
     func: function(user, userID, channel, args, message, bot) {
+        if(bot.isDiscord)return true;
         var target = args[1] ? args[1].toLowerCase() : "everyone";
 
         bot.sendMessage({
