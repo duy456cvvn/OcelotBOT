@@ -113,7 +113,7 @@ exports.command = {
         var keys = Object.keys(letters);
         var times = 0;
         var done = true;
-        var target = event.d.id;
+        var target = event.d ? event.d.id : event.ts;
         if(args[1] === "^")
             bot.getMessages({
                 channelID: channel,
