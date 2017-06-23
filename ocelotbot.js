@@ -49,68 +49,61 @@ var WS_CLOSE_CODES = {
 
 
 
+var botWillReconnect = false;
 
 var bot;
 
-
-
-if(isDiscord){
-    console.log("Running in Discord mode");
-
-    var token = fs.readFileSync("token.txt").toString();
-    console.log(token);
-    bot = new Discord.Client({
-        autorun: true,
-        token: token
-    });
-}else{
-    bot = {};
-}
-
-bot.isDiscord = isDiscord;
-
-var botWillReconnect = false;
-
-bot.messageHandlers = {};
-bot.lastCrash = new Date();
-bot.bannedUsers = [];
-bot.bannedChannels = [];
-
-bot.services = {};
-
-if(isDiscord){
-    bot.services.loadBefore = [
-        require('./config.js')(bot),
-        require('./database.js')(bot),
-        require('./commands.js')(bot)
-    ];
-    bot.services.loadAfter = [
-        require('./autoreplies.js')(bot)
-    ];
-}else{
-    bot.services.loadBefore = [
-        require('./config.js')(bot),
-        require('./database.js')(bot),
-        require('./interactiveMessages.js')(bot),
-        require('./commands.js')(bot)
-    ];
-    bot.services.loadAfter = [
-        require('./autoreplies.js')(bot),
-        require('./logging.js')(bot),
-        require('./importantDates.js')(bot),
-        //  require('./petify.js')(bot)
-        // require('./statusmonitor.js')(bot)
-        //  require('./scriptfodder.js')(bot),
-        // require('./ucas.js')(bot)
-    ];
-}
-
-
-
 function startBot(){
+
+    bot = {};
 
     if(isDiscord){
         bot.registerInteractiveMessage = function noop(){};
+        console.log("Running in Discord mode");
+
+        var token = fs.readFileSync("token.txt").toString();
+        console.log(token);
+        bot = new Discord.Client({
+            autorun: true,
+            token: token
+        });
+
+    }
+    bot.isDiscord = isDiscord || false;
+
+
+    bot.messageHandlers = {};
+    bot.lastCrash = new Date();
+    bot.bannedUsers = [];
+    bot.bannedChannels = [];
+
+    bot.services = {};
+
+    if(isDiscord){
+        bot.services.loadBefore = [
+            require('./config.js')(bot),
+            require('./database.js')(bot),
+            require('./commands.js')(bot)
+        ];
+        bot.services.loadAfter = [
+            require('./autoreplies.js')(bot)
+        ];
+    }else{
+        bot.services.loadBefore = [
+            require('./config.js')(bot),
+            require('./database.js')(bot),
+            require('./interactiveMessages.js')(bot),
+            require('./commands.js')(bot)
+        ];
+        bot.services.loadAfter = [
+            require('./autoreplies.js')(bot),
+            require('./logging.js')(bot),
+            require('./importantDates.js')(bot),
+            //  require('./petify.js')(bot)
+            // require('./statusmonitor.js')(bot)
+            //  require('./scriptfodder.js')(bot),
+            // require('./ucas.js')(bot)
+        ];
     }
 
     bot.log = function(message, caller){
@@ -248,6 +241,19 @@ function botInit(cb){
 
         bot.editMessage = function(data, cb){
             bot.web.chat.update(data.messageID, data.channel || data.channelID, data.message, cb ? cb : null)
+        };
+
+        bot.uploadFile = function(data, cb){
+            var opts = {};
+            if(typeof data.file == "string"){
+                opts.file = fs.createReadStream(data.file);
+            }else{
+                opts.content = data.file;
+            }
+            opts.channels = data.to;
+            opts.filetype = data.filetype || filename.split(".")[1];
+
+            bot.web_p.files.upload(data.filename, opts, cb);
         };
 
         /**
@@ -406,14 +412,17 @@ function botInit(cb){
             }
         });
 
-        bot.on('disconnect', function(err, code){
+
+        bot.on('disconnect', function(err, code, event){
            console.log("Disconnected: "+err+" "+code);
-           // console.log("Reconnecting in 1 second");
-           // setTimeout(function(){
-           //     console.log("Reconnecting...");
-           //     bot.connect();
-           // }, 5000);
-            process.exit(1);
+           console.log("Reconnecting in "+(5+(bot.reconnects))+" seconds");
+           console.log(event);
+           bot.reconnects*=2;
+           setTimeout(function(){
+               console.log("Reconnecting...");
+               startBot();
+           }, 5000+(1000*bot.reconnects));
+           // process.exit(1);
         });
 
         setTimeout(function(){
@@ -435,9 +444,16 @@ function botInit(cb){
         }, 1000);
 
 
-        bot.on('ready', function(){
+        bot.on('error', function(err){
+            bot.error("Error: "+err);
+        });
 
+        bot.wasConnected = false;
+
+        bot.reconnects = 1;
+        bot.on('ready', function(){
             if(bot.isDiscord){
+                bot.log("Connected to Discord");
                 request.post({
                     headers: {
                         "Authorization": bot.config.misc.discordBotsKey,
@@ -460,8 +476,11 @@ function botInit(cb){
                 });
             }
 
-            if(cb)
+
+            if(cb && !bot.wasConnected){
+                bot.wasConnected = true;
                 cb();
+            }
         });
 
     }
