@@ -4,10 +4,48 @@
 var async = require('async');
 
 
+
+
 exports.command = {
     name: "spell",
     desc: "Spell a word with reactions. Use ^ to spell it on the last message",
     usage: "spell [^] [word]",
+    onReady: function(bot){
+        bot.spellQueue = [];
+        bot.processingSpellQueue = false;
+        bot.spellQueueTotal = 0;
+        bot.spellQueueTotalTime = 0;
+        bot.spellQueueTotalRetries = 0;
+        bot.spellQueueTotalFailed = 0;
+
+        bot.processSpellQueue = function processSpellQueue(){
+            if(bot.processingSpellQueue)return;
+            bot.processingSpellQueue = true;
+            var reaction = bot.spellQueue.shift();
+            if(reaction){
+                bot.spellQueueTotal++;
+                var now = new Date();
+                bot.spellQueueTotalTime += now-reaction.time;
+                bot.addReaction(reaction, function (err) {
+                    if(err) {
+                        reaction.retries++;
+                        if (reaction.retries < 3){
+                            bot.spellQueueTotalRetries++;
+                            bot.spellQueue.unshift(reaction);
+                        }else{
+                            bot.spellQueueTotalFailed++;
+                        }
+                    }
+                    bot.processingSpellQueue = false;
+                    setTimeout(processSpellQueue, 200);
+                });
+            }else{
+                bot.processingSpellQueue = false;
+            }
+
+        }
+
+    },
     func: function(user, userID, channel, args, message, bot, event){
         if(args.length < 2){
             return false;
@@ -37,6 +75,8 @@ exports.command = {
             on: ["🔛"],
             top: ["🔝"],
             soon: ["🔜"],
+            off: ["📴"],
+            oo: "➿",
             "$": ["💲"],
             "!!": ["‼"],
             "!": ["❗", "❕", "⚠", "‼"],
@@ -45,7 +85,7 @@ exports.command = {
             b: ["🅱", "🇧"],
             c: ["🇨", "©", "↪"],
             d: ["🇩"],
-            e: ["🇪"],
+            e: ["🇪", "📧"],
             f: ["🇫"],
             g: ["🇬"],
             h: ["🇭"],
@@ -53,13 +93,13 @@ exports.command = {
             j: ["🇯", "🇮"],
             k: ["🇰"],
             l: ["🇱"],
-            m: ["🇲", "Ⓜ", "🇳"],
+            m: ["🇲", "Ⓜ", "〽", "🇳"],
             n: ["🇳", "🇲", "Ⓜ"],
-            o: ["🇴", "🅾", "⭕", "🔄", "🔃"],
+            o: ["🇴", "🅾", "⭕", "🔄", "🔃", "👁‍", "🔅", "🔆"],
             p: ["🇵", "🅿"],
             q: ["🇶"],
             r: ["🇷", "®"],
-            s: ["🇸", "💲"],
+            s: ["🇸", "💲", "💰"],
             t: ["🇹"],
             u: ["🇺"],
             v: ["🇻"],
@@ -114,22 +154,23 @@ exports.command = {
                     return done || times > 30;
                 },
                 function () {
-                    var reacts = str.replace(/[A-z]/, "").split(" ");
+                    var reacts = str.replace(/[A-z]/g, "").split(" ");
                     async.eachSeries(reacts, function (react, cb) {
                         if (react) {
                             console.log(react);
-                            bot.addReaction({
+                            bot.spellQueue.push({
                                 channelID: channel,
                                 messageID: target,
-                                reaction: react
-                            }, function () {
-                                setTimeout(cb, 500);
+                                reaction: react,
+                                retries: 0,
+                                time: new Date()
                             });
                         }
-                        else
-                            cb();
+                        cb();
 
-                    })
+                    }, function(){
+                        bot.processSpellQueue(bot);
+                    });
 
                 });
         }
@@ -138,3 +179,4 @@ exports.command = {
         return true;
     }
 };
+
