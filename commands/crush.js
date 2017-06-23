@@ -27,6 +27,16 @@ exports.command = {
                         to: channel,
                         file: outputFile,
                         filename: "crush.png"
+                    }, function(err){
+                        if(err){
+                            fs.unlink(outputFile, function(err){
+                                if(err){
+                                    bot.error("There was an error trying to delete "+outputFile+": "+err);
+                                }else{
+                                    bot.log("Deleted "+outputFile);
+                                }
+                            });
+                        }
                     });
                 }else{
                     bot.web_p.files.upload("crush.png", {
@@ -63,14 +73,18 @@ exports.command = {
                     .resize(405)
                     .rotate("black", -5.25)
                     .extent(600, 875, "-128-455")
-                    //.affine("{sx,rx,ry,sy,tx,ty}")
-                    //.transform()
                     .toBuffer('PNG', function(err, buffer){
-
                         if(err){
                             bot.sendMessage({
                                 to: channel,
                                 message: "err: "+err
+                            });
+                            fs.unlink(fileName, function(err){
+                                if(err){
+                                    bot.error("There was an error trying to delete "+fileName+": "+err);
+                                }else{
+                                    bot.log("Deleted "+fileName);
+                                }
                             });
                         }else{
                             gm(buffer)
@@ -80,6 +94,13 @@ exports.command = {
                                         bot.sendMessage({
                                             to: channel,
                                             message: "err: "+err
+                                        });
+                                        fs.unlink(fileName, function(err){
+                                            if(err){
+                                                bot.error("There was an error trying to delete "+fileName+": "+err);
+                                            }else{
+                                                bot.log("Deleted "+fileName);
+                                            }
                                         });
                                     }else{
                                         if(bot.isDiscord){
