@@ -5,28 +5,69 @@ exports.command = {
 	func: function(user, userID, channel, args, inmessage, bot){
 		if(args.length < 2)return false;
 
-		var message = "\n";
+		var arg = args[1].toLowerCase();
 
-		if(args[1] === "bot"){
-			message += "*BOT INFO:*\n";
-            message += "**Created By**: <@139871249567318017> (Big P#1843)\n";
-			message += "`name`: "+process.title+"\n";
-			message += "`platform`: "+process.platform+"\n";
-			message += "`pid`: "+process.pid+"\n";
-			message += "`uptime`: "+parseInt(process.uptime()/60)+" minutes \n";
-			message += "`users`: " + Object.keys(bot.users).length+"\n";
-            message += "`channels`: " + Object.keys(bot.channels).length+"\n";
-			if(userID == "139871249567318017" && args[3]){
-                message += "**Servers:**\n";
-                for(var serverID in bot.servers){
-                    var server = bot.servers[serverID];
-                    message += "`"+serverID+"`: "+server.name+"\n";
-                }
-            }else{
-                message += "`servers`: " + Object.keys(bot.servers).length+"\n";
-            }
+		if(arg === "bot") {
 
-		}else if(args[1] === "server"){
+            bot.sendAttachment(channel, "", [{
+                fallback: "...",
+                color: "#9e9e9e",
+                title: `**OcelotBOT v3 created by Big P#1843**`,
+                text: "Support Server: https://discord.gg/7YNHpfF",
+                fields: [
+                    {
+                        title: "Uptime",
+                        value: parseInt(process.uptime() / 60) + " minutes.",
+                        short: true
+                    },
+                    {
+                        title: "Users",
+                        value: Object.keys(bot.users).length + "",
+                        short: true
+                    },
+                    {
+                        title: "Servers",
+                        value: Object.keys(bot.servers).length + "",
+                        short: true
+                    },
+                    {
+                        title: "Channels",
+                        value: Object.keys(bot.channels).length + "",
+                        short: true
+                    }
+                ]
+            }]);
+        }else if(arg === "spell"){
+            bot.sendAttachment(channel, "", [{
+                fallback: "...",
+                color: "#9e9e9e",
+                title: `**Spell command response times**`,
+                text: "",
+                fields: [
+                    {
+                        title: "Total Letters",
+                        value: bot.spellQueueTotal+"",
+                        short: true
+                    },
+                    {
+                        title: "Average Response Time",
+                        value:  (bot.spellQueueTotalTime/bot.spellQueueTotal).toFixed(2)+" ms",
+                        short: true
+                    },
+                    {
+                        title: "Total Retries",
+                        value: bot.spellQueueTotalRetries + "",
+                        short: true
+                    },
+                    {
+                        title: "Total Failed",
+                        value: bot.spellQueueTotalFailed + "",
+                        short: true
+                    }
+                ]
+            }]);
+        }else if(args[1] === "server"){
+		    var message = "";
 			var serverID = bot.channels[channel].guild_id;
 			var server = bot.servers[serverID];
 			message += "*SERVER INFO:*\n";
