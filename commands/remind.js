@@ -42,6 +42,17 @@ exports.command = {
 		}
 	},
 	onReady: function(bot){
+
+
+		function setReminder(reminder){
+			var now = new Date();
+			bot.log(`Set reminder for user ${reminder.user} in channel ${reminder.channel} at ${new Date(reminder.date)}, ${reminder.date-now} ms from now: ${reminder.message}`);
+            setTimeout(function(){
+            	bot.log("Reminding: "+reminder.user+" "+reminder.message+" (from "+new Date(reminder.date)+"");
+               // bot.sendMessage({to: reminder.channel, message: "<@"+reminder.user+">, you told me to remind you of this: \n	"+reminder.message});
+            }, reminder.date-now);
+		}
+
 		fs.readFile('reminders.json', function loadRemindersFile(err, data){
 			if(err){
 				bot.warn("Could not open reminders file!");
@@ -50,14 +61,13 @@ exports.command = {
 		    	var now = Date.now();
 		    	for(var i in outstandingReminders){
 		    		var reminder = outstandingReminders[i];
-		    		//if(reminder.at > now){
+		    		console.log(reminder);
+		    		if(reminder.date > now){
 		    			bot.log("Loaded reminder for "+reminder.user);
-			    		schedule.scheduleJob(reminder.at, function fireContinuedReminder(){
-			    			bot.log("Reminder fired");
-				  			bot.sendMessage({to: reminder.channel, message: "<@"+reminder.user+">, you told me to remind you of this: \n	"+reminder.message});
-				  			outstandingReminders.splice(i, 1);
-						});
-		    		//}
+		    			setReminder(reminder);
+		    		}else{
+		    			bot.log("Reminder "+new Date(reminder.date)+" was in the past")
+					}
 		    	}
 		    }
 		});
