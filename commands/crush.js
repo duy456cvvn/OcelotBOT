@@ -27,7 +27,8 @@ exports.command = {
                     bot.uploadFile({
                         to: channel,
                         file: outputFile,
-                        filename: "crush.png"
+                        filename: "crush.png",
+                        filetype: "png"
                     }, function(err){
                         if(err){
                             fs.unlink(outputFile, function(err){
@@ -80,7 +81,7 @@ exports.command = {
                         if(err){
                             bot.sendMessage({
                                 to: channel,
-                                message: "err: "+err
+                                message: "There was an error processing the image. Maybe the URL is invalid, or the user is unavailable for some reason..."
                             });
                             fs.unlink(fileName, function(err){
                                 if(err){
@@ -96,7 +97,7 @@ exports.command = {
                                     if(err){
                                         bot.sendMessage({
                                             to: channel,
-                                            message: "err: "+err
+                                            message: "There was an error processing the image. Maybe the URL is invalid, or the user is unavailable for some reason..."
                                         });
                                         fs.unlink(fileName, function(err){
                                             if(err){
@@ -110,7 +111,8 @@ exports.command = {
                                             bot.uploadFile({
                                                 to: channel,
                                                 file: buffer,
-                                                filename: "crush.png"
+                                                filename: "crush.png",
+                                                filetype: "png"
                                             });
                                         }else{
                                             bot.web_p.files.upload("crush.png", {
