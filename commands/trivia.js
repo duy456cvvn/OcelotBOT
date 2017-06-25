@@ -3,16 +3,56 @@
  */
 var request = require('request');
 var async = require('async');
+const columnify = require('columnify');
 var questionInProgress = false;
 var correctAnswer = false;
 var triviaSeconds = 15;
+
+const difficulties = [
+    "easy",
+    "medium",
+    "hard"
+];
+
 exports.command = {
     name: "trivia",
     desc: "Gives you a trivia question",
-    usage: "trivia",
+    usage: "trivia [leaderboards]",
     func: function(user, userID, channel, args, message, bot){
 
-        if(questionInProgress){
+        if(args[1] && (args[1] === "stats" || args[1] === "leaderboard")){
+            bot.connection.query("SELECT user, SUM(difficulty) as 'Score', COUNT(*) as 'correct', (SELECT COUNT(*) FROM trivia WHERE correct = '0') as 'incorrect' FROM trivia WHERE correct = '1' GROUP BY user ORDER BY Score DESC, correct DESC LIMIT 10", function(err, result){
+                if(err){
+                    bot.error(err);
+                    bot.sendMessage({
+                        to: channel,
+                        message: err
+                    });
+                }else{
+                    var data = [];
+                    var i = 1;
+                    async.eachSeries(result, function(entry, cb){
+                        data.push({
+                            "#": i++,
+                            "User": bot.users[entry.user] ? bot.users[entry.user].username+"#"+bot.users[entry.user].discriminator : "Unknown User "+entry.user,
+                            "Score": entry.Score,
+                            "Correct": entry.correct,
+                            "Incorrect": entry.incorrect,
+                            "Win Rate": parseInt((entry.correct/(entry.correct+entry.incorrect))*100)+"%"
+                        });
+                        cb();
+                    }, function(){
+                        bot.sendMessage({
+                            to: channel,
+                            message: "TOP 10 Trivia Players:\n```yaml\n"+columnify(data)+"\n```"
+                        });
+                    })
+
+                }
+
+            });
+
+        }else if(questionInProgress){
             bot.sendMessage({
                 to: channel,
                 message: "You can't start another question when one is already in progress. Vote with reactions!"
@@ -32,6 +72,8 @@ exports.command = {
                             correctAnswer = question.correct_answer === "True";
                             var winners = "";
                             var results = {};
+                            var winnerArray;
+                            var wrong;
                             async.mapValuesSeries({
                                 attachmentResp: function(cb){
                                    bot.sendAttachment(channel, `Category: *${decodeURIComponent(question.category)}*`, [{
@@ -90,16 +132,15 @@ exports.command = {
                                     var trueVoters = [], falseVoters = [];
                                     for(var i in results.getTrueReacts){
                                         trueVoters.push("<@"+results.getTrueReacts[i].id+">");
-                                        console.log("wowow "+results.getTrueReacts[i].id);
                                     }
                                     for(var j in results.getFalseReacts){
                                         falseVoters.push("<@"+results.getFalseReacts[j].id+">");
                                     }
 
                                     var correct = (correctAnswer ? trueVoters : falseVoters);
-                                    var wrong = (!correctAnswer ? trueVoters : falseVoters);
+                                    wrong = (!correctAnswer ? trueVoters : falseVoters);
 
-                                    var winnerArray = [];
+                                    winnerArray = [];
 
                                     for(var k in correct){
                                         var user = correct[k];
@@ -116,6 +157,20 @@ exports.command = {
                                         to: channel,
                                         message: `Time's up! The correct answer was **${correctAnswer}**.\n${winners}`
                                     }, cb);
+                                },
+                                addScores: function(cb){
+                                    async.eachSeries(winnerArray, function(winner, cb2){
+                                        var id = winner.replace(/[<>@]/g, "");
+                                        bot.connection.query(`INSERT INTO trivia (user, correct, difficulty, server) VALUES (${id}, 1, ${difficulties.indexOf(question.difficulty)+1}, '${bot.channels[channel].guild_id}')`, cb);
+                                    }, cb);
+                                },
+                                addLosers: function(cb){
+                                    async.eachSeries(wrong, function(winner, cb2){
+                                        var id = winner.replace(/[<>@]/g, "");
+                                        if(id !== "146293573422284800")
+                                        bot.connection.query(`INSERT INTO trivia (user, correct, difficulty, server) VALUES (${id}, 0, ${difficulties.indexOf(question.difficulty)+1}, '${bot.channels[channel].guild_id}')`, cb);
+                                        else cb();
+                                    }, cb);
                                 }
                             },
                             function(func, key, callback){
@@ -128,7 +183,10 @@ exports.command = {
                                     });
                                 }, 150);
                             }
-                            ,function(){
+                            ,function(err){
+                                if(err){
+                                    bot.log(err);
+                                }
                                 questionInProgress = false;
                             });
 
