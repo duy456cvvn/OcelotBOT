@@ -4,7 +4,6 @@
 
 var fs              = require('fs'),
     mysql           = require('mysql'),
-    simplebus       = require('simplebus'),
     https           = require('https'),
     caller_id       = require('caller-id'),
     async           = require('async'),
@@ -580,14 +579,6 @@ function botInit(cb){
 
 }
 
-function busInit(){
-    bot.log("Creating message bus...");
-    bot.bus = simplebus.createBus(1000);
-    bot.bus.post("OcelotBOT startup");
-    bot.bus.subscribe(function busSubscribe(msg){
-       bot.log("Received message: "+msg);
-    });
-}
 
 
 process.on('uncaughtException', function uncaughtException(err){
