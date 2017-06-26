@@ -102,27 +102,36 @@ var sargs = {
             for(var serverID in data){
                 var server = data[serverID];
                 var ratio = server.bots/server.users;
-                if(ratio > 1){
+                if(ratio > 20){
                     if(server.bots+server.users !== server.total){
-                        output+= `(MISMATCH ${server.total} members.) **${server.name}** (${serverID}) has **${server.bots} bots** and **${server.users} users**. (${ratio.toFixed(2)} ratio)\n`
+                        //output+= `(MISMATCH ${server.total} members.) **${server.name}** (${serverID}) has **${server.bots} bots** and **${server.users} users**. (${ratio.toFixed(2)} ratio)\n`
                     }else{
-                        output+= `**${server.name}** (${serverID}) has **${server.bots} bots** and **${server.users} users**. (${ratio.toFixed(2)} ratio)\n`
+                        outputs.push(serverID);
+                        //output+= `**${server.name}** (${serverID}) has **${server.bots} bots** and **${server.users} users**. (${ratio.toFixed(2)} ratio)\n`
+                        //
                     }
-                    if(output.length > 1000){
-                        outputs.push(output);
-                        output = "-\n";
-                    }
+
                 }
             }
-            outputs.push(output);
 
             async.eachSeries(outputs, function(output, cb){
+                var mainChannel = Object.keys(bot.servers[output].channels)[0];
+                bot.sendMessage({
+                    to: mainChannel,
+                    message: "Leaving suspected bot farm due to high ratio of bots to users."
+                }, function(){
+
+                    setTimeout(function(){
+                        bot.leaveServer(output, function(){
+                        setTimeout(cb, 1000);
+                    });
+                    }, 1000);
+                });
+            }, function(){
                 bot.sendMessage({
                     to: channel,
-                    message: output
-                }, function(){
-                    setTimeout(cb, 500);
-                })
+                    message: "Left "+output.length+" servers"
+                });
             });
         }, 1000);
 
