@@ -10,7 +10,7 @@ exports.command = {
 
         var sentence = message.substring(message.indexOf(args[2]));
 
-        request("https://translate.yandex.net/api/v1.5/tr.json/detect?key="+bot.config.misc.translateKey+"&text="+sentence, function getTranslationLanguage(err, response, body){
+        request("https://translate.yandex.net/api/v1.5/tr.json/detect?key="+bot.config.misc.translateKey+"&text="+encodeURIComponent(sentence), function getTranslationLanguage(err, response, body){
             if(err){
                 bot.sendMessage({
                 	to: channel,
@@ -20,7 +20,7 @@ exports.command = {
             }else{
                 var langResult = JSON.parse(body);
                 if(langResult.code === 200){
-                    request("https://translate.yandex.net/api/v1.5/tr.json/translate?key="+bot.config.misc.translateKey+"&lang="+langResult.lang+"-"+args[1]+"&text="+sentence, function getTranslation(err, response, body){
+                    request("https://translate.yandex.net/api/v1.5/tr.json/translate?key="+bot.config.misc.translateKey+"&lang="+langResult.lang+"-"+args[1]+"&text="+encodeURIComponent(sentence), function getTranslation(err, response, body){
                         if(err){
                             bot.sendMessage({
                                 to: channel,
