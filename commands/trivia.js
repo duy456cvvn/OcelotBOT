@@ -38,8 +38,6 @@ exports.command = {
                                 "User": bot.users[entry.user] ? bot.users[entry.user].username + "#" + bot.users[entry.user].discriminator : "Unknown User " + entry.user,
                                 "Score": entry.Score,
                                 "Correct": entry.correct,
-                                "Incorrect": entry.incorrect,
-                                "Win Rate": parseInt((entry.correct / (entry.correct + entry.incorrect)) * 100) + "%"
                             });
                         }else{
                             data.push({
@@ -47,8 +45,6 @@ exports.command = {
                                 "User": "Discord User " + entry.user,
                                 "Score": entry.Score,
                                 "Correct": entry.correct,
-                                "Incorrect": entry.incorrect,
-                                "Win Rate": parseInt((entry.correct / (entry.correct + entry.incorrect)) * 100) + "%"
                             });
                         }
                         cb();
@@ -166,13 +162,13 @@ exports.command = {
                                         trueVoters.push("<@"+(bot.isDiscord ? results.getTrueReacts[i].id : results.getTrueReacts[i])+">");
                                     }
                                     for(var j in results.getFalseReacts){
-                                        falseVoters.push("<@"+(bot.isDiscord ? results.getTrueReacts[j].id : results.getFalseReacts[j])+">");
+                                        falseVoters.push("<@"+(bot.isDiscord ? results.getFalseReacts[j].id : results.getFalseReacts[j])+">");
                                     }
 
                                     var correct = (correctAnswer ? trueVoters : falseVoters);
                                     wrong = (!correctAnswer ? trueVoters : falseVoters);
 
-                                    winnerArray = correct;
+                                    winnerArray = [];
 
                                     for(var k in correct){
                                         var user = correct[k];
@@ -180,8 +176,8 @@ exports.command = {
                                             winnerArray.push(user);
                                         }
                                     }
-
-                                    winners = winnerArray.length > 0 ? "Congratulations "+winnerArray.join(" ") : "Nobody won that round.";
+                                    var points = difficulties.indexOf(question.difficulty)+1;
+                                    winners = winnerArray.length > 0 ? "Congratulations "+winnerArray.join(" ")+`\nYou${winnerArray.length > 1 ? "each ": ""} earned **${points} point${points > 1 ? "s" : ""}**!` : "Nobody won that round.";
                                     setTimeout(cb, 100);
                                 },
                                 showWinners: function(cb){
@@ -195,7 +191,7 @@ exports.command = {
                                     else
                                     async.eachSeries(winnerArray, function(winner, cb2){
                                         var id = winner.replace(/[<>@]/g, "");
-                                        bot.connection.query(`INSERT INTO trivia (user, correct, difficulty, server) VALUES (${id}, 1, ${difficulties.indexOf(question.difficulty)+1}, '${bot.isDiscord ? bot.channels[channel].guild_id : channel}')`, cb2);
+                                        bot.connection.query(`INSERT INTO trivia (user, correct, difficulty, server) VALUES (${id}, 1, ${difficulties.indexOf(question.difficulty)+1}, '${bot.channels[channel].guild_id}')`, cb2);
                                     }, cb);
                                 },
                                 addLosers: function(cb){
@@ -204,7 +200,7 @@ exports.command = {
                                     async.eachSeries(wrong, function(winner, cb2){
                                         var id = winner.replace(/[<>@]/g, "");
                                         if(id !== "146293573422284800" && bot.isDiscord)
-                                        bot.connection.query(`INSERT INTO trivia (user, correct, difficulty, server) VALUES (${id}, 0, ${difficulties.indexOf(question.difficulty)+1}, '${bot.isDiscord ? bot.channels[channel].guild_id : channel}')`, cb2);
+                                        bot.connection.query(`INSERT INTO trivia (user, correct, difficulty, server) VALUES (${id}, 0, ${difficulties.indexOf(question.difficulty)+1}, '${bot.channels[channel].guild_id}')`, cb2);
                                         else cb();
                                     }, cb);
                                 }
