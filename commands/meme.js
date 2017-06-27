@@ -5,7 +5,7 @@ exports.command = {
 	usage: "meme <meme/list/add <name> <url>/globaladd <name> <url>",
 	func: function(user, userID, channel, args, message, bot){
 		if(args.length < 2)return false;
-		var server = bot.servers[bot.channels[channel].guild_id];
+		var server = bot.isDiscord ? bot.servers[bot.channels[channel].guild_id] : {id: "slack"};
 		var arg = args[1].toLowerCase();
 		if(arg === "list") {
             bot.connection.query("SELECT name, server FROM stevie.ocelotbot_memes WHERE server = ? OR server = 'global';", [server.id], function (err, result) {
@@ -26,10 +26,17 @@ exports.command = {
                         }
                         cb();
                     }, function () {
-                        bot.sendMessage({
-                            to: channel,
-                            message: "**Available Memes:**\n__**Global** memes:__ " + globalMemes + "\n__**" + server.name + "** memes:__ " + serverMemes
-                        });
+                        if(bot.isDiscord) {
+                            bot.sendMessage({
+                                to: channel,
+                                message: "**Available Memes:**\n__**Global** memes:__ " + globalMemes + "\n__**" + server.name + "** memes:__ " + serverMemes
+                            });
+                        }else{
+                            bot.sendMessage({
+                                to: channel,
+                                message: "*Available Memes:*\n*Global* memes: " + globalMemes + "\n*Ocelotworks* memes: " + serverMemes
+                            });
+                        }
                     });
                 }
 
