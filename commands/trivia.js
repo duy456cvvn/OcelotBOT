@@ -32,14 +32,25 @@ exports.command = {
                     var data = [];
                     var i = 1;
                     async.eachSeries(result, function(entry, cb){
-                        data.push({
-                            "#": i++,
-                            "User": bot.users[entry.user] ? bot.users[entry.user].username+"#"+bot.users[entry.user].discriminator : "Unknown User "+entry.user,
-                            "Score": entry.Score,
-                            "Correct": entry.correct,
-                            "Incorrect": entry.incorrect,
-                            "Win Rate": parseInt((entry.correct/(entry.correct+entry.incorrect))*100)+"%"
-                        });
+                        if(bot.isDiscord) {
+                            data.push({
+                                "#": i++,
+                                "User": bot.users[entry.user] ? bot.users[entry.user].username + "#" + bot.users[entry.user].discriminator : "Unknown User " + entry.user,
+                                "Score": entry.Score,
+                                "Correct": entry.correct,
+                                "Incorrect": entry.incorrect,
+                                "Win Rate": parseInt((entry.correct / (entry.correct + entry.incorrect)) * 100) + "%"
+                            });
+                        }else{
+                            data.push({
+                                "#": i++,
+                                "User": "Discord User " + entry.user,
+                                "Score": entry.Score,
+                                "Correct": entry.correct,
+                                "Incorrect": entry.incorrect,
+                                "Win Rate": parseInt((entry.correct / (entry.correct + entry.incorrect)) * 100) + "%"
+                            });
+                        }
                         cb();
                     }, function(){
                         bot.sendMessage({
@@ -79,7 +90,7 @@ exports.command = {
                                    bot.sendAttachment(channel, `Category: *${decodeURIComponent(question.category)}*`, [{
                                        fallback: `True/False: ${encodeURIComponent(question.question)}. React :white_check_mark: for true and :negative_squared_cross_mark: for false. You have ${triviaSeconds} seconds.`,
                                        color: "#00ad00",
-                                       title: `*You have ${triviaSeconds} seconds to answer.*\nTrue or False:`,
+                                       title: bot.isDiscord ? `*You have ${triviaSeconds} seconds to answer.*\nTrue or False:` : `You have ${triviaSeconds} seconds to answer.\nTrue or False:`,
                                        text: decodeURIComponent(question.question),
                                        fields: [
                                            {
@@ -115,32 +126,53 @@ exports.command = {
                                     setTimeout(cb, triviaSeconds*1000);
                                 },
                                 getTrueReacts: function(cb){
-                                    bot.getReaction({
-                                        channelID: channel,
-                                        messageID: results.attachmentResp.id,
-                                        reaction:  "✅"
-                                    }, cb);
+                                    if(bot.isDiscord) {
+                                        bot.getReaction({
+                                            channelID: channel,
+                                            messageID: results.attachmentResp.id,
+                                            reaction: "✅"
+                                        }, cb);
+                                    }else{
+                                        bot.web.reactions.get({
+                                            channel: channel,
+                                            timestamp: results.attachmentResp.ts
+                                        }, cb);
+                                    }
                                 },
                                 getFalseReacts: function(cb){
-                                    bot.getReaction({
-                                        channelID: channel,
-                                        messageID: results.attachmentResp.id,
-                                        reaction: "❎"
-                                    }, cb);
+                                    if(bot.isDiscord) {
+                                        bot.getReaction({
+                                            channelID: channel,
+                                            messageID: results.attachmentResp.id,
+                                            reaction: "❎"
+                                        }, cb);
+                                    }else{
+                                        cb();
+                                    }
                                 },
                                 calculateWinners: function(cb){
                                     var trueVoters = [], falseVoters = [];
+                                    if(!bot.isDiscord){
+                                        var fullResult = results.getTrueReacts;
+                                        for(var i in fullResult.message.reactions){
+                                            if(fullResult.message.reactions[i].name === "white_check_mark"){
+                                                results.getTrueReacts = fullResult.message.reactions[i].users;
+                                            }else if(fullResult.message.reactions[i].name === "negative_squared_cross_mark") {
+                                                results.getFalseReacts = fullResult.message.reactions[i].users;
+                                            }
+                                        }
+                                    }
                                     for(var i in results.getTrueReacts){
-                                        trueVoters.push("<@"+results.getTrueReacts[i].id+">");
+                                        trueVoters.push("<@"+(bot.isDiscord ? results.getTrueReacts[i].id : results.getTrueReacts[i])+">");
                                     }
                                     for(var j in results.getFalseReacts){
-                                        falseVoters.push("<@"+results.getFalseReacts[j].id+">");
+                                        falseVoters.push("<@"+(bot.isDiscord ? results.getTrueReacts[j].id : results.getFalseReacts[j])+">");
                                     }
 
                                     var correct = (correctAnswer ? trueVoters : falseVoters);
                                     wrong = (!correctAnswer ? trueVoters : falseVoters);
 
-                                    winnerArray = [];
+                                    winnerArray = correct;
 
                                     for(var k in correct){
                                         var user = correct[k];
@@ -155,20 +187,24 @@ exports.command = {
                                 showWinners: function(cb){
                                     bot.sendMessage({
                                         to: channel,
-                                        message: `Time's up! The correct answer was **${correctAnswer}**.\n${winners}`
+                                        message: bot.isDiscord ? `Time's up! The correct answer was **${correctAnswer}**.\n${winners}` : `Time's up! The correct answer was *${correctAnswer}*.\n${winners}`
                                     }, cb);
                                 },
                                 addScores: function(cb){
+                                    if(!bot.isDiscord)cb();
+                                    else
                                     async.eachSeries(winnerArray, function(winner, cb2){
                                         var id = winner.replace(/[<>@]/g, "");
-                                        bot.connection.query(`INSERT INTO trivia (user, correct, difficulty, server) VALUES (${id}, 1, ${difficulties.indexOf(question.difficulty)+1}, '${bot.channels[channel].guild_id}')`, cb);
+                                        bot.connection.query(`INSERT INTO trivia (user, correct, difficulty, server) VALUES (${id}, 1, ${difficulties.indexOf(question.difficulty)+1}, '${bot.isDiscord ? bot.channels[channel].guild_id : channel}')`, cb2);
                                     }, cb);
                                 },
                                 addLosers: function(cb){
+                                    if(!bot.isDiscord)cb();
+                                    else
                                     async.eachSeries(wrong, function(winner, cb2){
                                         var id = winner.replace(/[<>@]/g, "");
-                                        if(id !== "146293573422284800")
-                                        bot.connection.query(`INSERT INTO trivia (user, correct, difficulty, server) VALUES (${id}, 0, ${difficulties.indexOf(question.difficulty)+1}, '${bot.channels[channel].guild_id}')`, cb);
+                                        if(id !== "146293573422284800" && bot.isDiscord)
+                                        bot.connection.query(`INSERT INTO trivia (user, correct, difficulty, server) VALUES (${id}, 0, ${difficulties.indexOf(question.difficulty)+1}, '${bot.isDiscord ? bot.channels[channel].guild_id : channel}')`, cb2);
                                         else cb();
                                     }, cb);
                                 }
