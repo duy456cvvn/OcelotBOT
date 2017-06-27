@@ -43,14 +43,24 @@ exports.command = {
 	},
 	onReady: function(bot){
 
+	    var newReminders = [];
 
 		function setReminder(reminder){
 			var now = new Date();
 			bot.log(`Set reminder for user ${reminder.user} in channel ${reminder.channel} at ${new Date(reminder.date)}, ${reminder.date-now} ms from now: ${reminder.message}`);
-            setTimeout(function(){
-            	bot.log("Reminding: "+reminder.user+" "+reminder.message+" (from "+new Date(reminder.date)+"");
-               // bot.sendMessage({to: reminder.channel, message: "<@"+reminder.user+">, you told me to remind you of this: \n	"+reminder.message});
-            }, reminder.date-now);
+			var then = new Date(reminder.date);
+			if(then !== "Invalid Date") {
+                newReminders.push(reminder);
+                setTimeout(function () {
+                    bot.log("Reminding: " + reminder.user + " " + reminder.message + " (from " + then + ")");
+                    bot.sendMessage({
+                        to: reminder.channel,
+                        message: "<@" + reminder.user + ">, you told me to remind you of this: \n	" + reminder.message
+                    });
+                }, reminder.date - now);
+            }else{
+			    bot.log("Reminder has invalid date");
+            }
 		}
 
 		fs.readFile('reminders.json', function loadRemindersFile(err, data){
@@ -61,7 +71,6 @@ exports.command = {
 		    	var now = Date.now();
 		    	for(var i in outstandingReminders){
 		    		var reminder = outstandingReminders[i];
-		    		console.log(reminder);
 		    		if(reminder.date > now){
 		    			bot.log("Loaded reminder for "+reminder.user);
 		    			setReminder(reminder);
@@ -69,6 +78,14 @@ exports.command = {
 		    			bot.log("Reminder "+new Date(reminder.date)+" was in the past")
 					}
 		    	}
+		    	setTimeout(function() {
+                    fs.writeFile("reminders.json", JSON.stringify(newReminders), function (err) {
+                        if(err){
+                            bot.log(err);
+                        }else
+                            bot.log("Rewritten reminders");
+                    });
+                }, 1000);
 		    }
 		});
 	},
