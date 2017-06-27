@@ -4,7 +4,7 @@
 var request = require('request');
 var async = require('async');
 const columnify = require('columnify');
-var questionInProgress = false;
+var questionsInProgress = [];
 var correctAnswer = false;
 var triviaSeconds = 15;
 
@@ -59,7 +59,7 @@ exports.command = {
 
             });
 
-        }else if(questionInProgress){
+        }else if(questionsInProgress.indexOf(channel) > -1){
             bot.sendMessage({
                 to: channel,
                 message: "You can't start another question when one is already in progress. Vote with reactions!"
@@ -72,6 +72,7 @@ exports.command = {
                         message: "Trivia service is currently unavailable ("+err+")"
                     })
                 }else{
+                    questionsInProgress.push(channel);
                     try{
                         var data = JSON.parse(body);
                         if(data.results[0]){
@@ -177,7 +178,7 @@ exports.command = {
                                         }
                                     }
                                     var points = difficulties.indexOf(question.difficulty)+1;
-                                    winners = winnerArray.length > 0 ? "Congratulations "+winnerArray.join(" ")+`\nYou${winnerArray.length > 1 ? "each ": ""} earned **${points} point${points > 1 ? "s" : ""}**!` : "Nobody won that round.";
+                                    winners = winnerArray.length > 0 ? "Congratulations "+winnerArray.join(" ")+`\nYou${winnerArray.length > 1 ? " each": ""} earned ${points} point${points > 1 ? "s" : ""}!` : "Nobody won that round.";
                                     setTimeout(cb, 100);
                                 },
                                 showWinners: function(cb){
@@ -187,20 +188,16 @@ exports.command = {
                                     }, cb);
                                 },
                                 addScores: function(cb){
-                                    if(!bot.isDiscord)cb();
-                                    else
                                     async.eachSeries(winnerArray, function(winner, cb2){
                                         var id = winner.replace(/[<>@]/g, "");
-                                        bot.connection.query(`INSERT INTO trivia (user, correct, difficulty, server) VALUES (${id}, 1, ${difficulties.indexOf(question.difficulty)+1}, '${bot.channels[channel].guild_id}')`, cb2);
+                                        bot.connection.query(`INSERT INTO trivia (user, correct, difficulty, server) VALUES (${id}, 1, ${difficulties.indexOf(question.difficulty)+1}, '${bot.isDiscord ? bot.channels[channel].guild_id : channel}')`, cb2);
                                     }, cb);
                                 },
                                 addLosers: function(cb){
-                                    if(!bot.isDiscord)cb();
-                                    else
                                     async.eachSeries(wrong, function(winner, cb2){
                                         var id = winner.replace(/[<>@]/g, "");
                                         if(id !== "146293573422284800" && bot.isDiscord)
-                                        bot.connection.query(`INSERT INTO trivia (user, correct, difficulty, server) VALUES (${id}, 0, ${difficulties.indexOf(question.difficulty)+1}, '${bot.channels[channel].guild_id}')`, cb2);
+                                        bot.connection.query(`INSERT INTO trivia (user, correct, difficulty, server) VALUES (${id}, 0, ${difficulties.indexOf(question.difficulty)+1}, '${bot.isDiscord ? bot.channels[channel].guild_id : channel}')`, cb2);
                                         else cb();
                                     }, cb);
                                 }
@@ -219,7 +216,7 @@ exports.command = {
                                 if(err){
                                     bot.log(err);
                                 }
-                                questionInProgress = false;
+                                delete questionsInProgress[questionsInProgress.indexOf(channel)];
                             });
 
                         }else{
