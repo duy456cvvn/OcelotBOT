@@ -138,7 +138,7 @@ module.exports = function(bot) {
 
                 if(message.indexOf("alot") > -1) {
                     var now = new Date();
-                    if(!alotRateLimit[channelID] || now-alotRateLimit[channelID] > 500){
+                    if(!alotRateLimit[channelID] || now-alotRateLimit[channelID] > 5000){
                         for(var i in alots){
                             if(message.indexOf(i) > -1){
                                 if(bot.isDiscord){
