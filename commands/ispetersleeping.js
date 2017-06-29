@@ -37,35 +37,35 @@ exports.command = {
                                     fallback: "...",
                                     color: "#4d41ef",
                                     title: `Peter's last state was: ${states[peter.state] || peter.state}`,
-                                    text: peter.state === "Home" ? `:musical_note: Listening to **${data.artist_name} - ${data.title}**` : `Last update: ${peter.timestamp}`,
+                                    text: peter.state === "Home" ? `:musical_note: Listening to ${bot.isDiscord ? "**" : ""}${data.artist_name} - ${data.title}${bot.isDiscord ? "**" : ""}` : `Last update: ${peter.timestamp}`,
                                     fields: [
                                         {
-                                            title: "Heart Rate",
+                                            title: ":heart: Heart Rate",
                                             value: peter.peter_heartrate+" BPM",
                                             short: true
                                         },
                                         {
-                                            title: "Room Temperature",
+                                            title: ":thermometer: Room Temperature",
                                             value: peter.inside_temp+" C",
                                             short: true
                                         },
                                         {
-                                            title: "Phone Battery",
+                                            title: ":battery: Phone Battery",
                                             value: peter.jimmy_battery+"%",
                                             short: true
                                         },
                                         {
-                                            title: "Phone Temperature",
+                                            title: ":iphone: Phone Temperature",
                                             value: peter.jimmy_light+" C",
                                             short: true
                                         },
                                         {
-                                            title: "Speed",
+                                            title: ":blue_car: Speed",
                                             value: peter.jimmy_speed+" m/s",
                                             short: true
                                         },
                                         {
-                                            title: "Altitude",
+                                            title: ":airplane: Altitude",
                                             value: peter.jimmy_altitude+" m above sealevel.",
                                             short: true
                                         }
