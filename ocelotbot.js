@@ -507,34 +507,34 @@ function botInit(cb){
 
         bot.on('disconnect', function(err, code, event){
            console.log("Disconnected: "+err+" "+code);
-           console.log("Reconnecting in "+(5+(bot.reconnects))+" seconds");
+           console.log("Reconnecting in 20 seconds");
            console.log(event);
            bot.reconnects*=2;
            setTimeout(function(){
                console.log("Reconnecting...");
-               startBot();
-           }, 5000+(1000*bot.reconnects));
-           // process.exit(1);
+               bot.connect();
+               //process.exit(1);
+           }, 20000+(1000*bot.reconnects));
+
         });
 
         setTimeout(function(){
-            bot.on('guildCreate', function(){
+            bot.on('guildCreate', debounce(function(){
                 bot.setPresence({
                     game: {
                         name: "in "+Object.keys(bot.servers).length+" servers"
                     }
                 });
-            });
+            }, 10000, true));
 
-            bot.on('guildDelete', function(){
+            bot.on('guildDelete', debounce(function(){
                 bot.setPresence({
                     game: {
                         name: "in "+Object.keys(bot.servers).length+" servers"
                     }
                 });
-            });
+            }, 10000, true));
         }, 1000);
-
 
         bot.on('error', function(err){
             bot.error("Error: "+err);
@@ -600,6 +600,43 @@ process.on('uncaughtException', function uncaughtException(err){
     //     // }, 10000);
     // }
 });
+
+function debounce(func, wait, immediate) {
+    var timeout;
+    return function() {
+        var context = this
+            , args = arguments;
+        var later = function() {
+            timeout = null;
+            if (!immediate)
+                func.apply(context, args)
+        };
+        var callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow)
+            func.apply(context, args)
+    }
+}
+function throttle(fn, threshhold, scope) {
+    threshhold || (threshhold = 250);
+    var last, deferTimer;
+    return function() {
+        var context = scope || this;
+        var now = +new Date
+            , args = arguments;
+        if (last && now < last + threshhold) {
+            clearTimeout(deferTimer);
+            deferTimer = setTimeout(function() {
+                last = now;
+                fn.apply(context, args)
+            }, threshhold)
+        } else {
+            last = now;
+            fn.apply(context, args)
+        }
+    }
+}
 
 
 startBot();
