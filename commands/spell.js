@@ -28,6 +28,8 @@ exports.command = {
                 bot.spellQueueTotalTime += now-reaction.time;
                 bot.addReaction(reaction, function (err) {
                     if(err) {
+                        bot.log("Spell queue item failed with: "+err);
+                        console.log(err);
                         reaction.retries++;
                         if (reaction.retries < 3){
                             bot.spellQueueTotalRetries++;
@@ -42,7 +44,6 @@ exports.command = {
             }else{
                 bot.processingSpellQueue = false;
             }
-
         }
 
     },
@@ -58,7 +59,16 @@ exports.command = {
             vs: ["🆚"],
             ok: ["🆗"],
             cool: ["🆒"],
-            "0": ["🇴", "🅾", "⭕", "🔄", "🔃"],
+            "0": ["0⃣","🇴", "🅾", "⭕", "🔄", "🔃"],
+            "1": ["1⃣"],
+            "2": ["2⃣"],
+            "3": ["3⃣"],
+            "4": ["4⃣"],
+            "5": ["5⃣"],
+            "6": ["6⃣"],
+            "7": ["7⃣"],
+            "8": ["8⃣"],
+            "9": ["9⃣"],
             "10": ["🔟"],
             "100": ["💯"],
             lo: ["🔟"],
