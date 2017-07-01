@@ -1,6 +1,9 @@
 {
   "Bot": {
   },
+  "Slack": {
+    "token": ""
+  },
   "Discord": {
     "token": "",
     "messageDelay": 300
@@ -12,18 +15,44 @@
       "port": 3306,
       "user": "",
       "password": "",
-      "database": "ethanbot"
+      "database": "ocelotbot"
     },
     "pool": {
       "min": 0,
       "max": 20
     }
   },
+  "Commands": {
+    "8ball": {
+      "responses": [
+        "It is certain",
+        "It is decidedly so",
+        "Without a doubt",
+        "Yes, definitely",
+        "You may rely on it",
+        "As I see it, yes",
+        "Most likely",
+        "Outlook good",
+        "Yes",
+        "Signs point to yes",
+        "Don't count on it",
+        "My reply is no",
+        "My sources say no",
+        "Outlook not so good",
+        "Very doubtful"
+      ]
+    },
+    "crush": {
+      "dir": "temp/",
+      "filename": "crush.png",
+      "template": "static/crush.png"
+    }
+  },
   "Modules": {
     "LoadBefore": [
+      "util",
       "database",
-      "commands",
-      "items"
+      "commands"
     ],
     "LoadAfter": [
 

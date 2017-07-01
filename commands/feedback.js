@@ -6,19 +6,19 @@ module.exports = {
     usage: "feedback [message]",
     accessLevel: 0,
     commands: ["feedback", "support"],
-    run: function run(user, userID, channel, message, args, event, bot) {
-        var server = bot.channels[channel] ? bot.channels[channel].guild_id : "DM";
+    run: function run(user, userID, channel, message, args, event, bot, recv) {
+        var server =  recv.getServerFromChannel(channel);
         if(args.length > 1){
-            bot.sendMessage({
+            recv.sendMessage({
                 to: channel,
                 message: ":white_check_mark: Your feedback has been sent. Please note we cannot respond to all feedback."
             });
-            bot.sendMessage({
+            recv.sendMessage({
                 to: "139871249567318017",
-                message: `Feedback from ${userID} (${user}) in ${server} (${bot.servers[server] ? bot.servers[server].name : "DM"}):\n${message}`
+                message: `Feedback from ${userID} (${user}) in ${server} (${recv.getServer[server] ? bot.servers[server].name : "DM"}):\n${message}`
             });
         }else{
-            bot.sendMessage({
+            recv.sendMessage({
                 to: channel,
                 message: `:bangbang: You must enter some feedback. i.e **${bot.prefixCache[server]}feedback This bot is amazing!**`
             })

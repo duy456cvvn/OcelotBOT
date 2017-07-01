@@ -7,10 +7,10 @@ module.exports = {
     usage: "stats",
     accessLevel: 0,
     commands: ["stats", "statistics"],
-    run: function run(user, userID, channel, message, args, event, bot) {
+    run: function run(user, userID, channel, message, args, event, bot, recv) {
         bot.database.getStats()
             .then(function(stats){
-               bot.sendMessage({
+               recv.sendMessage({
                    to: channel,
                    message: "",
                    embed: {

@@ -8,8 +8,10 @@
     "config": "^1.26.1",
     "dateformat": "^2.0.0",
     "discord.io": "^2.5.1",
+    "gm": "^1.23.0",
     "knex": "^0.13.0",
     "mysql": "^2.13.0",
-    "promise-async": "^0.2.0"
+    "promise-async": "^0.2.0",
+    "request": "^2.81.0"
   }
 }

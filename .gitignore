@@ -28,3 +28,4 @@ typings/
 config/production.json
 config/development.json
 config/Earth.json
+temp/

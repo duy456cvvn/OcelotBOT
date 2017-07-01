@@ -27,7 +27,9 @@ module.exports = function(bot){
                     bot.log(`Loaded command ${loadedCommand.name}`);
                     bot.commandUsages[loadedCommand.name] = {
                         usage: loadedCommand.usage,
-                        accessLevel: loadedCommand.accessLevel
+                        accessLevel: loadedCommand.accessLevel,
+                        receivers: loadedCommand.receivers,
+                        hidden: loadedCommand.hidden
                     };
                     for(var i in loadedCommand.commands){
                         if(loadedCommand.commands.hasOwnProperty(i)) {
@@ -41,33 +43,35 @@ module.exports = function(bot){
         });
 
         bot.prefixCache = {};
-        bot.database.getPrefixes()
-            .then(function(result){
-                 for(var i in result){
-                     if(result.hasOwnProperty(i))
-                        bot.prefixCache[result[i].server] = result[i].prefix;
-                 }
-            })
-            .catch(function(err){
-                bot.error("Error loading prefix cache: ");
-                console.error(err);
-            });
+        // bot.database.getPrefixes()
+        //     .then(function(result){
+        //          for(var i in result){
+        //              if(result.hasOwnProperty(i))
+        //                 bot.prefixCache[result[i].server] = result[i].prefix;
+        //          }
+        //     })
+        //     .catch(function(err){
+        //         bot.error("Error loading prefix cache: ");
+        //         console.error(err);
+        //     });
 
-        bot.on('message', function(user, userID, channelID, message, event){
+
+        bot.registerMessageHandler("commands", function(user, userID, channelID, message, event, _bot, receiver){
             try {
-                var server = bot.channels[channelID] ? bot.channels[channelID].guild_id : null;
+                var server = receiver.getServerFromChannel(channelID);
                 if ((bot.prefixCache[server] && message.startsWith(bot.prefixCache[server])) || (!bot.prefixCache[server] && message.startsWith("!"))) {
                     var args = message.split(" ");
                     var command = bot.commands[args[0].substring(bot.prefixCache[server]? bot.prefixCache[server].length : 1)];
                     if (command) {
-                        command(user, userID, channelID, message, args, event, bot);
+                        command(user, userID, channelID, message, args, event, bot, receiver);
                     }
                 }
             }catch(e){
-                bot.sendMessage({
+                receiver.sendMessage({
                     to: channelID,
                     message: ":bangbang: Command failed: "+e
-                })
+                });
+                console.error(e);
             }
         });
       }

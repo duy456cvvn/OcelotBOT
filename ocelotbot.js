@@ -2,11 +2,11 @@
  * Created by Peter on 07/06/2017.
  */
 const   config      = require('config'),
-        Discord     = require('discord.io'),
         dateFormat  = require('dateformat'),
         colors      = require('colors'),
         caller_id   = require('caller-id'),
-        async       = require('async');
+        async       = require('async'),
+        path        = require('path');
 
 var bot = {};
 
@@ -17,16 +17,12 @@ function initBot(cb){
     bot.commandCount = 0;
     bot.lastCrash = new Date();
 
-    bot.numberWithCommas = function(x){
-        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    };
-
     bot.log = function log(message, caller){
         if(!caller)
             caller = caller_id.getData();
         var file = ["Nowhere"];
         if(caller.filePath)
-            file = caller.filePath.split("/");
+            file = caller.filePath.split(path.sep);
 
         var origin = `[${file[file.length-1]}${caller.functionName ? "/"+caller.functionName : ""}] `.bold;
 
@@ -45,25 +41,39 @@ function initBot(cb){
 
     bot.log("OcelotBOT Loading...");
 
+    bot.messageHandlers = {};
 
-    var messageReceivers = config.get("Receivers");
-    async.eachSeries(messageReceivers, function loadMessageReceiver(file, cb){
-        var messageReceiver = require("./receivers/"+file);
-        if(messageReceiver.init) {
-            bot.log(`Loading Message Receiver ${messageReceiver.name}`);
-            messageReceiver.init(bot, cb);
-        }else{
-            bot.warn(`Message Receiver ${file} is invalid/missing 'init' function.`);
+    bot.registerMessageHandler = function registerMessageHandler(name, func){
+        bot.messageHandlers[name] = func;
+        bot.log(`Registered message handler ${name}`);
+    };
+
+    bot.receiveMessage = function receiveMessage(user, userID, channelID, message, event, bot, receiver){
+        for(var i in bot.messageHandlers){
+            if(bot.messageHandlers.hasOwnProperty(i)){
+                bot.messageHandlers[i](user, userID, channelID, message, event, bot, bot.receivers[receiver]);
+            }
         }
-    }, function finishLoad(){
-        bot.log("Loaded all message receivers");
-    });
-
+    };
+    bot.receivers = [];
     bot.loadBefore = config.get("Modules.LoadBefore");
     bot.loadAfter = config.get("Modules.LoadAfter");
 
-    initModules(bot.loadBefore, function(){
-        startBot(function(){
+    initModules(bot.loadBefore, function initLoadBefore() {
+        var messageReceivers = config.get("Receivers");
+        async.eachSeries(messageReceivers, function loadMessageReceiver(file, cb) {
+            var messageReceiver = require("./receivers/" + file)(bot);
+            if (messageReceiver.init) {
+                bot.log(`Loading Message Receiver ${messageReceiver.name}`);
+                bot.receivers[messageReceiver.id] = messageReceiver;
+                bot.receivers[messageReceiver.id].internal = {};
+                messageReceiver.init(bot.receivers[messageReceiver.id].internal, cb);
+
+            } else {
+                bot.warn(`Message Receiver ${file} is invalid/missing 'init' function.`);
+            }
+        }, function finishLoad() {
+            bot.log("Loaded all message receivers");
             initModules(bot.loadAfter, cb);
         });
     });
@@ -76,62 +86,6 @@ function initModules(modules, cb){
         bot.log(`Loading ${loadedModule.name}...`);
         loadedModule.init(callback);
     }, cb);
-}
-
-function startBot(cb){
-    bot.on("ready", function(){
-       bot.log("Bot connected");
-       if(cb && !bot.wasConnected){
-           bot.wasConnected = true;
-           cb();
-       }
-    });
-
-    bot.on("disconnect", function(err){
-       bot.warn("Disconnected... Reconnecting in 1 second "+err);
-       setTimeout(bot.connect, 1000);
-    });
-
-    bot.on("guildMemberAdd", function(member, event){
-        var username = bot.users[member.id].username+"#"+bot.users[member.id].discriminator;
-        var server = event.d.guild_id;
-        bot.database.getServer(server)
-            .then(function(result){
-                var serverInfo = result[0];
-                if(serverInfo.useServerCurrency){
-                   return bot.database.createServerUser(server, member.id, username);
-                }
-            })
-            .then(function(result){
-                if(result)
-                    bot.log(`Added server user ${member.id} ${username} ${server}`);
-            })
-            .catch(function(err){
-                if(err.message.indexOf("Duplicate") > -1){
-                    bot.log(`User ${member.id} ${username} already exists on ${server}`);
-                }else
-                bot.error(`Error adding server user: ${member.id} ${username} ${server}: ${err}`)
-            });
-
-        bot.database.addUser(member.id, username)
-            .then(function(){
-                bot.log(`Added user ${member.id}: ${username}`);
-            })
-            .catch(function(err){
-                if(err.message.indexOf("Duplicate") > -1){
-                    bot.log(`User ${member.id} ${username} already exists.`);
-                }else
-               bot.error(`Error adding user ${member.id}/${username}: ${err}`);
-            });
-    });
-
-    bot.on("guildCreate", function(server){
-        bot.log("Joined Server "+server.name);
-        bot.database.addAllUsers(server.id);
-    });
-
-    bot.log("Connecting to Discord...");
-    bot.connect();
 }
 
 initBot(function(){

@@ -8,54 +8,9 @@ module.exports = {
     accessLevel: 1,
     commands: ["settings", "serversettings"],
     init: function init(bot, cb){
-        var now = new Date();
-        var midnight = new Date();
-        midnight.setHours(0, 0, 0);
-        if(midnight < now){
-            midnight.setDate(midnight.getDate()+1);
-        }
-        bot.log("Midnight is at "+midnight);
-        bot.doDailyRewards = function(){
-
-            bot.database.getRewardServers()
-                .then(function(servers){
-                    return pasync.eachSeries(servers, function(server, callback){
-                        if(server.useRoleRewards){
-                            bot.database.getRoleRewards(server.server).then(function(roleRewards){
-                               return pasync.eachSeries(bot.servers[server.server].members, function(member, cb){
-                                    var keys = Object.keys(member.roles);
-                                    pasync.eachSeries(roleRewards, function(roleReward, cb2){
-                                        if(keys.indexOf(roleReward.role) > -1){
-                                            bot.log(`Rewarding ${member.id} ${roleReward.amount} monies in ${server.server}.`);
-                                            bot.transact("reward============", member.id, roleReward.amount, server.server)
-                                                .then(function(){
-                                                    cb2();
-                                                })
-                                                .catch(function(err){
-                                                    bot.warning("Failed to give out daily reward: "+err);
-                                                    cb2();
-                                                })
-                                        }else{
-                                            cb2();
-                                        }
-
-                                    }).then(function(){cb();});
-                               });
-                            });
-                        }
-                        callback();
-                    });
-                })
-                .catch(function(err){
-                    bot.log("Error giving out rewards: "+err);
-                });
-
-            setTimeout(bot.doDailyRewards, 8.64e7);//24 hours
-        };
-
-        setTimeout(bot.doDailyRewards, midnight-now);
+        cb();
     },
-    run: function run(user, userID, channel, message, args, event, bot) {
+    run: function run(user, userID, channel, message, args, event, bot, recv) {
         var server = bot.channels[channel].guild_id;
         const settings = {
             useServerCurrency: {
@@ -134,21 +89,21 @@ module.exports = {
                                 output += `**${i}** - ${settings[i].format(serverInfo[i])}\n`
                             }
                         }
-                        bot.sendMessage({
+                        recv.sendMessage({
                             to: channel,
                             message: output
                         });
                     },
                     "set": function(){
                         if(args.length < 4){
-                            bot.sendMessage({
+                            recv.sendMessage({
                                 to: channel,
                                 message: `:bangbang: You must supply a **setting** and a **value**:\n${bot.prefixCache[server]}settings set useServerCurrency false`
                             });
                         }else if(Object.keys(settings).indexOf(args[2]) > -1){
                             bot.database.setServerSetting(server, args[2], args[3] === "true" || args[3] === "false" ? args[3] === "true" : args[3])
                                 .then(function(){
-                                    bot.sendMessage({
+                                    recv.sendMessage({
                                         to: channel,
                                         message: `:white_check_mark: Successfully set ${args[2]} to **${args[3]}**`
                                     });
@@ -156,13 +111,13 @@ module.exports = {
                                         settings[args[2]].onSet(args[3]);
                                 })
                                 .catch(function(err){
-                                    bot.sendMessage({
+                                    recv.sendMessage({
                                         to: channel,
                                         message: `Error setting value. Did you spell something wrong?:\n\`${err}\``
                                     })
                                 });
                         }else{
-                            bot.sendMessage({
+                            recv.sendMessage({
                                 to: channel,
                                 message: `:bangbang: Not a valid setting. Try ${bot.prefixCache[server]}settings list`
                             });
@@ -170,12 +125,12 @@ module.exports = {
                     },
                     "help": function(){
                         if(Object.keys(settings).indexOf(args[2]) > -1){
-                            bot.sendMessage({
+                            recv.sendMessage({
                                 to: channel,
                                 message: settings[args[2]].explanation
                             });
                         }else{
-                            bot.sendMessage({
+                            recv.sendMessage({
                                 to: channel,
                                 message: `:bangbang: Not a valid setting. Try ${bot.prefixCache[server]}settings list.`
                             });
@@ -184,7 +139,7 @@ module.exports = {
                     },
                     "rolerewards": function(){
                         if(args.length < 4){
-                            bot.sendMessage({
+                            recv.sendMessage({
                                 to: channel,
                                 message: `:bangbang: You must supply a role and an amount: ${bot.prefixCache[server]}settings rewardroles @Admin 100`
                             });
@@ -192,14 +147,14 @@ module.exports = {
                             var role = args[2].replace(/[<>&@]/g, "");
                             var amount = parseInt(args[3]);
                             if(!amount){
-                                bot.sendMessage({
+                                recv.sendMessage({
                                     to: channel,
                                     message: ":bangbang: You must enter a valid amount!"
                                 });
                             }else if(!bot.servers[server].roles[role]){
                                 console.log(role);
                                 console.log(bot.servers[server].roles);
-                                bot.sendMessage({
+                                recv.sendMessage({
                                     to: channel,
                                     message: `:bangbang: Invalid role. Make sure the role is mentionable and mentioned like ${bot.prefixCache[server]}settings rewardroles @Admin 100`
                                 });
@@ -209,13 +164,13 @@ module.exports = {
                                         return bot.getCurrencyFor(server, amount);
                                     })
                                     .then(function(currency){
-                                        bot.sendMessage({
+                                        recv.sendMessage({
                                             to: channel,
                                             message: `:white_check_mark: Successfully set <&@${role}>'s daily reward to ${amount} ${currency}.`
                                         });
                                     })
                                     .catch(function(err){
-                                        bot.sendMessage({
+                                        recv.sendMessage({
                                             to: channel,
                                             message: `:bangbang: Error setting role reward:\n${err}`
                                         });
@@ -234,13 +189,13 @@ module.exports = {
                 }
                 //noinspection EqualityComparisonWithCoercionJS
                 if(serverInfo.addedby != userID && !hasRole){
-                    bot.sendMessage({
+                    recv.sendMessage({
                         to: channel,
                         message: ":bangbang: You don't have permission to run this command! Only the server owner or people with the 'Bot Controller' role can do that."
                     });
                 }else{
                     if(!args[1] || (args[1] === "help" && !args[2]) || !subCommands[args[1]]){
-                        bot.sendMessage({
+                        recv.sendMessage({
                             to: channel,
                             message: "**Usage:**\n!settings help [setting] - This message or help on an individual setting\n!settings list - List the available settings and their current values\n!settings set [setting] [value] - Set a new value for a server setting\n!settings rolerewards [role] [amount]"
                         });

@@ -1,15 +1,15 @@
 /**
- * Created by Peter on 09/06/2017.
+ * Created by Peter on 01/07/2017.
  */
 module.exports = {
-    name: "Invite Bot",
-    usage: "invite",
+    name: "Expand",
+    usage: "expand <word>",
     accessLevel: 0,
-    commands: ["invite", "joinserver", "addbot"],
+    commands: ["expand"],
     run: function run(user, userID, channel, message, args, event, bot, recv) {
         recv.sendMessage({
             to: channel,
-            message: bot.inviteURL
+            message:  message.replace("!expand", "").split("").join(" ")
         });
     }
 };

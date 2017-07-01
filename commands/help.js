@@ -6,17 +6,17 @@ module.exports = {
     usage: "help [command]",
     accessLevel: 0,
     commands: ["help", "commands"],
-    run: function run(user, userID, channel, message, args, event, bot){
+    run: function run(user, userID, channel, message, args, event, bot, recv){
        var output = "COMMANDS:\n";
-       var server = bot.channels[channel] ? bot.channels[channel].guild_id : null;
+       var server = recv.getServerFromChannel(channel);
        for(var i in bot.commandUsages){
-           output += `**${i}** - ${bot.prefixCache[server] || "!"}${bot.commandUsages[i].usage}\n`
+           if(bot.commandUsages.hasOwnProperty(i) && !bot.commandUsages[i].hidden && (!bot.commandUsages[i].receivers || bot.commandUsages[i].receivers.indexOf(recv.id) > -1))
+               output += `**${i}** - ${bot.prefixCache[server] || "!"}${bot.commandUsages[i].usage}\n`
        }
 
-       bot.sendMessage({
+       recv.sendMessage({
            to: channel,
            message: output
        });
-
     }
 };
