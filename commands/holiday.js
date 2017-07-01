@@ -1,7 +1,6 @@
 /**
  * Created by Peter on 08/06/2017.
  */
-//https://holidayapi.com/v1/holidays?key=70d061ad-cd46-4aa1-86b3-2aba24dd1021&country=US&year=2016&month=06
 const request = require('request');
 exports.command = {
     name: "holiday",
