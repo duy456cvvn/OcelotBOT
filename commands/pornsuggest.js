@@ -33,6 +33,7 @@ exports.command = {
                         to: channel,
                         message: "Feeling horny? Try *" + e + "*"
                     });
+                    console.log(e);
                 }
                 // bot.sendMessage({
                 //     to: channel,
