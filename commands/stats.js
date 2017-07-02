@@ -6,7 +6,7 @@ module.exports = {
     name: "Stats Command",
     usage: "stats",
     accessLevel: 0,
-    commands: ["stats", "statistics"],
+    commands: ["stats", "statistics", "info"],
     run: function run(user, userID, channel, message, args, event, bot, recv) {
         bot.database.getStats()
             .then(function(stats){

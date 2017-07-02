@@ -1,8 +1,8 @@
 
 const   config = require('config'),
         Discord = require('discord.io');
+/** @namespace bot.receivers.discord */
 /**
- * @namespace bot.receivers.discord
  * @param {bot} bot
  * @returns {object}
  */
@@ -94,6 +94,45 @@ module.exports = function(bot){
         },
         uploadFile: function uploadFile(opts, cb){
             bot.receivers.discord.internal.client.uploadFile(opts, cb);
+        },
+        sendAttachment: function sendAttachment(channel, text, attachments, cb){
+            var attachment = attachments[0];
+            for(var i in attachment.fields){
+                attachment.fields[i].name = attachment.fields[i].title;
+                delete attachment.fields[i].title;
+                attachment.fields[i].inline = attachment.fields[i].short;
+                delete attachment.fields[i].short;
+            }
+            obj.sendMessage({
+                to: channel,
+                message: text,
+                embed: {
+                    color: parseInt("0x"+attachment.color.substring(1)),
+                    title: attachment.title,
+                    description: attachment.text,
+                    image: {
+                        url: attachment.author_icon
+                    },
+                    fields: attachment.fields,
+                    author: {
+                        name: attachment.author_name,
+                        url: attachment.author_link,
+                        icon_url: attachment.author_icon
+                    }
+                }
+            }, cb);
+        },
+        editMessage: function editMessage(opts, cb){
+            bot.receivers.discord.internal.client.editMessage(opts, cb);
+        },
+        addReaction: function addReaction(opts, cb){
+            bot.receivers.discord.internal.client.addReaction(opts, cb);
+        },
+        getReaction: function getReaction(opts, cb){
+            bot.receivers.discord.internal.client.getReaction(opts, cb);
+        },
+        getMessages: function getMessages(opts, cb){
+            bot.receivers.discord.internal.client.getMessages(opts, cb);
         }
     };
 

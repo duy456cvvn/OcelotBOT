@@ -7,7 +7,7 @@ module.exports = {
     name: "Urban Dictionary",
     usage: "defineud <word>",
     accessLevel: 0,
-    commands: ["defineud"],
+    commands: ["defineud", "ud"],
     run: function run(user, userID, channel, message, args, event, bot, recv) {
         const term = encodeURIComponent(args.slice(1).join(" "));
         request(`http://api.urbandictionary.com/v0/define?term=${term}`, function(err, resp, body){

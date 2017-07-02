@@ -9,16 +9,12 @@ module.exports = function(bot){
         name: "Database Module",
         enabled: true,
         init: function init(cb){
-            const USERS_TABLE           = "eb_users";
-            const SERVER_BALANCE_TABLE  = "eb_server_balances";
-            const TRANSACTIONS_TABLE    = "eb_transactions";
-            const SERVERS_TABLE         = "eb_servers";
-            const LOTTERY_TABLE         = "eb_lottery";
-            const REWARDS_TABLE         = "eb_rewardroles";
-            const SHOP_TABLE            = "eb_shop";
-            const INVENTORY_TABLE       = "eb_inventory";
 
-
+            const SERVERS_TABLE         = "ocelotbot_servers";
+            const PETERMON_TABLE        = "pm_status";
+            const MEMES_TABLE           = "ocelotbot_memes";
+            const REMINDERS_TABLE       = "ocelotbot_reminders";
+            const TRIVIA_TABLE          = "trivia";
 
             bot.database = {
                 addServer: function addNewServer(serverID, addedBy){
@@ -45,7 +41,48 @@ module.exports = function(bot){
                 },
                 getPrefixes: function getPrefixes(){
                     return knex.select("server","prefix").from(SERVERS_TABLE);
+                },
+                getLastPetermonData: function getLastPetermonData(){
+                    return knex.select().from(PETERMON_TABLE).orderBy("timestamp", "DESC").limit(1);
+                },
+                getMemes: function getMemes(server){
+                    return knex.select("name", "server").from(MEMES_TABLE).where({server: server}).orWhere({server: "global"});
+                },
+                removeMeme: function removeMeme(meme, server){
+                    return knex.raw(knex.delete().from(MEMES_TABLE).where({name: meme}).whereIn("server", [server, "global"]).toString()+" LIMIT 1");
+                },
+                addReminder: function addReminder(receiver, user, server, channel, at, message){
+                    return knex.insert({
+                        receiver: receiver,
+                        user: user,
+                        server: server,
+                        channel: channel,
+                        at: knex.raw(`FROM_UNIXTIME(${at/1000})`),
+                        message: message
+                    }).into(REMINDERS_TABLE);
+                },
+                getReminders: function getReminders(){
+                    return knex.select().from(REMINDERS_TABLE);
+                },
+                removeReminder: function removeReminder(id){
+                    return knex.delete().from(REMINDERS_TABLE).where({id: id});
+                },
+                getTriviaLeaderboard: function getTriviaLeaderboard(){
+                    return knex.select("user", knex.raw("SUM(difficulty) as 'Score'"), knex.raw("COUNT(*) as 'correct'"))
+                        .from(TRIVIA_TABLE)
+                        .where("correct", 1)
+                        .orderBy("Score", "DESC")
+                        .limit(1);
+                },
+                logTrivia: function logTrivia(user, correct, difficulty, server){
+                    return knex.insert({
+                        user: user,
+                        correct: correct,
+                        difficulty: difficulty,
+                        server: server
+                    }).into(TRIVIA_TABLE);
                 }
+
             };
 
             cb();
