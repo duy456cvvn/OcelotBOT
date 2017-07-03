@@ -30,7 +30,7 @@ module.exports = function(bot){
 
 
             bot.util.quantify = function quantify(data, unit, value) {
-                if (value) {
+                if (value && value >= 1) {
                     if (value > 1 || value < -1)
                         unit += 's';
 
@@ -52,7 +52,8 @@ module.exports = function(bot){
 
                 if (typeof seconds === 'number') {
 
-                    data = bot.util.quantify(data, 'day',    parseInt(seconds / 86400));
+                    data = bot.util.quantify(data, 'year',   Math.round(seconds / 31556926));
+                    data = bot.util.quantify(data, 'day',    parseInt((seconds % 31556926) / 86400));
                     data = bot.util.quantify(data, 'hour',   parseInt((seconds % 86400) / 3600));
                     data = bot.util.quantify(data, 'minute', parseInt((seconds % 3600) / 60));
                     data = bot.util.quantify(data, 'second', Math.floor(seconds % 60));
@@ -73,6 +74,84 @@ module.exports = function(bot){
                 }
 
                 return prettyString;
+            };
+
+            bot.util.debounce = function debounce(func, wait, immediate) {
+                var timeout;
+                return function() {
+                    var context = this
+                        , args = arguments;
+                    var later = function() {
+                        timeout = null;
+                        if (!immediate)
+                            func.apply(context, args)
+                    };
+                    var callNow = immediate && !timeout;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                    if (callNow)
+                        func.apply(context, args)
+                }
+            };
+
+            bot.util.throttle = function throttle(fn, threshhold, scope) {
+                threshhold || (threshhold = 250);
+                var last, deferTimer;
+                return function() {
+                    var context = scope || this;
+                    var now = +new Date
+                        , args = arguments;
+                    if (last && now < last + threshhold) {
+                        clearTimeout(deferTimer);
+                        deferTimer = setTimeout(function() {
+                            last = now;
+                            fn.apply(context, args)
+                        }, threshhold)
+                    } else {
+                        last = now;
+                        fn.apply(context, args)
+                    }
+                }
+            };
+
+            bot.util.searchCache = function (moduleName, callback) {
+                // Resolve the module identified by the specified name
+                var mod = require.resolve(moduleName);
+
+                // Check if the module has been resolved and found within
+                // the cache
+                if (mod && ((mod = require.cache[mod]) !== undefined)) {
+                    // Recursively go over the results
+                    (function run(mod) {
+                        // Go over each of the module's children and
+                        // run over it
+                        mod.children.forEach(function (child) {
+                            run(child);
+                        });
+
+                        // Call the specified callback providing the
+                        // found module
+                        callback(mod);
+                    })(mod);
+                }
+            };
+
+            bot.util.uncache = function uncache(moduleName, cb) {
+                // Run over the cache looking for the files
+                // loaded by the specified module name
+                bot.util.searchCache(moduleName, function (mod) {
+                    delete require.cache[mod.id];
+                    if(cb)
+                        cb();
+                });
+
+                // Remove cached paths to the module.
+                // Thanks to @bentael for pointing this out.
+                Object.keys(module.constructor._pathCache).forEach(function(cacheKey) {
+                    if (cacheKey.indexOf(moduleName)>0) {
+                        delete module.constructor._pathCache[cacheKey];
+                    }
+                });
             };
 
 
