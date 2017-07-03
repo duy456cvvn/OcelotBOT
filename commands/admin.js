@@ -2,160 +2,48 @@
  * Created by Peter on 08/06/2017.
  */
 const config = require('config');
+const fs = require('fs');
+const async = require('async');
 module.exports = {
     name: "Admin Command",
     usage: "admin",
     accessLevel: 10,
     commands: ["admin"],
     hidden: true,
+    functions: [],
+    init: function init(bot, cb){
+        bot.log("Loading admin commands...");
+        fs.readdir("commands/admin", function(err, files){
+           if(err){
+               bot.error(`Error loading admin commands: ${err.stack}`);
+           } else{
+               async.eachSeries(files, function(file, cb2){
+                   try {
+                        var command = require(`./admin/${file}`);
+                        module.exports.functions[command.id.toLowerCase()] = command.run;
+                        bot.log(`Loaded Admin Command ${command.id}`);
+                   }catch(e){
+                       bot.error(e.stack);
+                   }finally{
+                       cb2();
+                   }
+               });
+           }
+        });
+        cb();
+    },
     run: function run(user, userID, channel, message, args, event, bot, recv){
         //noinspection EqualityComparisonWithCoercionJS
         if(userID == "139871249567318017"){
-            var command = args[1];
-            switch(command){
-                case "leave":
-                    recv.leaveServer(args[2]);
-                    break;
-                case "clearmq":
-                    bot.messageQueue = [];
-                    recv.sendMessage({
-                        to: channel,
-                        message: "Done."
-                    });
-                    break;
-                case "eval":
-                    eval(message.substring(12));
-                    break;
-                case "restart":
-                    process.exit(1);
-                    break;
-                case "stats":
-                    recv.sendMessage({
-                        to: channel,
-                        message: `Currently active in **${Object.keys(recv.getServers()).length}** servers. ${parseInt(process.uptime()/60)} minutes uptime.`
-                    });
-                    break;
-                case "say":
-                    recv.sendMessage({
-                        to: channel,
-                        message: message.substring(11)
-                    });
-                    break;
-                case "servers":
-                    var fields = [];
-                    for(var i in bot.servers){
-                        var server = bot.servers[i];
-                        var field = {
-                            name: server.name,
-                            value: `**${server.member_count}** members. **${Object.keys(server.channels).length}** channels.`,
-                            inline: true
-                        };
-                        fields.push(field);
-                    }
-                    recv.sendMessage({
-                        to: channel,
-                        message: "",
-                        embed: {
-                            color: 0x189F06,
-                            title: `Currently in **${Object.keys(bot.servers).length} servers.**`,
-                            description: "",
-                            fields: fields
-                        }
-                    });
-                    break;
-                case "presence":
-                    recv.setPresence({
-                        game: {
-                            name: message.substring(16)
-                        }
-                    });
-                    break;
-                case "broadcast":
-                    for(var i in bot.servers){
-                       recv.sendMessage({
-                           to: Object.keys(bot.servers[i].channels)[0],
-                           message: ":bangbang: BROADCAST: "+message.substring(17)
-                       });
-                    }
-                    break;
-                case "take":
-                    bot.database.transact(args[2].replace(/[!@<>]/g, ""), userID, args[3])
-                        .then(function(){
-                            recv.sendMessage({
-                                to: channel,
-                                message: `:dollar: Taken **${args[3]}** ${config.get("Bot.defaultCurrency")}s from <@${args[2]}>`
-                            });
-                        });
-                    break;
-                case "reload":
-                    try {
-                        require.uncache("./"+args[2], function () {
-                            var loadedCommand = require("./" + args[2]);
-                            recv.sendMessage({
-                                to: channel,
-                                message: `Loaded command ${loadedCommand.name}`
-                            });
-                            bot.commandUsages[loadedCommand.name] = {
-                                usage: loadedCommand.usage,
-                                accessLevel: loadedCommand.accessLevel
-                            };
-                            for (var i in loadedCommand.commands) {
-                                if (loadedCommand.commands.hasOwnProperty(i)) {
-                                    bot.commands[loadedCommand.commands[i]] = loadedCommand.run;
-                                }
-
-                            }
-                        });
-                    }catch(e){
-                        recv.sendMessage({
-                            to: channel,
-                            message: e.stack
-                        });
-                    }
-                    break;
-
+            if(args[1] && module.exports.functions[args[1].toLowerCase()]){
+                module.exports.functions[args[1].toLowerCase()](user, userID, channel, message, args, event, bot, recv);
+            }else{
+                recv.sendMessage({
+                    to: channel,
+                    message: `:bangbang: Invalid usage. !admin ${Object.keys(module.exports.functions).join("/")}`
+                })
             }
         }
 
     }
-};
-
-require.searchCache = function (moduleName, callback) {
-    // Resolve the module identified by the specified name
-    var mod = require.resolve(moduleName);
-
-    // Check if the module has been resolved and found within
-    // the cache
-    if (mod && ((mod = require.cache[mod]) !== undefined)) {
-        // Recursively go over the results
-        (function run(mod) {
-            // Go over each of the module's children and
-            // run over it
-            mod.children.forEach(function (child) {
-                run(child);
-            });
-
-            // Call the specified callback providing the
-            // found module
-            callback(mod);
-        })(mod);
-    }
-};
-
-require.uncache = function uncache(moduleName, cb) {
-    // Run over the cache looking for the files
-    // loaded by the specified module name
-    require.searchCache(moduleName, function (mod) {
-        delete require.cache[mod.id];
-        if(cb)
-            cb();
-    });
-
-    // Remove cached paths to the module.
-    // Thanks to @bentael for pointing this out.
-    Object.keys(module.constructor._pathCache).forEach(function(cacheKey) {
-        if (cacheKey.indexOf(moduleName)>0) {
-            delete module.constructor._pathCache[cacheKey];
-        }
-    });
 };
