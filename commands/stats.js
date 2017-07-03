@@ -8,54 +8,42 @@ module.exports = {
     accessLevel: 0,
     commands: ["stats", "statistics", "info"],
     run: function run(user, userID, channel, message, args, event, bot, recv) {
-        bot.database.getStats()
-            .then(function(stats){
-               recv.sendMessage({
-                   to: channel,
-                   message: "",
-                   embed: {
-                       color: 0x189F06,
-                       title: "",
-                       description: "",
-                       fields: [
-                           {
-                               name: "Total Servers",
-                               value: bot.numberWithCommas(Object.keys(bot.servers).length),
-                               inline: true
-                           },
-                           {
-                               name: "Total Users",
-                               value: bot.numberWithCommas(Object.keys(bot.users).length),
-                               inline: true
-                           },
-                           {
-                               name: "Current Uptime",
-                               value: bot.numberWithCommas(parseInt(process.uptime()/60))+" minutes",
-                               inline: true
-                           },
-                           {
-                               name: "Message Stats",
-                               value: `**${bot.messageCount}** total messages sent this session. **${(bot.totalMessageTime/bot.messageCount).toFixed(2)} ms** average response time.`,
-                               inline: false
-                           },
-                           {
-                               name: "Total Balance",
-                               value: `${bot.numberWithCommas(stats[0].totalBalance)} ${config.get("Bot.defaultCurrency")}s`,
-                               inline: true
-                           },
-                           {
-                               name: "Average Balance",
-                               value: `${bot.numberWithCommas(stats[0].averageBalance)} ${config.get("Bot.defaultCurrency")}s`,
-                               inline: true
-                           }
-                       ],
-                       author: {
-                           name: "EthanBot Statistics",
-                           icon_url: "https://cdn.discordapp.com/avatars/322031850329604096/2963e8aa5e9d1a46605caa5287b6aeea.webp"
+           recv.sendMessage({
+               to: channel,
+               message: "",
+               embed: {
+                   color: 0x189F06,
+                   title: "OcelotBOT Version `stevie4`",
+                   description: "",
+                   fields: [
+                       {
+                           name: "Total Servers",
+                           value: bot.util.numberWithCommas(Object.keys(recv.internal.client.servers).length),
+                           inline: true
+                       },
+                       {
+                           name: "Total Users",
+                           value: bot.util.numberWithCommas(Object.keys(recv.internal.client.users).length),
+                           inline: true
+                       },
+                       {
+                           name: "Current Uptime",
+                           value: bot.util.prettySeconds(process.uptime()),
+                           inline: true
+                       },
+                       {
+                           name: "OcelotBOT Age",
+                           value: bot.util.prettySeconds((new Date() - 1390089600000)/1000),
+                           inline: true
+                       },
+                       {
+                           name: "Message Stats",
+                           value: `**${recv.messageCount}** total messages sent this session. **${(recv.totalMessageTime/recv.messageCount).toFixed(2)} ms** average response time.`,
+                           inline: false
                        }
-                   }
-               })
-            });
+                   ]
+               }
+           });
     }
 };
 
