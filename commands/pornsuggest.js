@@ -29,7 +29,7 @@ module.exports = {
                 }else{
                     try{
                         const names = JSON.parse(body);
-                        bot.sendMessage({
+                        recv.sendMessage({
                             to: channel,
                             message: `Feeling horny? Try *${bot.util.arrayRand(names).keyword}*`
                         });
