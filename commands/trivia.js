@@ -27,9 +27,10 @@ module.exports = {
                         var data = [];
                         var i = 1;
                         async.eachSeries(result, function(entry, cb){
+                            var user = recv.getUser(entry.user);
                             data.push({
                                 "#": i++,
-                                "User": bot.users[entry.user] ? bot.users[entry.user].username + "#" + bot.users[entry.user].discriminator : "Unknown User " + entry.user,
+                                "User": user ? `${user.username}#${user.discriminator}` : `Unknown User ${entry.user}`,
                                 "Score": entry.Score,
                                 "Correct": entry.correct,
                             });
@@ -43,6 +44,7 @@ module.exports = {
                 })
                 .catch(function(err){
                     bot.error(err);
+                    console.log(err);
                     recv.sendMessage({
                         to: channel,
                         message: ":warning: Error getting leaderboard. Try again later."
