@@ -51,8 +51,16 @@ module.exports = function(bot){
                 getMemes: function getMemes(server){
                     return knex.select("name", "server").from(MEMES_TABLE).where({server: server}).orWhere({server: "global"});
                 },
-                removeMeme: function removeMeme(meme, server){
-                    return knex.raw(knex.delete().from(MEMES_TABLE).where({name: meme}).whereIn("server", [server, "global"]).toString()+" LIMIT 1");
+                removeMeme: function removeMeme(meme, server, user){
+                    return knex.raw(knex.delete().from(MEMES_TABLE).where({name: meme, addedby: user}).whereIn("server", [server, "global"]).toString()+" LIMIT 1");
+                },
+                addMeme: function addMeme(user, server, name, content){
+                    return knex.insert({
+                        name: name,
+                        addedby: user,
+                        server: server,
+                        meme: content
+                    }).into(MEMES_TABLE);
                 },
                 getMeme: function getMeme(meme, server){
                     return knex.select("meme").from(MEMES_TABLE).where({name: meme}).whereIn("server", [server, "global"]).orderBy("server");
