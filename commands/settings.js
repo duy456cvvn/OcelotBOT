@@ -11,6 +11,7 @@ module.exports = {
         cb();
     },
     run: function run(user, userID, channel, message, args, event, bot, recv) {
+        return false;
         var server = bot.channels[channel].guild_id;
         const settings = {
             useServerCurrency: {
