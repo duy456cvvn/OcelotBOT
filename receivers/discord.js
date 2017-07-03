@@ -31,8 +31,22 @@ module.exports = function(bot){
                 setTimeout(namespace.client.connect, 1000);
             });
 
+            var lastPresenceUpdate = 0;
+
             namespace.client.on("guildCreate", function guildCreate(server) {
                 bot.log("Joined Server " + server.name);
+
+                var now = new Date();
+                if(now-lastPresenceUpdate > 10000){
+                    bot.log("!!! Updating presence");
+                    namespace.client.setPresence({
+                        game: {
+                            name: `${bot.message ? bot.message + " | " : ""}in ${Object.keys(namespace.client.servers).length} servers.`
+                        }
+                    });
+                    lastPresenceUpdate = now;
+                }
+
             });
 
             namespace.client.on("message", function (user, userID, channelID, message, event) {
@@ -57,7 +71,7 @@ module.exports = function(bot){
                 obj.isProcessingMessageQueue = true;
                 bot.receivers.discord.internal.client.sendMessage(messageParams[0], messageParams[1]);
                 obj.messageCount++;
-                obj.totalMessageTime = new Date() - messageParams.sentAt;
+                obj.totalMessageTime += new Date() - messageParams.sentAt;
                 setTimeout(obj.processMessageQueue, parseInt(config.get("Discord.messageDelay")));
             }else{
                 obj.isProcessingMessageQueue = false;
@@ -80,7 +94,13 @@ module.exports = function(bot){
          * @returns {string}
          */
         getServerFromChannel: function getServerFromChannel(channel){
-            return bot.receivers.discord.internal.client.channels[channel].guild_id;
+            return bot.receivers.discord.internal.client.channels[channel] ? bot.receivers.discord.internal.client.channels[channel].guild_id : "DM";
+        },
+        getServerInfo: function(server){
+            return bot.receivers.discord.internal.client.servers[server];
+        },
+        getChannelInfo: function(channel){
+            return bot.receivers.discord.internal.client.channels[channel];
         },
         /**
          * Gets user details from their Snowflake
