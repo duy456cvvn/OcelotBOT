@@ -9,6 +9,19 @@ module.exports = function(bot){
       enabled: true,
       init: function init(cb){
         bot.log("Loading Commands...");
+        bot.banCache = {
+            channel: [],
+            server: [],
+            user: []
+        };
+
+        bot.database.getBans()
+            .then(function(result){
+                async.eachSeries(result, function(ban){
+                    bot.banCache[ban.type].push(ban.id);
+                });
+            });
+
         bot.commands = {};
         bot.commandUsages = {};
         fs.readdir("commands", function readCommands(err, files){
@@ -18,27 +31,28 @@ module.exports = function(bot){
                 cb(err);
             }else{
                 async.eachSeries(files, function loadCommands(command, callback){
-                    var loadedCommand = require("../commands/"+command);
-                    if(loadedCommand.init){
-                        loadedCommand.init(bot, function(){
-                            bot.log(`Performed startup tasks for ${loadedCommand.name}`);
-                        });
-                    }
-                    bot.log(`Loaded command ${loadedCommand.name}`);
-                    bot.commandUsages[loadedCommand.name] = {
-                        usage: loadedCommand.usage,
-                        accessLevel: loadedCommand.accessLevel,
-                        receivers: loadedCommand.receivers,
-                        hidden: loadedCommand.hidden
-                    };
-                    for(var i in loadedCommand.commands){
-                        if(loadedCommand.commands.hasOwnProperty(i)) {
-                            bot.commands[loadedCommand.commands[i]] = loadedCommand.run;
+                    if(!fs.lstatSync("commands/" + command).isDirectory()) {
+                        var loadedCommand = require("../commands/" + command);
+                        if (loadedCommand.init) {
+                            loadedCommand.init(bot, function () {
+                                bot.log(`Performed startup tasks for ${loadedCommand.name}`);
+                            });
                         }
-
+                        bot.log(`Loaded command ${loadedCommand.name}`);
+                        bot.commandUsages[loadedCommand.name] = {
+                            usage: loadedCommand.usage,
+                            accessLevel: loadedCommand.accessLevel,
+                            receivers: loadedCommand.receivers,
+                            hidden: loadedCommand.hidden
+                        };
+                        for (var i in loadedCommand.commands) {
+                            if (loadedCommand.commands.hasOwnProperty(i)) {
+                                bot.commands[loadedCommand.commands[i]] = loadedCommand.run;
+                            }
+                        }
                     }
                     callback();
-                }, cb)
+                }, cb);
             }
         });
 
@@ -62,8 +76,19 @@ module.exports = function(bot){
                 if ((bot.prefixCache[server] && message.startsWith(bot.prefixCache[server])) || (!bot.prefixCache[server] && message.startsWith("!"))) {
                     var args = message.split(" ");
                     var command = bot.commands[args[0].substring(bot.prefixCache[server]? bot.prefixCache[server].length : 1)];
-                    if (command) {
+                    if (bot.banCache.server.indexOf(receiver.getServerFromChannel(channelID)) === -1 &&
+                        bot.banCache.channel.indexOf(channelID) === -1 &&
+                        bot.banCache.user.indexOf(userID) === -1 &&
+                        command) {
+                        bot.commandCount++;
                         command(user, userID, channelID, message, args, event, bot, receiver);
+                        bot.database.logCommand(userID, channelID, message)
+                            .then(function(){
+                                bot.log(`${user} (${userID}) performed command ${message}`);
+                            })
+                            .catch(function(err){
+                                bot.error(`Error logging command: ${err.stack}`);
+                            });
                     }
                 }
             }catch(e){
@@ -71,7 +96,7 @@ module.exports = function(bot){
                     to: channelID,
                     message: ":bangbang: Command failed: "+e
                 });
-                console.error(e);
+                bot.error(e);
             }
         });
       }

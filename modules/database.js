@@ -15,6 +15,9 @@ module.exports = function(bot){
             const MEMES_TABLE           = "ocelotbot_memes";
             const REMINDERS_TABLE       = "ocelotbot_reminders";
             const TRIVIA_TABLE          = "trivia";
+            const COMMANDLOG_TABLE      = "commandlog";
+            const BANS_TABLE            = "bans";
+
 
             bot.database = {
                 addServer: function addNewServer(serverID, addedBy){
@@ -51,6 +54,9 @@ module.exports = function(bot){
                 removeMeme: function removeMeme(meme, server){
                     return knex.raw(knex.delete().from(MEMES_TABLE).where({name: meme}).whereIn("server", [server, "global"]).toString()+" LIMIT 1");
                 },
+                getMeme: function getMeme(meme, server){
+                    return knex.select("meme").from(MEMES_TABLE).where({name: meme}).whereIn("server", [server, "global"]).orderBy("server");
+                },
                 addReminder: function addReminder(receiver, user, server, channel, at, message){
                     return knex.insert({
                         receiver: receiver,
@@ -72,7 +78,8 @@ module.exports = function(bot){
                         .from(TRIVIA_TABLE)
                         .where("correct", 1)
                         .orderBy("Score", "DESC")
-                        .limit(1);
+                        .groupBy("user")
+                        .limit(10);
                 },
                 logTrivia: function logTrivia(user, correct, difficulty, server){
                     return knex.insert({
@@ -81,6 +88,23 @@ module.exports = function(bot){
                         difficulty: difficulty,
                         server: server
                     }).into(TRIVIA_TABLE);
+                },
+                logCommand: function logCommand(user, channel, command){
+                    return knex.insert({
+                        userID: user,
+                        channelID: channel,
+                        command: command
+                    }).into(COMMANDLOG_TABLE);
+                },
+                ban: function ban(id, type, reason){
+                    return knex.insert({
+                        id: id,
+                        type: type,
+                        reason: reason
+                    }).into(BANS_TABLE);
+                },
+                getBans: function(){
+                    return knex.select().from(BANS_TABLE);
                 }
 
             };
