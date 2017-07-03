@@ -16,8 +16,9 @@ function initBot(cb){
     bot.errorCount = 0;
     bot.commandCount = 0;
     bot.lastCrash = new Date();
+    bot.message = "v4 released!";
 
-    bot.log = function log(message, caller){
+    bot.log = function log(message, caller, error){
         if(!caller)
             caller = caller_id.getData();
         var file = ["Nowhere"];
@@ -27,11 +28,14 @@ function initBot(cb){
         var origin = `[${file[file.length-1]}${caller.functionName ? "/"+caller.functionName : ""}] `.bold;
 
         var output = origin+message;
-        console.log(`[${dateFormat(new Date(), "dd/mm/yy hh:MM")}]`+output);
+        if(error)
+            console.error(`[${dateFormat(new Date(), "dd/mm/yy hh:MM")}]`+output);
+        else
+            console.log(`[${dateFormat(new Date(), "dd/mm/yy hh:MM")}]`+output);
     };
 
     bot.error = function error(message){
-        bot.log(message.red, caller_id.getData());
+        bot.log(message.red, caller_id.getData(), true);
         bot.errorCount++;
     };
 
