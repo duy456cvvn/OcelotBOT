@@ -14,20 +14,20 @@ module.exports = {
                embed: {
                    color: 0x189F06,
                    title: "OcelotBOT Version `stevie4`",
-                   description: "",
+                   description: recv.id === "discord" ? `You are being served by **shard #${config.get("Discord.shard")}**` : "",
                    fields: [
                        {
-                           name: "Total Servers",
+                           name: "Shard Total Servers",
                            value: bot.util.numberWithCommas(Object.keys(recv.internal.client.servers).length),
                            inline: true
                        },
                        {
-                           name: "Total Users",
+                           name: "Shard Total Users",
                            value: bot.util.numberWithCommas(Object.keys(recv.internal.client.users).length),
                            inline: true
                        },
                        {
-                           name: "Current Uptime",
+                           name: "Current Shard Uptime",
                            value: bot.util.prettySeconds(process.uptime()),
                            inline: true
                        },
@@ -38,7 +38,7 @@ module.exports = {
                        },
                        {
                            name: "Message Stats",
-                           value: `**${recv.messageCount}** total messages sent this session. **${(recv.totalMessageTime/recv.messageCount).toFixed(2)} ms** average response time.`,
+                           value: `**${recv.messageCount}** total messages sent from this shard. **${(recv.totalMessageTime/recv.messageCount).toFixed(2)} ms** average response time.`,
                            inline: false
                        }
                    ]

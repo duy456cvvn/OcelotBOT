@@ -11,10 +11,18 @@ module.exports = function(bot){
         name: "Discord Message Receiver",
         id: "discord",
         init: function init(namespace, cb) {
-            namespace.client = new Discord.Client({
+
+            var discordConfig = {
                 token: config.get("Discord.token"),
                 autorun: false
-            });
+            };
+
+            if(config.get("Discord.totalShards") > 0){
+                discordConfig.shard = [config.get("Discord.shard"), config.get("Discord.totalShards")];
+                bot.log(`This is shard #${discordConfig.shard[0]}`);
+            }
+
+            namespace.client = new Discord.Client(discordConfig);
 
             namespace.name = "discord";
 

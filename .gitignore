@@ -28,4 +28,5 @@ typings/
 config/production.json
 config/development.json
 config/Earth.json
+config/petermon2.json
 temp/

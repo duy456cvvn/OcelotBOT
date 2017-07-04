@@ -7,7 +7,9 @@
   },
   "Discord": {
     "token": "",
-    "messageDelay": 300
+    "messageDelay": 300,
+    "totalShards": 0,
+    "shard": 0
   },
   "Database": {
     "client": "mysql",
