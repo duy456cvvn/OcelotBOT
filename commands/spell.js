@@ -23,7 +23,9 @@ module.exports = {
                 bot.spellQueueTotal++;
                 var now = new Date();
                 bot.spellQueueTotalTime += now-reaction.time;
-                reaction.receiver.addReaction(reaction, function (err) {
+                var receiver = reaction.receiver;
+                delete reaction.receiver;
+                receiver.addReaction(reaction, function (err) {
                     if(err) {
                         bot.log("Spell queue item failed with: "+err);
                         console.log(err);
@@ -162,6 +164,7 @@ module.exports = {
                 },
                 function () {
                     var reacts = str.replace(/[A-z]/g, "").split(" ");
+                    reacts.splice(20);
                     async.eachSeries(reacts, function (react, cb) {
                         if (react) {
                             console.log(react);

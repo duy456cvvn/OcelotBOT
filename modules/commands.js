@@ -57,6 +57,7 @@ module.exports = function(bot){
         });
 
         bot.prefixCache = {};
+
         // bot.database.getPrefixes()
         //     .then(function(result){
         //          for(var i in result){
@@ -72,31 +73,35 @@ module.exports = function(bot){
 
         bot.registerMessageHandler("commands", function(user, userID, channelID, message, event, _bot, receiver){
             try {
-                var server = receiver.getServerFromChannel(channelID);
-                if ((bot.prefixCache[server] && message.startsWith(bot.prefixCache[server])) || (!bot.prefixCache[server] && message.startsWith("!"))) {
-                    var args = message.split(" ");
-                    var command = bot.commands[args[0].substring(bot.prefixCache[server]? bot.prefixCache[server].length : 1)];
-                    if (bot.banCache.server.indexOf(receiver.getServerFromChannel(channelID)) === -1 &&
-                        bot.banCache.channel.indexOf(channelID) === -1 &&
-                        bot.banCache.user.indexOf(userID) === -1 &&
-                        command) {
-                        bot.commandCount++;
-                        command(user, userID, channelID, message, args, event, bot, receiver);
-                        bot.database.logCommand(userID, channelID, message)
-                            .then(function(){
-                                bot.log(`${user} (${userID}) performed command ${message}`);
-                            })
-                            .catch(function(err){
-                                bot.error(`Error logging command: ${err.stack}`);
-                            });
+                receiver.getServerFromChannel(channelID, function(err, server){
+                    if ((bot.prefixCache[server] && message.startsWith(bot.prefixCache[server])) || (!bot.prefixCache[server] && message.startsWith("!"))) {
+                        var args = message.split(" ");
+                        var command = bot.commands[args[0].substring(bot.prefixCache[server]? bot.prefixCache[server].length : 1)];
+                        if (bot.banCache.server.indexOf(server) === -1 &&
+                            bot.banCache.channel.indexOf(channelID) === -1 &&
+                            bot.banCache.user.indexOf(userID) === -1 &&
+                            command) {
+                            bot.commandCount++;
+                            command(user, userID, channelID, message, args, event, bot, receiver);
+                            bot.database.logCommand(userID, channelID, message)
+                                .then(function(){
+                                    bot.log(`${user} (${userID}) performed command ${message}`);
+                                })
+                                .catch(function(err){
+                                    bot.error(`Error logging command: ${err.stack}`);
+                                });
+                        }
                     }
-                }
+
+                });
+
             }catch(e){
                 receiver.sendMessage({
                     to: channelID,
                     message: ":bangbang: Command failed: "+e
                 });
-                bot.error(e);
+                bot.error(`Command ${message} failed: ${e}`);
+                bot.error(e.stack);
             }
         });
       }

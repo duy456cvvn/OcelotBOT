@@ -101,7 +101,8 @@ module.exports = function(bot){
                     return knex.insert({
                         userID: user,
                         channelID: channel,
-                        command: command
+                        command: command,
+                        server: "ocelotbot-"+bot.instance
                     }).into(COMMANDLOG_TABLE);
                 },
                 ban: function ban(id, type, reason){

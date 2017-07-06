@@ -22,6 +22,8 @@ module.exports = function(bot){
                 bot.log(`This is shard #${discordConfig.shard[0]}`);
             }
 
+            bot.message = null;
+
             namespace.client = new Discord.Client(discordConfig);
 
             namespace.name = "discord";
@@ -59,7 +61,7 @@ module.exports = function(bot){
 
             namespace.client.on("message", function (user, userID, channelID, message, event) {
                 if(userID != namespace.client.id)
-                    bot.receiveMessage(user, userID, channelID, message, event, bot, obj.id);
+                    bot.receiveMessage(user, userID, channelID, message, event);
             });
 
             cb();
@@ -99,28 +101,32 @@ module.exports = function(bot){
         /**
          * Get the server Snowflake that a channel belongs to
          * @param {string} channel
+         * @param cb {function} callback
          * @returns {string}
          */
-        getServerFromChannel: function getServerFromChannel(channel){
-            return bot.receivers.discord.internal.client.channels[channel] ? bot.receivers.discord.internal.client.channels[channel].guild_id : "DM";
+        getServerFromChannel: function getServerFromChannel(channel, cb){
+            cb(null, bot.receivers.discord.internal.client.channels[channel] ? bot.receivers.discord.internal.client.channels[channel].guild_id : "DM");
         },
-        getServerInfo: function(server){
-            return bot.receivers.discord.internal.client.servers[server];
+        getServerInfo: function(server, cb){
+            cb(null, bot.receivers.discord.internal.client.servers[server]);
         },
-        getChannelInfo: function(channel){
-            return bot.receivers.discord.internal.client.channels[channel];
+        getChannelInfo: function(channel, cb){
+            cb(null, bot.receivers.discord.internal.client.channels[channel]);
         },
         /**
          * Gets user details from their Snowflake
          * @param {string} id
+         * @param cb
          */
-        getUser: function getUser(id){
-            return bot.receivers.discord.internal.client.users[id];
+        getUser: function getUser(id, cb){
+            cb(null, bot.receivers.discord.internal.client.users[id]);
         },
         simulateTyping: function simulateTyping(channel, cb){
             bot.receivers.discord.internal.client.simulateTyping(channel, cb);
         },
         uploadFile: function uploadFile(opts, cb){
+            if(opts.file.type && opts.file.type === "Buffer")
+                opts.file = new Buffer(opts.file.data);
             bot.receivers.discord.internal.client.uploadFile(opts, cb);
         },
         sendAttachment: function sendAttachment(channel, text, attachments, cb){
@@ -161,6 +167,34 @@ module.exports = function(bot){
         },
         getMessages: function getMessages(opts, cb){
             bot.receivers.discord.internal.client.getMessages(opts, cb);
+        },
+        getStats: function getStats(cb){
+            cb({
+                uptime: process.uptime(),
+                servers: Object.keys(bot.receivers.discord.internal.client.servers).length,
+                users: Object.keys(bot.receivers.discord.internal.client.users).length,
+                messageCount: bot.totalMessages,
+                messagesSent: obj.messageCount
+            });
+        },
+        call: function call(func, args, cb){
+            if(cb)
+                args.push(cb);
+            bot.receivers.discord.internal.client[func].apply(args);
+        },
+        eval: function(text, cb){
+            if(cb){
+                try {
+                    cb(null, eval(text));
+                }catch(e){
+                    cb(e);
+                }
+            }else{
+                eval(text);
+            }
+        },
+        setMessage: function(text){
+            bot.message = text;
         }
     };
 

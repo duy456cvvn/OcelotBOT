@@ -15,10 +15,10 @@ module.exports = {
             });
         }else{
             request(`http://numbersapi.com/${parseInt(args[1])}/`, function(err, resp, body){
-                bot.sendMessage({
+                recv.sendMessage({
                     to: channel,
                     message: err || body
-                })
+                });
             });
         }
     }

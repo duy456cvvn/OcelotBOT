@@ -9,7 +9,7 @@ module.exports = {
     run: function run(user, userID, channel, message, args, event, bot, recv) {
         recv.sendMessage({
             to: channel,
-            message: bot.inviteURL
+            message: "https://discordapp.com/oauth2/authorize?client_id=171640650721132544&scope=bot"
         });
     }
 };

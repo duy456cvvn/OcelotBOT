@@ -69,29 +69,32 @@ module.exports = {
                     to: channel,
                     message: `:watch: Reminding you in **${bot.util.prettySeconds(offset/1000)}**. (At ${at})`
                 });
-                bot.database.addReminder(recv.id, userID, recv.getServerFromChannel(channel), channel, at.getTime(), rargs[2])
-                    .then(function(resp){
-                        setTimeout(function(){
+                recv.getServerFromChannel(channel, function(err, server){
+                    bot.database.addReminder(recv.id, userID, server, channel, at.getTime(), rargs[2])
+                        .then(function(resp){
+                            setTimeout(function(){
+                                recv.sendMessage({
+                                    to: channel,
+                                    message: `<@${userID}>, you told me to remind you of this:\n${rargs[2]}`
+                                });
+                                bot.database.removeReminder(resp[0])
+                                    .then(function(){
+                                        bot.log(`Removed Reminder ${resp[0]}`)
+                                    })
+                                    .catch(function(err){
+                                        bot.error(err.stack);
+                                    });
+                            }, offset);
+                        })
+                        .catch(function(err){
                             recv.sendMessage({
                                 to: channel,
-                                message: `<@${userID}>, you told me to remind you of this:\n${rargs[2]}`
+                                message: ":bangbang: There was an error setting your reminder. Try again later."
                             });
-                            bot.database.removeReminder(resp[0])
-                                .then(function(){
-                                    bot.log(`Removed Reminder ${resp[0]}`)
-                                })
-                                .catch(function(err){
-                                    bot.error(err.stack);
-                                });
-                        }, offset);
-                    })
-                    .catch(function(err){
-                        recv.sendMessage({
-                            to: channel,
-                            message: ":bangbang: There was an error setting your reminder. Try again later."
+                            bot.error(err.stack);
                         });
-                        bot.error(err.stack);
-                    });
+                });
+
             }
         }
 

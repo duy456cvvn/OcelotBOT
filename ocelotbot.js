@@ -6,7 +6,8 @@ const   config      = require('config'),
         colors      = require('colors'),
         caller_id   = require('caller-id'),
         async       = require('async'),
-        path        = require('path');
+        path        = require('path'),
+        ipc         = require('node-ipc');
 
 var bot = {};
 
@@ -52,35 +53,22 @@ function initBot(cb){
         bot.log(`Registered message handler ${name}`);
     };
 
-    bot.receiveMessage = function receiveMessage(user, userID, channelID, message, event, bot, receiver){
+    bot.receiveMessage = function receiveMessage(user, userID, channelID, message, event){
         for(var i in bot.messageHandlers){
             if(bot.messageHandlers.hasOwnProperty(i)){
-                bot.messageHandlers[i](user, userID, channelID, message, event, bot, bot.receivers[receiver]);
+                bot.messageHandlers[i](user, userID, channelID, message, event, bot, bot.receiver);
             }
         }
     };
-    bot.receivers = [];
+
     bot.loadBefore = config.get("Modules.LoadBefore");
     bot.loadAfter = config.get("Modules.LoadAfter");
 
     initModules(bot.loadBefore, function initLoadBefore() {
-        var messageReceivers = config.get("Receivers");
-        async.eachSeries(messageReceivers, function loadMessageReceiver(file, cb) {
-            var messageReceiver = require("./receivers/" + file)(bot);
-            if (messageReceiver.init) {
-                bot.log(`Loading Message Receiver ${messageReceiver.name}`);
-                bot.receivers[messageReceiver.id] = messageReceiver;
-                bot.receivers[messageReceiver.id].internal = {};
-                messageReceiver.init(bot.receivers[messageReceiver.id].internal, cb);
-
-            } else {
-                bot.warn(`Message Receiver ${file} is invalid/missing 'init' function.`);
-            }
-        }, function finishLoad() {
-            bot.log("Loaded all message receivers");
-            initModules(bot.loadAfter, cb);
-        });
+        bot.log("Done.");
     });
+
+    cb();
 }
 
 function initModules(modules, cb){
