@@ -27,14 +27,15 @@ module.exports = {
                         var data = [];
                         var i = 1;
                         async.eachSeries(result, function(entry, cb){
-                            var user = recv.getUser(entry.user);
-                            data.push({
-                                "#": i++,
-                                "User": user ? `${user.username}#${user.discriminator}` : `Unknown User ${entry.user}`,
-                                "Score": entry.Score,
-                                "Correct": entry.correct,
+                            recv.getUser(entry.user, function(err, user){
+                                data.push({
+                                    "#": i++,
+                                    "User": user ? `${user.username}#${user.discriminator}` : `Unknown User ${entry.user}`,
+                                    "Score": entry.Score,
+                                    "Correct": entry.correct,
+                                });
+                                cb();
                             });
-                            cb();
                         }, function(){
                             recv.sendMessage({
                                 to: channel,
