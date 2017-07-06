@@ -62,7 +62,10 @@ module.exports = function(bot){
                     }else{
                         bot.log(`Populating serverCache for channel ${channel}`);
                         var callbackNumber = callbackIDs++;
-                        bot.waitingCallbacks[callbackNumber] = cb;
+                        bot.waitingCallbacks[callbackNumber] = function(err, server){
+                            serverCache[channel] = server;
+                            cb(null, server);
+                        };
                         bot.ipc.emit("command", {
                             receiver: "discord",
                             args: Array.from(arguments),
