@@ -53,7 +53,7 @@ module.exports = {
                 });
 
         }else if(questionsInProgress.indexOf(channel) > -1){
-            bot.sendMessage({
+            recv.sendMessage({
                 to: channel,
                 message: "You can't start another question when one is already in progress. Vote with reactions!"
             });
