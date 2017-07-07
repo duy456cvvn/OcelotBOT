@@ -9,7 +9,7 @@ module.exports = {
             fallback: `fuck you`,
             color: "#ffffff",
             title: "OcelotBOT v4 Technical Statistics",
-            text: `Uptime: ${bot.util.prettySeconds(process.uptime()/1000)}`,
+            text: `Uptime: ${bot.util.prettySeconds(process.uptime())}`,
             fields: [
                 {
                     title: "Modules Loaded",
@@ -27,8 +27,8 @@ module.exports = {
                     short: true
                 },
                 {
-                    title: "Message Receivers",
-                    value: `**${Object.keys(bot.receivers).length}** message receivers loaded. (${Object.keys(bot.receivers).join(", ")})`,
+                    title: "This instance uptime: ",
+                    value: bot.util.prettySeconds(process.uptime()),
                     short: false
                 },
                 {
@@ -39,11 +39,6 @@ module.exports = {
                 {
                     title: "This Session",
                     value: `**${bot.commandCount}** commands. **${bot.errorCount}** errors.`,
-                    short: true
-                },
-                {
-                    title: "Discord Message Queue",
-                    value: `${bot.receivers.discord.messageCount} messages sent. Average ${(bot.receivers.discord.totalMessageTime/bot.receivers.discord.messageCount).toFixed(2)} ms wait time.`,
                     short: true
                 }
             ]
