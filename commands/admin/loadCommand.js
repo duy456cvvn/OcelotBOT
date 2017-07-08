@@ -5,7 +5,8 @@ module.exports = {
     id: "loadCommand",
     run: function run(user, userID, channel, message, args, event, bot, recv){
         try {
-            var loadedCommand = require("../" + args[2]);
+            const path = __dirname+"/../"+args[2];
+            var loadedCommand = require(path);
             recv.sendMessage({
                 to: channel,
                 message: `Loaded command ${loadedCommand.name}`
