@@ -42,16 +42,10 @@ module.exports = function(bot){
                     timeout: 1000
                 },
                 {
-                    regex: /(xd|ecks( ?)dee)/i,
+                    regex: /(xd|e(cks|x)( ?)dee)/i,
                     type: types.REACTION,
                     content: ["🇽","🇩"],
                     timeout: 1000
-                },
-                {
-                    regex: /test/i,
-                    type: types.message,
-                    content: "icles",
-                    timeout: 5000
                 },
                 {
                     regex: /whoop(,?) there it is/i,
