@@ -30,6 +30,24 @@ module.exports = function(bot){
                 bot.ipc.on("connect", function ipcConnected(){
                     bot.log(`Connected to IPC on ${socket}`);
                     bot.ipc.emit('instanceReady', {instance: bot.instance});
+
+
+                    bot.emitWithCallback("command", {
+                        receiver: "discord",
+                        args: ["bot.receivers.discord.internal.client.servers", undefined],
+                        command: "eval",
+                    }, function(err, result){
+                        serverCache = result;
+                    });
+
+                    bot.emitWithCallback("command", {
+                        receiver: "discord",
+                        args: ["bot.receivers.discord.internal.client.channels", undefined],
+                        command: "eval",
+                    }, function(err, result){
+                        channelCache = result;
+                    });
+
                 });
 
                 bot.ipc.on("receiveMessage", function(data){
@@ -53,27 +71,64 @@ module.exports = function(bot){
             });
 
             var serverCache = {};
+            var channelCache = {};
+
+
+            bot.emitWithCallback = function emitWithCallback(command, data, callback){
+                var callbackNumber = callbackIDs++;
+                bot.waitingCallbacks[callbackNumber] = callback;
+                data.callbackID = callbackNumber;
+                bot.ipc.emit(command, data);
+            };
 
             bot.receiver = new Proxy({
                 id: "discord",
                 getServerFromChannel: function getServerFromChannel(channel, cb){
-                    if(serverCache[channel]){
-                        cb(null, serverCache[channel]);
+                    if(channelCache[channel]){
+                        cb(null, channelCache[channel].guild_id);
                     }else{
-                        bot.log(`Populating serverCache for channel ${channel}`);
-                        var callbackNumber = callbackIDs++;
-                        bot.waitingCallbacks[callbackNumber] = function(err, server){
-                            serverCache[channel] = server;
-                            cb(null, server);
-                        };
-                        bot.ipc.emit("command", {
+                        bot.emitWithCallback("command", {
                             receiver: "discord",
                             args: Array.from(arguments),
-                            command: "getServerFromChannel",
-                            callbackID: callbackNumber
+                            command: "getChannelInfo",
+                        }, function(err, channelInfo){
+                            bot.log(`Populating channelCache for channel ${channel}`);
+                            channelCache[channel] = channelInfo;
+                            cb(null, channelInfo.guild_id);
+                        });
+                    }
+                },
+                getChannelInfo: function getChannelInfo(channel, cb){
+                    if(channelCache[channel]){
+                        cb(null, channelCache[channel]);
+                    }else{
+                        bot.emitWithCallback("command", {
+                            receiver: "discord",
+                            args: Array.from(arguments),
+                            command: "getChannelInfo",
+                        }, function(err, channelInfo){
+                            bot.log(`Populating channelCache for channel ${channel}`);
+                            channelCache[channel] = channelInfo;
+                            cb(null, channelInfo);
+                        });
+                    }
+                },
+                getServerInfo: function getServerInfo(server, cb){
+                    if(serverCache[server]){
+                        cb(null, serverCache[server]);
+                    }else{
+                        bot.emitWithCallback("command", {
+                            receiver: "discord",
+                            args: Array.from(arguments),
+                            command: "getServerInfo",
+                        }, function(err, serverCache){
+                            bot.log(`Populating serverCache for channel ${server}`);
+                            serverCache[server] = serverCache;
+                            cb(null, serverCache);
                         });
                     }
                 }
+
             }, {
                 get: function(target, command){
                     return target[command] || function(){
