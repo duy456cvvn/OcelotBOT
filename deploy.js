@@ -20,7 +20,7 @@ pm2.connect(function(){
                             console.error(`FAILED to restart ${process.name}: ${err}`);
                         }else{
                             console.log(`Restarted ${process.name}`);
-                            setTimeout(cb, 5000);
+                            setTimeout(cb, 10000);
                         }
                     })
                  }else{
