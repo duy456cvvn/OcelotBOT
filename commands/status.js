@@ -12,10 +12,6 @@ exports.command = {
 
         const hosts = [
             {
-                host: "vpn.tekno.pw",
-                name: "VPN (!youtube)"
-            },
-            {
                 host: "earth.boywanders.us",
                 name: "Earth (Main Server)"
             },
@@ -25,7 +21,7 @@ exports.command = {
             },
             {
                 host: "mercury.boywanders.us",
-                name: "Mercury"
+                name: "Mercury (!youtube)"
             },
             {
                 host: "homeof.unacceptableuse.com",
