@@ -209,7 +209,8 @@
       "util",
       "database",
       "commands",
-      "ipc"
+      "ipc",
+      "autoreplies"
     ],
     "LoadAfter": [
 
