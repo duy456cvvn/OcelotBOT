@@ -19,7 +19,6 @@ exports.command = {
            if(!err){
                svg2png(new Buffer(body), {width: 400, height: 400})
                    .then(function(image){
-                       bot.log("hey it worked");
                        bot.uploadFile({
                            to: channel,
                            file: image,
