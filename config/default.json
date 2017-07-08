@@ -180,10 +180,6 @@
     "status": {
       "hosts": [
         {
-          "host": "vpn.tekno.pw",
-          "name": "VPN (!youtube)"
-        },
-        {
           "host": "earth.boywanders.us",
           "name": "Earth (Main Server)"
         },
@@ -193,7 +189,7 @@
         },
         {
           "host": "mercury.boywanders.us",
-          "name": "Mercury"
+          "name": "Mercury (Audio proxy)"
         },
         {
           "host": "homeof.unacceptableuse.com",
