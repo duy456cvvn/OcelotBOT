@@ -75,6 +75,33 @@ var sargs = {
             message: ":wave: Bye Bye <#"+ban+">"
         });
     },
+    createInvite: function(user, userID, channel, args, message, bot){
+        bot.createInvite({
+            channelID: args[2],
+            max_users: 1,
+            max_age: 60
+        }, function(err, resp){
+            if(err) {
+                bot.sendMessage({
+                    to: channel,
+                    message: "Unable to create invite. "+err.message
+                })
+            }else{
+                bot.sendMessage({
+                    to: channel,
+                    message: "http://discord.gg/"+resp.code
+                });
+            }
+        });
+    },
+    deleteInvite: function(user, userID, channel, args, message, bot){
+        bot.deleteInvite(args[2], function(err){
+            bot.sendMessage({
+                to: channel,
+                message: err ? "Error deleting invite: "+err : "Deleted successfully"
+            });
+        })
+    },
     botFarms: function(user, userID, channel, args, message, bot){
         var data = {};
         for(var serverID in bot.servers){
@@ -106,7 +133,7 @@ var sargs = {
                     if(server.bots+server.users !== server.total){
                         //output+= `(MISMATCH ${server.total} members.) **${server.name}** (${serverID}) has **${server.bots} bots** and **${server.users} users**. (${ratio.toFixed(2)} ratio)\n`
                     }else{
-                        outputs.push(serverID);
+                        //outputs.push(serverID);
                         //output+= `**${server.name}** (${serverID}) has **${server.bots} bots** and **${server.users} users**. (${ratio.toFixed(2)} ratio)\n`
                         //
                     }
