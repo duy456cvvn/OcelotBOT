@@ -58,11 +58,6 @@ module.exports = function(bot){
                     type: types.MESSAGE,
                     content: "**WHO THE FUCK SAID THAT?**",
                     timeout: 5000
-                },
-                {
-                    regex: /(gay|lesbian|homosexual|home of sexual)/,
-                    type: types.REACTION,
-                    content: ["🏳🌈️"],
                 }
             ];
 
