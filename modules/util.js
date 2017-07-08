@@ -15,7 +15,7 @@ module.exports = function(bot){
              * @returns {*} A random object from the specified array
              */
             bot.util.arrayRand = function arrayRand(array){
-                return array[Math.round(Math.random()*array.length)];
+                return array[Math.round(Math.random()*(array.length-1))];
             };
 
             /**
