@@ -1,9 +1,4 @@
 var http = require('https');
-var o = [
-    "straight",
-    "gay",
-    "tranny"
-];
 exports.command = {
 	name: "pornsuggest",
 	desc: "Suggest some porn",
