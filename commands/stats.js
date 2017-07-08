@@ -17,7 +17,7 @@ module.exports = {
                 embed: {
                     color: 0x189F06,
                     title: "OcelotBOT Version `stevie4`",
-                    description: `You are being served by \`ocelotbot-${bot.instance}\`\nCreated by Big P#1843. Copyright 2017 Ocelotworks.\nSupport Server: https://discord.gg/7YNHpfF`,
+                    description: `You are being served by \`ocelotbot-${bot.instance}\`\nCreated by Big P#1843. Copyright 2017 [Ocelotworks](https://ocelotworks.com).\n[Click Here To Join The Support Server](https://discord.gg/7YNHpfF)`,
                     fields: [
                         {
                             name: "Total Servers",
