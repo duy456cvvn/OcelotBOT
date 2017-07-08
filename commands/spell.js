@@ -32,6 +32,7 @@ module.exports = {
                         reaction.retries++;
                         if (reaction.retries < 3){
                             bot.spellQueueTotalRetries++;
+                            reaction.receiver = receiver;
                             bot.spellQueue.unshift(reaction);
                         }else{
                             bot.spellQueueTotalFailed++;
