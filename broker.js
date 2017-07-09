@@ -16,10 +16,12 @@ bot.error = console.error;
 
 bot.availableInstances = [];
 bot.totalMessages = 0;
+bot.busyInstances = [];
 
 bot.receiveMessage = function(user, userID, channelID, message, event){
-    if(bot.availableInstances.length)
+    if(bot.availableInstances.length){
         ipc.server.emit(bot.availableInstances[bot.totalMessages++ % bot.availableInstances.length], "receiveMessage", Array.from(arguments));
+    }
 };
 
 var messageReceivers = config.get("Receivers");
@@ -54,6 +56,22 @@ ipc.serve(function(){
         console.log(`Instance ${data.instance} is going down.`);
         bot.availableInstances.splice(bot.availableInstances.indexOf(socket), 1);
         console.log(bot.availableInstances.length);
+    });
+
+    ipc.server.on('instanceBusy', function instanceDisconnect(data){
+        console.log(`Instance ${data.instance} is busy.`);
+        bot.busyInstances.push(data.instance);
+    });
+
+    ipc.server.on('instanceFree', function instanceDisconnect(data){
+        console.log(`Instance ${data.instance} is free again.`);
+        bot.busyInstances.splice(bot.busyInstances.indexOf(data.instance), 1);
+    });
+
+    ipc.server.on('subscribeEvent', function subscribeEvent(data, socket){
+        bot.receivers.discord.internal.client.on(data.event, function(){
+            ipc.server.emit(socket, data.event, Array.from(arguments));
+        });
     });
 
     ipc.server.on('command', function command(data, socket){
