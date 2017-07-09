@@ -9,8 +9,8 @@ module.exports = function(bot){
 
             bot.util = {};
 
-            Array.prototype.diff = function(a) {
-                return this.filter(function(i) {return a.indexOf(i) < 0;});
+            bot.util.arrayDiff = function(first, second) {
+                return first.filter(function(i) {return second.indexOf(i) < 0;});
             };
 
             /**
