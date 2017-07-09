@@ -59,7 +59,6 @@ module.exports = function(bot){
                 if(bot.instance === 1) {
 
                     bot.ipc.emit("subscribeEvent", {event: "guildCreate"});
-                    bot.ipc.emit("subscribeEvent", {event: "guildDelete"});
 
                     bot.ipc.on("guildCreate", function(data){
                         var server = data[0];
@@ -71,17 +70,6 @@ module.exports = function(bot){
                                 if(err.message.indexOf("Duplicate") === -1){
                                     bot.error(err.message);
                                 }
-                            });
-                    });
-
-                    bot.ipc.on("guildDelete", function (data) {
-                        var server = data[0];
-                        bot.database.deleteServer(server.id)
-                            .then(function () {
-                                bot.log(`Left server ${server.name}`)
-                            })
-                            .catch(function (err) {
-                                bot.error(err.message);
                             });
                     });
                 }
