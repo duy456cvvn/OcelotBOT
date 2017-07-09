@@ -160,7 +160,12 @@ module.exports = function(bot){
             bot.receivers.discord.internal.client.editMessage(opts, cb);
         },
         addReaction: function addReaction(opts, cb){
-            bot.receivers.discord.internal.client.addReaction(opts, cb);
+            try {
+                bot.receivers.discord.internal.client.addReaction(opts, cb);
+            }catch(e){
+                console.error(e);
+                cb(e);
+            }
         },
         getReaction: function getReaction(opts, cb){
             bot.receivers.discord.internal.client.getReaction(opts, cb);
@@ -194,7 +199,27 @@ module.exports = function(bot){
             }
         },
         setMessage: function(text){
-            bot.message = text;
+            bot.message = text === "clear" ? null : text;
+            bot.receivers.discord.internal.client.setPresence({
+                game: {
+                    name: `${bot.message ? bot.message + " | " : ""}in ${Object.keys(namespace.client.servers).length} servers.`
+                }
+            });
+        },
+        getServers: function getServers(cb){
+            cb(null, bot.receivers.discord.internal.client.servers)
+        },
+        getUsers: function getUsers(cb){
+            cb(null, bot.receivers.discord.internal.client.users)
+        },
+        getChannels: function getChannels(cb){
+            cb(null, bot.receivers.discord.internal.client.channels)
+        },
+        getInstances: function getInstances(cb){
+            cb(null, bot.availableInstances);
+        },
+        getBusyInstances: function getBusyInstances(cb){
+            cb(null, bot.busyInstances);
         }
     };
 
