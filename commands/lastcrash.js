@@ -7,14 +7,21 @@ module.exports = {
     accessLevel: 0,
     commands: ["lastcrash", "uptime"],
     run: function run(user, userID, channel, message, args, event, bot, recv) {
-        var now = new Date().getTime();
+        // var now = new Date().getTime();
+        //
+        // var timeDiff = Math.abs(now - bot.lastCrash.getTime())/1000;
 
-        var timeDiff = Math.abs(now - bot.lastCrash.getTime())/1000;
 
-        recv.sendMessage({
-            to: channel,
-            message: `The last crash was **${bot.util.prettySeconds(timeDiff)}** ago. (${bot.lastCrash.getDate()}/${bot.lastCrash.getMonth()+1}/${bot.lastCrash.getFullYear()})`
+        recv.getStats(function(stats){
+            recv.sendMessage({
+                to: channel,
+                message: `The last crash was **${bot.util.prettySeconds(stats.uptime)}** ago.`
+            });
         });
+        // recv.sendMessage({
+        //     to: channel,
+        //     message: `The last crash was **${bot.util.prettySeconds(timeDiff)}** ago. (${bot.lastCrash.getDate()}/${bot.lastCrash.getMonth()+1}/${bot.lastCrash.getFullYear()})`
+        // });
 
     }
 };
