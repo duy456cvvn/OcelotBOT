@@ -56,10 +56,41 @@ module.exports = function(bot){
                     bot.receiveMessage.apply(this, data)
                 });
 
+                if(bot.instance === 1) {
+
+                    bot.ipc.emit("subscribeEvent", {event: "guildCreate"});
+                    bot.ipc.emit("subscribeEvent", {event: "guildDelete"});
+
+                    bot.ipc.on("guildCreate", function(data){
+                        var server = data[0];
+                        bot.database.addServer(server.id, server.owner_id, server.name, server.joined_at)
+                            .then(function(){
+                                bot.log(`Joined server ${server.name}`)
+                            })
+                            .catch(function(err){
+                                if(err.message.indexOf("Duplicate") === -1){
+                                    bot.error(err.message);
+                                }
+                            });
+                    });
+
+                    bot.ipc.on("guildDelete", function (data) {
+                        var server = data[0];
+                        bot.database.deleteServer(server.id)
+                            .then(function () {
+                                bot.log(`Left server ${server.name}`)
+                            })
+                            .catch(function (err) {
+                                bot.error(err.message);
+                            });
+                    });
+                }
+
                 bot.ipc.on("callback", function(data){
                     bot.waitingCallbacks[data.id].apply(this, data.args);
                     delete bot.waitingCallbacks[data.id];
                 });
+
 
                 bot.ipc.on('disconnect', function ipcDisconnect(){
                     bot.warn("IPC Disconnected");

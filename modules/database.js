@@ -20,11 +20,20 @@ module.exports = function(bot){
 
 
             bot.database = {
-                addServer: function addNewServer(serverID, addedBy){
+                addServer: function addNewServer(serverID, addedBy, name, timestamp){
                     return knex.insert({
                         server: serverID,
-                        addedby: addedBy
+                        owner: addedBy,
+                        name: encodeURIComponent(name),
+                        timestamp: knex.raw(`FROM_UNIXTIME(${(timestamp ? new Date(timestamp).getTime() : new Date().getTime())/1000})`)
                     }).into(SERVERS_TABLE);
+                },
+                deleteServer: function deleteServer(serverID){
+                    return knex.delete()
+                        .from(SERVERS_TABLE)
+                        .where({
+                            server: serverID
+                        });
                 },
                 getServer: function getServer(serverID){
                     return knex.select().from(SERVERS_TABLE).where({server: serverID}).limit(1);
