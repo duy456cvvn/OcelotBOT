@@ -82,7 +82,7 @@ module.exports = function(bot){
                             bot.banCache.user.indexOf(userID) === -1 &&
                             command) {
                             bot.commandCount++;
-                            command(user, userID, channelID, message, args, event, bot, receiver);
+                            command(user, userID, channelID, message, args, event, bot, receiver, message.indexOf("-DEBUG") > -1);
                             bot.database.logCommand(userID, channelID, message)
                                 .then(function(){
                                     bot.log(`${user} (${userID}) performed command ${message}`);
