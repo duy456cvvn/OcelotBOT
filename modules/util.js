@@ -9,6 +9,10 @@ module.exports = function(bot){
 
             bot.util = {};
 
+            Array.prototype.diff = function(a) {
+                return this.filter(function(i) {return a.indexOf(i) < 0;});
+            };
+
             /**
              * Chooses a random object from `array`
              * @param {Array} array
@@ -17,6 +21,26 @@ module.exports = function(bot){
             bot.util.arrayRand = function arrayRand(array){
                 return array[Math.round(Math.random()*(array.length-1))];
             };
+
+            bot.util.shuffle = function shuffle(a) {
+                var j, x, i;
+                for (i = a.length; i; i--) {
+                    j = Math.floor(Math.random() * i);
+                    x = a[i - 1];
+                    a[i - 1] = a[j];
+                    a[j] = x
+                }
+            };
+
+            bot.util.after = function after(time, func){
+                return function(err, resp){
+                    // var args = arguments;
+                    setTimeout(function(){
+                        func(err, resp);
+                    }, time);
+                };
+            };
+
 
             /**
              * Parses a number into a human readable format
