@@ -30,7 +30,7 @@ module.exports = {
                         bot.log("Spell queue item failed with: "+err);
                         console.log(err);
                         reaction.retries++;
-                        if (reaction.retries < 3){
+                        if (reaction.retries < 3 && err.response.message.indexOf("ate") > -1){
                             bot.spellQueueTotalRetries++;
                             reaction.receiver = receiver;
                             bot.spellQueue.unshift(reaction);
