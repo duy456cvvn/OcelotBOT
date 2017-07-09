@@ -99,20 +99,8 @@ module.exports = {
                                         }], cb);
                                     },
                                     addTrueReact: function (cb) {
-                                        recv.addReaction({
-                                            channelID: channel,
-                                            messageID: results.attachmentResp.id || results.attachmentResp.ts,
-                                            reaction: "✅",
-                                            reactionName: "white_check_mark"
-                                        }, cb);
-                                    },
-                                    addFalseReact: function (cb) {
-                                        recv.addReaction({
-                                            channelID: channel,
-                                            messageID: results.attachmentResp.id || results.attachmentResp.ts,
-                                            reaction: "❎",
-                                            reactionName: "negative_squared_cross_mark"
-                                        }, cb);
+                                        bot.queueReactions(["✅", "❎"], channel, results.attachmentResp.id, recv);
+                                        cb();
                                     },
                                     triviaEnd: function (cb) {
                                         recv.getServerFromChannel(channel, function(err, theServer){
@@ -125,16 +113,14 @@ module.exports = {
                                             channelID: channel,
                                             messageID: results.attachmentResp.id,
                                             reaction: "✅"
-                                        });
-                                        cb();
+                                        }, cb);
                                     },
                                     getFalseReacts: function (cb) {
                                         recv.getReaction({
                                             channelID: channel,
                                             messageID: results.attachmentResp.id,
                                             reaction: "❎"
-                                        });
-                                        cb();
+                                        }, cb);
                                     },
                                     calculateWinners: function (cb) {
                                         var trueVoters = [], falseVoters = [];
