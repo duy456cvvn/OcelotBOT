@@ -20,28 +20,35 @@ module.exports = {
     usage: "trivia [leaderboard]",
     accessLevel: 0,
     commands: ["trivia"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: function run(user, userID, channel, message, args, event, bot, recv, debug) {
         if(args[1] && (args[1].toLowerCase() === "stats" || args[1].toLowerCase() === "leaderboard")){
             bot.database.getTriviaLeaderboard()
                 .then(function(result){
-                        var data = [];
-                        var i = 1;
-                        async.eachSeries(result, function(entry, cb){
-                            recv.getUser(entry.user, function(err, user){
-                                data.push({
-                                    "#": i++,
-                                    "User": user ? `${user.username}#${user.discriminator}` : `Unknown User ${entry.user}`,
-                                    "Score": entry.Score,
-                                    "Correct": entry.correct,
-                                });
-                                cb();
+                    var data = [];
+                    var i = 1;
+                    async.eachSeries(result, function(entry, cb){
+                        recv.getUser(entry.user, function(err, user){
+                            data.push({
+                                "#": i++,
+                                "User": user ? `${user.username}#${user.discriminator}` : `Unknown User ${entry.user}`,
+                                "Score": entry.Score,
+                                "Correct": entry.correct,
                             });
-                        }, function(){
-                            recv.sendMessage({
-                                to: channel,
-                                message: "TOP 10 Trivia Players:\n```yaml\n"+columnify(data)+"\n```"
-                            });
-                        })
+                            cb();
+                        });
+                    }, function(){
+                        recv.sendMessage({
+                            to: channel,
+                            message: "TOP 10 Trivia Players:\n```yaml\n"+columnify(data)+"\n```"
+                        });
+                    });
+                    if(debug)
+                        recv.sendMessage({
+                            to: channel,
+                            message: `\`\`\`json\n${JSON.stringify(result)}\n\`\`\``
+                        });
+
+
                 })
                 .catch(function(err){
                     bot.error(err);
@@ -50,6 +57,11 @@ module.exports = {
                         to: channel,
                         message: ":warning: Error getting leaderboard. Try again later."
                     });
+                    if(debug)
+                        recv.sendMessage({
+                            to: channel,
+                            message: `\`\`\`json\n${JSON.stringify(err)}\n\`\`\``
+                        });
                 });
 
         }else if(questionsInProgress.indexOf(channel) > -1){
@@ -57,17 +69,28 @@ module.exports = {
                 to: channel,
                 message: "You can't start another question when one is already in progress. Vote with reactions!"
             });
+            if(debug)
+                recv.sendMessage({
+                    to: channel,
+                    message: `\`\`\`json\n${JSON.stringify(questionsInProgress)}\n\`\`\``
+                });
         }else {
             var server = "NYL";
             request("https://opentdb.com/api.php?amount=1&type=boolean&encode=url3986", function (err, resp, body) {
                 if (err) {
+                    bot.error(err.stack);
                     recv.sendMessage({
                         to: channel,
                         message: `:warning: Trivia service is currently unavailable (${err})`
-                    })
+                    });
                 } else {
                     const triviaSeconds = config.get("Commands.trivia.seconds");
                     questionsInProgress.push(channel);
+                    if(debug)
+                        recv.sendMessage({
+                            to: channel,
+                            message: `\`\`\`json\n${body}\n\`\`\``
+                        });
                     try {
                         var data = JSON.parse(body);
                         if (data.results[0]) {
@@ -151,13 +174,15 @@ module.exports = {
                                         for (var k in correct) {
                                             if(correct.hasOwnProperty(k)) {
                                                 var user = correct[k];
-                                                if (wrong.indexOf(user) === -1) {
+                                                if (wrong.indexOf(user) === -1 && user !== "<@146293573422284800>") {
                                                     winnerArray.push(user);
                                                 }
                                             }
                                         }
                                         var points = difficulties.indexOf(question.difficulty) + 1;
                                         winners = winnerArray.length > 0 ? "Congratulations " + winnerArray.join(" ") + `\nYou${winnerArray.length > 1 ? " each" : ""} earned ${points} point${points > 1 ? "s" : ""}!` : "Nobody won that round.";
+                                        if(debug)
+                                            winners += "\n**Nobody won anything because the debug flag was enabled**";
                                         setTimeout(cb, 100);
                                     },
                                     showWinners: function (cb) {
@@ -167,30 +192,32 @@ module.exports = {
                                         }, cb);
                                     },
                                     addScores: function (cb) {
-                                        async.eachSeries(winnerArray, function (winner, cb2) {
-                                            var id = winner.replace(/[<>@]/g, "");
-                                            bot.database.logTrivia(id, 1, difficulties.indexOf(question.difficulty) + 1, server)
-                                                .then(function(){
-                                                    cb2()
-                                                })
-                                                .catch(function(err){
-                                                    bot.error(err);
-                                                });
-                                        }, cb);
-                                    },
-                                    addLosers: function (cb) {
-                                        async.eachSeries(wrong, function (winner, cb2) {
-                                            var id = winner.replace(/[<>@]/g, "");
-                                            if (id !== "146293573422284800")
-                                                bot.database.logTrivia(id, 0, difficulties.indexOf(question.difficulty) + 1, server)
+                                        if(!debug)
+                                            async.eachSeries(winnerArray, function (winner, cb2) {
+                                                var id = winner.replace(/[<>@]/g, "");
+                                                bot.database.logTrivia(id, 1, difficulties.indexOf(question.difficulty) + 1, server)
                                                     .then(function(){
                                                         cb2()
                                                     })
                                                     .catch(function(err){
                                                         bot.error(err);
                                                     });
-                                            else cb2();
-                                        }, cb);
+                                            }, cb);
+                                    },
+                                    addLosers: function (cb) {
+                                        if(!debug)
+                                            async.eachSeries(wrong, function (winner, cb2) {
+                                                var id = winner.replace(/[<>@]/g, "");
+                                                if (id !== "146293573422284800")
+                                                    bot.database.logTrivia(id, 0, difficulties.indexOf(question.difficulty) + 1, server)
+                                                        .then(function(){
+                                                            cb2()
+                                                        })
+                                                        .catch(function(err){
+                                                            bot.error(err);
+                                                        });
+                                                else cb2();
+                                            }, cb);
                                     }
                                 },
                                 function (func, key, callback) {
@@ -205,7 +232,17 @@ module.exports = {
                                 }
                                 , function (err) {
                                     if (err) {
-                                        bot.log(err);
+                                        bot.error(err);
+                                    }
+                                    if(debug) {
+                                        recv.sendMessage({
+                                            to: channel,
+                                            message: `\`\`\`json\n${JSON.stringify(err)}\n\`\`\``
+                                        });
+                                        recv.sendMessage({
+                                            to: channel,
+                                            message: `\`\`\`json\n${JSON.stringify(results)}\n\`\`\``
+                                        });
                                     }
                                     delete questionsInProgress[questionsInProgress.indexOf(channel)];
                                 });
