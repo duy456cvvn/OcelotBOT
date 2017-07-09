@@ -31,7 +31,7 @@ module.exports = function(bot){
                     content: ["👍"]
                 },
                 {
-                    regex: /the more you know/i,
+                    regex: /the more (yo?)u know/i,
                     type: types.REACTION,
                     content: ["🌈","⭐"]
                 },
@@ -62,58 +62,59 @@ module.exports = function(bot){
                     bot.banCache.channel.indexOf(channelID) === -1 &&
                     bot.banCache.user.indexOf(userID) === -1) {
                     for (var i in bot.autoReplies) {
-                        var reply = bot.autoReplies[i];
-                        if (message.match(reply.regex) && (!reply.timeout || !timeouts[channelID] || !timeouts[channelID][i] || new Date().getTime() - timeouts[channelID][i] > reply.timeout)) {
-                            if (reply.type === types.EMBED) {
-                                receiver.sendMessage({
-                                    to: channelID,
-                                    message: "",
-                                    embed: {
-                                        image: {
-                                            url: reply.content
+                        if (bot.autoReplies.hasOwnProperty(i)) {
+                            var reply = bot.autoReplies[i];
+                            if (message.match(reply.regex) && (!reply.timeout || !timeouts[channelID] || !timeouts[channelID][i] || new Date().getTime() - timeouts[channelID][i] > reply.timeout)) {
+                                if (reply.type === types.EMBED) {
+                                    receiver.sendMessage({
+                                        to: channelID,
+                                        message: "",
+                                        embed: {
+                                            image: {
+                                                url: reply.content
+                                            }
                                         }
-                                    }
-                                });
-                            } else if (reply.type === types.MESSAGE) {
-                                receiver.sendMessage({
-                                    to: channelID,
-                                    message: reply.content
-                                });
-                            } else if (reply.type === types.REACTION) {
-                                for (var j in reply.content) {
-                                    bot.spellQueue.push({
-                                        channelID: channelID,
-                                        messageID: event.d.id,
-                                        reaction: reply.content[j],
-                                        retries: 0,
-                                        receiver: receiver,
-                                        time: new Date()
                                     });
+                                } else if (reply.type === types.MESSAGE) {
+                                    receiver.sendMessage({
+                                        to: channelID,
+                                        message: reply.content
+                                    });
+                                } else if (reply.type === types.REACTION) {
+                                    for (var j in reply.content) {
+                                        bot.spellQueue.push({
+                                            channelID: channelID,
+                                            messageID: event.d.id,
+                                            reaction: reply.content[j],
+                                            retries: 0,
+                                            receiver: receiver,
+                                            time: new Date()
+                                        });
+                                    }
+                                    bot.processSpellQueue();
                                 }
-                                bot.processSpellQueue();
-                            }
 
-                            if (reply.timeout) {
-                                if (timeouts[channelID]) {
-                                    timeouts[channelID][i] = new Date().getTime();
-                                } else {
-                                    timeouts[channelID] = [];
-                                    timeouts[channelID][i] = new Date().getTime();
+                                if (reply.timeout) {
+                                    if (timeouts[channelID]) {
+                                        timeouts[channelID][i] = new Date().getTime();
+                                    } else {
+                                        timeouts[channelID] = [];
+                                        timeouts[channelID][i] = new Date().getTime();
+                                    }
                                 }
-                            }
 
-                            bot.database.logCommand(userID, channelID, `${message} [AUTOREPLY MATCH ${reply.regex}]`)
-                                .then(function(){
-                                    bot.log(`${user} (${userID}) matched autoreply ${message}`);
-                                })
-                                .catch(function(err){
-                                    bot.error(`Error logging autoreply: ${err.stack}`);
-                                });
+                                bot.database.logCommand(userID, channelID, `${message} [AUTOREPLY MATCH ${i} ${reply.regex}]`)
+                                    .then(function () {
+                                        bot.log(`${user} (${userID}) matched autoreply ${message}`);
+                                    })
+                                    .catch(function (err) {
+                                        bot.error(`Error logging autoreply: ${err.stack}`);
+                                    });
+                            }
                         }
                     }
                 }
             });
-
             cb();
         }
     }
