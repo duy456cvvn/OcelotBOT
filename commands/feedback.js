@@ -13,9 +13,11 @@ module.exports = {
                     to: channel,
                     message: ":white_check_mark: Your feedback has been sent. Please note we cannot respond to all feedback."
                 });
-                recv.sendMessage({
-                    to: "139871249567318017",
-                    message: `Feedback from ${userID} (${user}) in ${server} (${recv.getServer[server] ? bot.servers[server].name : "DM"}):\n${message}`
+                recv.getServer(server, function(err, serverInfo){
+                    recv.sendMessage({
+                        to: "139871249567318017",
+                        message: `Feedback from ${userID} (${user}) in ${server} (${serverInfo ? serverInfo.name : "DM"}):\n${message}`
+                    });
                 });
             }else{
                 recv.sendMessage({
