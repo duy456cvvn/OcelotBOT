@@ -125,14 +125,16 @@ module.exports = {
                                             channelID: channel,
                                             messageID: results.attachmentResp.id,
                                             reaction: "✅"
-                                        }, cb);
+                                        });
+                                        cb();
                                     },
                                     getFalseReacts: function (cb) {
                                         recv.getReaction({
                                             channelID: channel,
                                             messageID: results.attachmentResp.id,
                                             reaction: "❎"
-                                        }, cb);
+                                        });
+                                        cb();
                                     },
                                     calculateWinners: function (cb) {
                                         var trueVoters = [], falseVoters = [];
