@@ -15,6 +15,25 @@ module.exports = {
         bot.spellQueueTotalRetries = 0;
         bot.spellQueueTotalFailed = 0;
 
+
+        bot.queueReactions = function queueReactions(reactions, channel, message, recv){
+            for(var i in reactions){
+                if(reactions.hasOwnProperty(i)){
+                    bot.spellQueue.push({
+                        channelID: channel,
+                        messageID: message,
+                        reaction: reactions[i],
+                        retries: 0,
+                        receiver: recv,
+                        time: new Date()
+                    });
+                }
+            }
+
+            bot.processSpellQueue();
+
+        };
+
         bot.processSpellQueue = function processSpellQueue(){
             if(bot.processingSpellQueue)return;
             bot.processingSpellQueue = true;
