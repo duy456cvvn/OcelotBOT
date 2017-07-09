@@ -149,10 +149,12 @@ module.exports = {
                                         //     }
                                         // }
                                         for (var i in results.getTrueReacts) {
-                                            trueVoters.push(`<@${results.getTrueReacts[i].id}>`);
+                                            if(results.getTrueReacts.hasOwnProperty(i))
+                                                trueVoters.push(`<@${results.getTrueReacts[i].id}>`);
                                         }
                                         for (var j in results.getFalseReacts) {
-                                            falseVoters.push(`<@${results.getFalseReacts[j].id}>`);
+                                            if(results.getFalseReacts.hasOwnProperty(i))
+                                                falseVoters.push(`<@${results.getFalseReacts[j].id}>`);
                                         }
 
                                         var correct = (correctAnswer ? trueVoters : falseVoters);
@@ -161,9 +163,11 @@ module.exports = {
                                         winnerArray = [];
 
                                         for (var k in correct) {
-                                            var user = correct[k];
-                                            if (wrong.indexOf(user) === -1) {
-                                                winnerArray.push(user);
+                                            if(correct.hasOwnProperty(k)) {
+                                                var user = correct[k];
+                                                if (wrong.indexOf(user) === -1) {
+                                                    winnerArray.push(user);
+                                                }
                                             }
                                         }
                                         var points = difficulties.indexOf(question.difficulty) + 1;
