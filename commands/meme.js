@@ -76,27 +76,40 @@ module.exports = {
                         });
                     });
                 }else if(arg === "add") {
-                    if (args.length < 4)return false;
-                    bot.database.addMeme(userID, server, args[2].toLowerCase(), message.substring(message.indexOf(args[3])).trim())
-                        .then(function(){
+                    if (args.length < 4){
+                        if(!args[2]){
                             recv.sendMessage({
                                 to: channel,
-                                message: "Meme added."
+                                message: ":bangbang: You must enter a name and URL. !meme add <name> <URL>"
                             });
-                        })
-                        .catch(function(err){
-                            if (err.message.indexOf("duplicate")) {
+                        }else{
+                            recv.sendMessage({
+                                to: channel,
+                                message: `:bangbang: You must enter a URL. !meme add ${args[2]} <URL>`
+                            })
+                        }
+                    }else {
+                        bot.database.addMeme(userID, server, args[2].toLowerCase(), message.substring(message.indexOf(args[3])).trim())
+                            .then(function () {
                                 recv.sendMessage({
                                     to: channel,
-                                    message: "That meme already exists. Try a different name."
+                                    message: "Meme added."
                                 });
-                            } else {
-                                recv.sendMessage({
-                                    to: channel,
-                                    message: "Error adding meme: " + err
-                                });
-                            }
-                        });
+                            })
+                            .catch(function (err) {
+                                if (err.message.indexOf("duplicate")) {
+                                    recv.sendMessage({
+                                        to: channel,
+                                        message: "That meme already exists. Try a different name."
+                                    });
+                                } else {
+                                    recv.sendMessage({
+                                        to: channel,
+                                        message: "Error adding meme: " + err
+                                    });
+                                }
+                            });
+                    }
                 }else if(arg === "addglobal"){
                     bot.database.addMeme(userID, "global", args[2].toLowerCase(), message.substring(message.indexOf(args[3])).trim())
                         .then(function(){
