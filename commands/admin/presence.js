@@ -4,10 +4,10 @@
 module.exports = {
     id: "presence",
     run: function run(user, userID, channel, message, args, event, bot, recv){
-        bot.message = message.substring(16);
+        recv.setMessage(message.substring(16));
         recv.sendMessage({
             to: channel,
-            message: "Presence message set. Will update at some point."
+            message: "Presence message set."
         });
     }
 };

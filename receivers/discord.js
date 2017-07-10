@@ -199,10 +199,11 @@ module.exports = function(bot){
             }
         },
         setMessage: function(text){
+            bot.log(`Setting message to ${text}`)
             bot.message = text === "clear" ? null : text;
             bot.receivers.discord.internal.client.setPresence({
                 game: {
-                    name: `${bot.message ? bot.message + " | " : ""}in ${Object.keys(namespace.client.servers).length} servers.`
+                    name: `${bot.message ? bot.message + " | " : ""}in ${Object.keys(bot.receivers.discord.internal.client.servers).length} servers.`
                 }
             });
         },
