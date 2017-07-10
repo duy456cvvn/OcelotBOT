@@ -18,7 +18,8 @@
       "port": 3306,
       "user": "",
       "password": "",
-      "database": "ocelotbot"
+      "database": "ocelotbot",
+      "charset": "utf8mb4_general_ci"
     },
     "pool": {
       "min": 0,
