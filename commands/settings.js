@@ -7,81 +7,41 @@ module.exports = {
     usage: "settings [set/help/list]",
     accessLevel: 1,
     commands: ["settings", "serversettings"],
-    init: function init(bot, cb){
-        cb();
-    },
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
-        return false;
-        var server = bot.channels[channel].guild_id;
+    run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
+
         const settings = {
-            useServerCurrency: {
-                format: function format(value){
-                    return !!value;
-                },
-                onSet: function(newVal){
-                    if(newVal == "true"){
-                        bot.database.setupServerCurrency(server, 0);
-                    }
-                },
-                explanation: "Enable/disable server currency. Disallows global currency trading on this server, but allows for server currency to be used and given out by server admins."
-            },
-            lotteryChannel: {
-                format: function format(value){
-                    return "<#"+value+">"
-                },
-                explanation: "The channel to announce the lottery in. Set this to 'null' to not get lottery announcements."
-            },
-            serverCurrencyName: {
-                explanation: "The name of your server's currency. This must be **singular** i.e *EthanBuck* not *EthanBucks*.",
-                format: function format(value){
-                    return "`"+value+"`"
-                }
-            },
-            usePluralCurrency: {
-                explanation: "Adds an S to the end of multiples of the currency, disable this if you use a word like 'Sheep' or 'USD'",
-                format: function format(value){
-                    return !!value;
-                }
-            },
-            useDailyReward: {
-                explanation: "Give everyone a daily balance of whatever is in `dailyBalanceAmount`, every day. Obviously.",
-                format: function format(value){
-                    return !!value
-                }
-            },
-            dailyRewardAmount: {
-                explanation: "The amount to give to all users every day.",
-                format: function format(value){
-                    return value;
-                }
-            },
-            dailyRewardRoles: {
-                explanation: "Use roles for daily rewards. Set with !settings rewardroles [role] [amount]",
-                format: function format(value){
-                    return !!value
-                }
-            },
-            useRoleRewards: {
-                explanation: "Use roles for setting role rewards instead of a fixed rate.",
-                format: function format(value){
-                    return !!value;
-                }
-            },
             prefix: {
-                explanation: "The prefix that goes before commands i.e !shop or !settings",
+                explanation: "The prefix that goes before commands i.e !spongebob or !settings",
                 format: function format(value){
                     return "`"+value+"`";
                 },
                 onSet: function(newVal){
                     bot.prefixCache[server] = newVal;
                 },
+            },
+            enableAutoReactions: {
+                explanation: "Enables the bot reacting to things like xD and 'the more you know'",
+                format: function format(value){
+                    return !!value;
+                }
+            },
+            enableAutoReplies: {
+                explanation: "Enables the bot replying to things like 'alot'",
+                format: function format(value){
+                    return !!value;
+                }
+            },
+            allowNSFW: {
+                explanation: "Enable NSFW results in commands such as !image",
+                format: function format(value){
+                    return !!value;
+                }
             }
         };
         bot.database.getServer(server)
             .then(function(results){
                 var serverInfo = results[0];
                 var hasRole = false;
-
                 var subCommands = {
                     "list": function(){
                         var output = "**Available Settings:**\n";
@@ -137,75 +97,35 @@ module.exports = {
                             });
                             bot.log(args[3]);
                         }
-                    },
-                    "rolerewards": function(){
-                        if(args.length < 4){
-                            recv.sendMessage({
-                                to: channel,
-                                message: `:bangbang: You must supply a role and an amount: ${bot.prefixCache[server]}settings rewardroles @Admin 100`
-                            });
-                        }else{
-                            var role = args[2].replace(/[<>&@]/g, "");
-                            var amount = parseInt(args[3]);
-                            if(!amount){
-                                recv.sendMessage({
-                                    to: channel,
-                                    message: ":bangbang: You must enter a valid amount!"
-                                });
-                            }else if(!bot.servers[server].roles[role]){
-                                console.log(role);
-                                console.log(bot.servers[server].roles);
-                                recv.sendMessage({
-                                    to: channel,
-                                    message: `:bangbang: Invalid role. Make sure the role is mentionable and mentioned like ${bot.prefixCache[server]}settings rewardroles @Admin 100`
-                                });
-                            }else{
-                                bot.database.setRoleReward(server, role, amount)
-                                    .then(function(){
-                                        return bot.getCurrencyFor(server, amount);
-                                    })
-                                    .then(function(currency){
-                                        recv.sendMessage({
-                                            to: channel,
-                                            message: `:white_check_mark: Successfully set <&@${role}>'s daily reward to ${amount} ${currency}.`
-                                        });
-                                    })
-                                    .catch(function(err){
-                                        recv.sendMessage({
-                                            to: channel,
-                                            message: `:bangbang: Error setting role reward:\n${err}`
-                                        });
-                                    });
-                            }
-                        }
                     }
                 };
 
-                for(var i in bot.servers[server].members[userID].roles){
-                    var role = bot.servers[server].roles[bot.servers[server].members[userID].roles[i]];
-                    if(role.name.toLowerCase() === "bot controller"){
-                        hasRole = true;
-                        break;
+
+                recv.getServerInfo(server, function(err, serverData){
+                    for(var i in serverData.members[userID].roles){
+                        var role = serverData.roles[serverData.members[userID].roles[i]];
+                        if(role.name.toLowerCase() === "bot controller"){
+                            hasRole = true;
+                            break;
+                        }
                     }
-                }
-                //noinspection EqualityComparisonWithCoercionJS
-                if(serverInfo.addedby != userID && !hasRole){
-                    recv.sendMessage({
-                        to: channel,
-                        message: ":bangbang: You don't have permission to run this command! Only the server owner or people with the 'Bot Controller' role can do that."
-                    });
-                }else{
-                    if(!args[1] || (args[1] === "help" && !args[2]) || !subCommands[args[1]]){
+                    //noinspection EqualityComparisonWithCoercionJS
+                    if(userID != "139871249567318017" && serverInfo.addedby != userID && !hasRole){
                         recv.sendMessage({
                             to: channel,
-                            message: "**Usage:**\n!settings help [setting] - This message or help on an individual setting\n!settings list - List the available settings and their current values\n!settings set [setting] [value] - Set a new value for a server setting\n!settings rolerewards [role] [amount]"
+                            message: ":bangbang: You don't have permission to run this command! Only the server owner or people with the 'Bot Controller' role can do that."
                         });
                     }else{
-                        subCommands[args[1]]();
+                        if(!args[1] || (args[1] === "help" && !args[2]) || !subCommands[args[1]]){
+                            recv.sendMessage({
+                                to: channel,
+                                message: `**Usage:**\n${bot.prefixCache[server]}settings help [setting] - This message or help on an individual setting\n${bot.prefixCache[server]}settings list - List the available settings and their current values\n${bot.prefixCache[server]}settings set [setting] [value] - Set a new value for a server setting`
+                            });
+                        }else{
+                            subCommands[args[1]]();
+                        }
                     }
-
-                }
-            })
-
+                });
+            });
     }
 };

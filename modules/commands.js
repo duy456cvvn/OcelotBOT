@@ -58,17 +58,17 @@ module.exports = function(bot){
 
         bot.prefixCache = {};
 
-        // bot.database.getPrefixes()
-        //     .then(function(result){
-        //          for(var i in result){
-        //              if(result.hasOwnProperty(i))
-        //                 bot.prefixCache[result[i].server] = result[i].prefix;
-        //          }
-        //     })
-        //     .catch(function(err){
-        //         bot.error("Error loading prefix cache: ");
-        //         console.error(err);
-        //     });
+        bot.database.getPrefixes()
+            .then(function(result){
+                 for(var i in result){
+                     if(result.hasOwnProperty(i))
+                        bot.prefixCache[result[i].server] = result[i].prefix;
+                 }
+            })
+            .catch(function(err){
+                bot.error("Error loading prefix cache: ");
+                console.error(err);
+            });
 
 
         bot.registerMessageHandler("commands", function(user, userID, channelID, message, event, _bot, receiver){
@@ -82,7 +82,7 @@ module.exports = function(bot){
                             bot.banCache.user.indexOf(userID) === -1 &&
                             command) {
                             bot.commandCount++;
-                            command(user, userID, channelID, message, args, event, bot, receiver, message.indexOf("-DEBUG") > -1);
+                            command(user, userID, channelID, message, args, event, bot, receiver, message.indexOf("-DEBUG") > -1, server);
                             bot.database.logCommand(userID, channelID, message)
                                 .then(function(){
                                     bot.log(`${user} (${userID}) performed command ${message}`);
