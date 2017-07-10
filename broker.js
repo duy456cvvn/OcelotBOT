@@ -45,6 +45,8 @@ ipc.config.id = 'ocelotbot';
 ipc.config.retry= 1500;
 ipc.config.silent = true;
 
+var subscribedEvents = {};
+
 ipc.serve(function(){
     ipc.server.on('instanceReady', function instanceReady(data, socket){
         console.log(`Instance ${data.instance} is ready to receive messages.`);
@@ -69,9 +71,17 @@ ipc.serve(function(){
     });
 
     ipc.server.on('subscribeEvent', function subscribeEvent(data, socket){
-        bot.receivers.discord.internal.client.on(data.event, function(){
+
+        var func = function(){
             ipc.server.emit(socket, data.event, Array.from(arguments));
-        });
+        };
+
+        if(subscribedEvents[socket])
+            subscribedEvents[socket][data.event] = func;
+        else
+            subscribedEvents[socket] = {[data.event]: func};
+
+        bot.receivers.discord.internal.client.on(data.event, subscribedEvents[socket][data.event]);
     });
 
     ipc.server.on('command', function command(data, socket){
@@ -97,6 +107,14 @@ ipc.serve(function(){
         console.log(`Socket ${destroyedSocketID} went away.`);
         bot.availableInstances.splice(bot.availableInstances.indexOf(socket), 1);
         console.log(bot.availableInstances.length);
+
+        if(subscribedEvents[socket]){
+            bot.log("Cleaning up event listeners for socket.");
+            for(var i in subscribedEvents[socket]){
+                if(subscribedEvents[socket].hasOwnProperty(i))
+                    bot.receivers.discord.internal.client.removeListener(i, subscribedEvents[socket][i]);
+            }
+        }
 
         if(bot.availableInstances.length === 0){
             bot.receivers.discord.sendMessage({
