@@ -7,7 +7,8 @@ const   config      = require('config'),
         caller_id   = require('caller-id'),
         async       = require('async'),
         path        = require('path'),
-        ipc         = require('node-ipc');
+        ipc         = require('node-ipc'),
+        logger      = require('ocelot-logger');
 
 var bot = {};
 
@@ -19,30 +20,9 @@ function initBot(cb){
     bot.lastCrash = new Date();
     bot.message = "v4 released!";
 
-    bot.log = function log(message, caller, error){
-        if(!caller)
-            caller = caller_id.getData();
-        var file = ["Nowhere"];
-        if(caller.filePath)
-            file = caller.filePath.split(path.sep);
-
-        var origin = `[${file[file.length-1]}${caller.functionName ? "/"+caller.functionName : ""}] `.bold;
-
-        var output = origin+message;
-        if(error)
-            console.error(`[${dateFormat(new Date(), "dd/mm/yy hh:MM")}]`+output);
-        else
-            console.log(`[${dateFormat(new Date(), "dd/mm/yy hh:MM")}]`+output);
-    };
-
-    bot.error = function error(message){
-        bot.log(message.red, caller_id.getData(), true);
-        bot.errorCount++;
-    };
-
-    bot.warn = function warn(message){
-        bot.log(message.yellow, caller_id.getData());
-    };
+    bot.log = logger.log;
+    bot.error = logger.error;
+    bot.warn = logger.warn;
 
     bot.log("OcelotBOT Loading...");
 
