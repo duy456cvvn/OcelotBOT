@@ -58,7 +58,7 @@ module.exports = {
                         }
                     }
                     bot.processingSpellQueue = false;
-                    setTimeout(processSpellQueue, 200);
+                    setTimeout(processSpellQueue, 300);
                 });
             }else{
                 bot.processingSpellQueue = false;
