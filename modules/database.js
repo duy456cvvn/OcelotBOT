@@ -24,7 +24,7 @@ module.exports = function(bot){
                     return knex.insert({
                         server: serverID,
                         owner: addedBy,
-                        name: encodeURIComponent(name),
+                        name: name,
                         timestamp: knex.raw(`FROM_UNIXTIME(${(timestamp ? new Date(timestamp).getTime() : new Date().getTime())/1000})`)
                     }).into(SERVERS_TABLE);
                 },
