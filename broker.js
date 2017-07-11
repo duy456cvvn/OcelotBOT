@@ -105,7 +105,8 @@ ipc.serve(function(){
 
     ipc.server.on('socket.disconnected', function socketDisconnect(socket, destroyedSocketID){
         console.log(`Socket ${destroyedSocketID} went away.`);
-        bot.availableInstances.splice(bot.availableInstances.indexOf(socket), 1);
+        if(bot.availableInstances.indexOf(socket) > -1)
+            bot.availableInstances.splice(bot.availableInstances.indexOf(socket), 1);
         console.log(bot.availableInstances.length);
 
         if(subscribedEvents[socket]){
