@@ -149,14 +149,13 @@ module.exports = function(bot){
                 }
 
             }, {
-                get: function(target, command){
-                    return target[command] || function(){
+                get: function proxyGet(target, command){
+                    return target[command] || function proxyToBroker(){
                         const hasCallback = typeof arguments[arguments.length-1] == "function";
                         if(hasCallback){
-                            console.log(command+" HAS CALLBACK!!");
                             var callback = arguments[arguments.length-1];
                             var callbackNumber = callbackIDs++;
-                            console.log("CALLBACK NUMBER IS "+callbackNumber);
+                            bot.log(`Callback for ${command} has ID ${callbackNumber}`);
                             bot.waitingCallbacks[callbackNumber] = callback;
                             delete arguments[arguments.length-1];
                         }
