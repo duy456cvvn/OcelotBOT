@@ -66,13 +66,13 @@ module.exports = function(bot){
 
             var timeouts = [];
 
-            bot.registerMessageHandler("autoreply", function(user, userID, channelID, message, event, _bot, receiver){
+            bot.registerMessageHandler("autoreply", function messageHandler(user, userID, channelID, message, event, _bot, receiver){
                 receiver.getServerFromChannel(channelID, function(err, server){
                     if (
                         bot.banCache.server.indexOf(server) === -1 &&
                         bot.banCache.channel.indexOf(channelID) === -1 &&
                         bot.banCache.user.indexOf(userID) === -1) {
-                        for (var i in bot.autoReplies) {
+                        for (let i in bot.autoReplies) {
                             if (bot.autoReplies.hasOwnProperty(i)) {
                                 let reply = bot.autoReplies[i];
                                 if (message.match(reply.regex) && (!reply.timeout || !timeouts[channelID] || !timeouts[channelID][i] || new Date().getTime() - timeouts[channelID][i] > reply.timeout)) {
@@ -123,7 +123,7 @@ module.exports = function(bot){
                                                 }
 
                                                 bot.database.logCommand(userID, channelID, `${message} [AUTOREPLY MATCH ${i} ${reply.regex}]`)
-                                                    .then(function () {
+                                                    .then(function logAutoreply() {
                                                         bot.log(`${user} (${userID}) matched autoreply ${message}`);
                                                     })
                                                     .catch(function (err) {
