@@ -2,9 +2,6 @@
  * Created by Peter on 07/06/2017.
  */
 const   config      = require('config'),
-        dateFormat  = require('dateformat'),
-        colors      = require('colors'),
-        caller_id   = require('caller-id'),
         async       = require('async'),
         path        = require('path'),
         ipc         = require('node-ipc'),
