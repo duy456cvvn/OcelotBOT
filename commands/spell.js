@@ -34,6 +34,8 @@ module.exports = {
 
         };
 
+        var notAllowedChannels = [];
+
         bot.processSpellQueue = function processSpellQueue(){
             if(bot.processingSpellQueue)return;
             bot.processingSpellQueue = true;
@@ -44,22 +46,31 @@ module.exports = {
                 bot.spellQueueTotalTime += now-reaction.time;
                 var receiver = reaction.receiver;
                 delete reaction.receiver;
-                receiver.addReaction(reaction, function (err) {
-                    if(err) {
-                        bot.log("Spell queue item failed with: "+err);
-                        console.log(err);
-                        reaction.retries++;
-                        if (reaction.retries < 3 && err.response.message.indexOf("ate") > -1){
-                            bot.spellQueueTotalRetries++;
-                            reaction.receiver = receiver;
-                            bot.spellQueue.unshift(reaction);
-                        }else{
-                            bot.spellQueueTotalFailed++;
-                        }
-                    }
+                if(notAllowedChannels.indexOf(reaction.channelID) > -1){
                     bot.processingSpellQueue = false;
-                    setTimeout(processSpellQueue, 300);
-                });
+                    processSpellQueue();
+                }else {
+                    receiver.addReaction(reaction, function (err) {
+                        if (err) {
+                            bot.log("Spell queue item failed with: " + err);
+                            console.log(err);
+                            reaction.retries++;
+                            if (reaction.retries < 3 && err.response.message === "You are being rate limited.") {
+                                bot.spellQueueTotalRetries++;
+                                reaction.receiver = receiver;
+                                bot.log("Rate limited, trying again next turn.");
+                                bot.spellQueue.unshift(reaction);
+                            } else {
+                                if (err.response.statusCode == 403) {
+                                    notAllowedChannels.push(reaction.channelID);
+                                }
+                                bot.spellQueueTotalFailed++;
+                            }
+                        }
+                        bot.processingSpellQueue = false;
+                        setTimeout(processSpellQueue, 300);
+                    });
+                }
             }else{
                 bot.processingSpellQueue = false;
             }
