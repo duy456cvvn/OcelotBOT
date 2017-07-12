@@ -65,41 +65,48 @@ module.exports = {
                     message: ":bangbang: Couldn't parse time. Enter something like 'in 5 minutes'"
                 });
             }else{
-                const at = new Date(new Date().getTime()+offset);
-                recv.sendMessage({
-                    to: channel,
-                    message: `:watch: Reminding you in **${bot.util.prettySeconds(offset/1000)}**. (At ${at})`
-                });
-                if(debug)
+                if(offset < 1000){
                     recv.sendMessage({
                         to: channel,
-                        message: `Offset ${offset}`
+                        message: ":tropical_fish: Do you have the memory of a goldfish? You can't enter a time shorter than **1 second**."
                     });
-                recv.getServerFromChannel(channel, function(err, server){
-                    bot.database.addReminder(recv.id, userID, server, channel, at.getTime(), rargs[2])
-                        .then(function(resp){
-                            bot.util.setLongTimeout(function(){
+                }else {
+                    const at = new Date(new Date().getTime() + offset);
+                    recv.sendMessage({
+                        to: channel,
+                        message: `:watch: Reminding you in **${bot.util.prettySeconds(offset / 1000)}**. (At ${at})`
+                    });
+                    if (debug)
+                        recv.sendMessage({
+                            to: channel,
+                            message: `Offset ${offset}`
+                        });
+                    recv.getServerFromChannel(channel, function (err, server) {
+                        bot.database.addReminder(recv.id, userID, server, channel, at.getTime(), rargs[2])
+                            .then(function (resp) {
+                                bot.util.setLongTimeout(function () {
+                                    recv.sendMessage({
+                                        to: channel,
+                                        message: `<@${userID}>, you told me to remind you of this:\n${rargs[2]}`
+                                    });
+                                    bot.database.removeReminder(resp[0])
+                                        .then(function () {
+                                            bot.log(`Removed Reminder ${resp[0]}`)
+                                        })
+                                        .catch(function (err) {
+                                            bot.error(err.stack);
+                                        });
+                                }, offset);
+                            })
+                            .catch(function (err) {
                                 recv.sendMessage({
                                     to: channel,
-                                    message: `<@${userID}>, you told me to remind you of this:\n${rargs[2]}`
+                                    message: ":bangbang: There was an error setting your reminder. Try again later."
                                 });
-                                bot.database.removeReminder(resp[0])
-                                    .then(function(){
-                                        bot.log(`Removed Reminder ${resp[0]}`)
-                                    })
-                                    .catch(function(err){
-                                        bot.error(err.stack);
-                                    });
-                            }, offset);
-                        })
-                        .catch(function(err){
-                            recv.sendMessage({
-                                to: channel,
-                                message: ":bangbang: There was an error setting your reminder. Try again later."
+                                bot.error(err.stack);
                             });
-                            bot.error(err.stack);
-                        });
-                });
+                    });
+                }
 
             }
         }
