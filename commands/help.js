@@ -7,6 +7,7 @@ module.exports = {
     accessLevel: 0,
     commands: ["help", "commands"],
     run: function run(user, userID, channel, message, args, event, bot, recv){
+       if(message.length > 10){ bot.log("Blocked help that is probably from a bot "+message.length); return;}
        var output = "COMMANDS:\n";
         recv.getServerFromChannel(channel, function(err, server){
             for(var i in bot.commandUsages){
