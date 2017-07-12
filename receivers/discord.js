@@ -199,7 +199,7 @@ module.exports = function(bot){
             }
         },
         setMessage: function(text){
-            bot.log(`Setting message to ${text}`)
+            bot.log(`Setting message to ${text}`);
             bot.message = text === "clear" ? null : text;
             bot.receivers.discord.internal.client.setPresence({
                 game: {
@@ -221,6 +221,12 @@ module.exports = function(bot){
         },
         getBusyInstances: function getBusyInstances(cb){
             cb(null, bot.busyInstances);
+        },
+        leaveServer: function leaveServer(server, cb){
+            bot.receivers.discord.internal.client.leaveServer(server, cb)
+        },
+        createInvite: function createInvite(opts, cb){
+            bot.receivers.discord.internal.client.createInvite(opts, cb);
         }
     };
 
