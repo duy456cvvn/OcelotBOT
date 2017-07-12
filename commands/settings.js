@@ -17,6 +17,7 @@ module.exports = {
                 },
                 onSet: function(newVal){
                     bot.prefixCache[server] = newVal;
+                    bot.ipc.emit("broadcast", {event: "clearPrefixCache"});
                 },
             },
             enableAutoReactions: {

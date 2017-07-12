@@ -73,6 +73,23 @@ module.exports = function(bot){
                         });
                 });
 
+                bot.ipc.on("clearPrefixCache", function clearBanCache(){
+                    bot.log("Clearing prefix cache....");
+                    bot.prefixCache = {};
+
+                    bot.database.getPrefixes()
+                        .then(function(result){
+                            for(var i in result){
+                                if(result.hasOwnProperty(i))
+                                    bot.prefixCache[result[i].server] = result[i].prefix;
+                            }
+                        })
+                        .catch(function(err){
+                            bot.error("Error loading prefix cache: ");
+                            console.error(err);
+                        });
+                });
+
                 if(bot.instance === 1) {
 
                     bot.ipc.emit("subscribeEvent", {event: "guildCreate"});
