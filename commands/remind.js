@@ -10,6 +10,7 @@ module.exports = {
     accessLevel: 0,
     commands: ["remind", "remindme", "reminder"],
     init: function(bot, cb){
+        if(bot.instance > 1)return cb();
         bot.database.getReminders()
             .then(function(result){
                 const now = new Date();
@@ -27,7 +28,7 @@ module.exports = {
                                     bot.error(`Error removing reminder: ${err}`);
                                 });
                         }else{
-                            setTimeout(function(){
+                            bot.util.setLongTimeout(function(){
                                 bot.log(`Reminding ${JSON.stringify(reminder)}`);
                                 bot.receivers[reminder.receiver].sendMessage({
                                     to: reminder.channel,
@@ -49,7 +50,7 @@ module.exports = {
             });
         cb();
     },
-    run: function run(user ,userID, channel, message, args, event, bot, recv) {
+    run: function run(user ,userID, channel, message, args, event, bot, recv, debug) {
         var rargs = regex.exec(message);
         if(!rargs || rargs.length < 3){
             recv.sendMessage({
@@ -69,10 +70,15 @@ module.exports = {
                     to: channel,
                     message: `:watch: Reminding you in **${bot.util.prettySeconds(offset/1000)}**. (At ${at})`
                 });
+                if(debug)
+                    recv.sendMessage({
+                        to: channel,
+                        message: `Offset ${offset}`
+                    });
                 recv.getServerFromChannel(channel, function(err, server){
                     bot.database.addReminder(recv.id, userID, server, channel, at.getTime(), rargs[2])
                         .then(function(resp){
-                            setTimeout(function(){
+                            bot.util.setLongTimeout(function(){
                                 recv.sendMessage({
                                     to: channel,
                                     message: `<@${userID}>, you told me to remind you of this:\n${rargs[2]}`

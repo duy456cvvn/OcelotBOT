@@ -41,6 +41,17 @@ module.exports = function(bot){
                 };
             };
 
+            bot.util.setLongTimeout = function setLongTimeout(callback, timeout_ms){
+                if(timeout_ms > 2147483646){
+                    setTimeout(function(){
+                        setLongTimeout(callback, (timeout_ms - 2147483646));
+                    },2147483646);
+                }
+                else{
+                    setTimeout(callback, timeout_ms);
+                }
+            };
+
 
             /**
              * Parses a number into a human readable format
