@@ -4,6 +4,7 @@
 
 const ipc = require('node-ipc');
 const config = require('config');
+const async = require('async');
 
 module.exports = function(bot){
     return {
@@ -56,9 +57,26 @@ module.exports = function(bot){
                     bot.receiveMessage.apply(this, data)
                 });
 
+                bot.ipc.on("clearBanCache", function clearBanCache(){
+                    bot.log("Clearing ban cache....");
+                    bot.banCache = {
+                        channel: [],
+                        server: [],
+                        user: []
+                    };
+
+                    bot.database.getBans()
+                        .then(function(result){
+                            async.eachSeries(result, function(ban){
+                                bot.banCache[ban.type].push(ban.id);
+                            });
+                        });
+                });
+
                 if(bot.instance === 1) {
 
                     bot.ipc.emit("subscribeEvent", {event: "guildCreate"});
+                    bot.ipc.emit("subscribeEvent", {event: "guildDelete"});
 
                     bot.ipc.on("guildCreate", function(data){
                         var server = data[0];
@@ -71,6 +89,10 @@ module.exports = function(bot){
                                     bot.error(err.message);
                                 }
                             });
+                    });
+
+                    bot.ipc.on("guildDelete", function(data){
+                       bot.log(`Left Server ${data[0].name}`);
                     });
                 }
 
@@ -143,7 +165,7 @@ module.exports = function(bot){
                         }, function(err, serverCache){
                             bot.log(`Populating serverCache for channel ${server}`);
                             serverCache[server] = serverCache;
-                            cb(null, serverCache);
+                            cb(null, serverCache[server]);
                         });
                     }
                 }
