@@ -95,8 +95,7 @@ module.exports = function(bot){
                         .from(TRIVIA_TABLE)
                         .where("correct", 1)
                         .orderBy("Score", "DESC")
-                        .groupBy("user")
-                        .limit(10);
+                        .groupBy("user");
                 },
                 logTrivia: function logTrivia(user, correct, difficulty, server){
                     return knex.insert({
