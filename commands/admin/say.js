@@ -7,6 +7,6 @@ module.exports = {
         recv.sendMessage({
             to: channel,
             message: message.substring(11)
-        })
+        });
     }
 };
