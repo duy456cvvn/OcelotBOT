@@ -70,6 +70,10 @@ ipc.serve(function(){
         bot.busyInstances.splice(bot.busyInstances.indexOf(data.instance), 1);
     });
 
+    ipc.server.on('broadcast', function broadcast(data){
+        ipc.server.emit(data.event, data.payload);
+    });
+
     ipc.server.on('subscribeEvent', function subscribeEvent(data, socket){
 
         var func = function(){
