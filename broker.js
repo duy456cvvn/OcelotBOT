@@ -71,7 +71,7 @@ ipc.serve(function(){
     });
 
     ipc.server.on('broadcast', function broadcast(data){
-        ipc.server.emit(data.event, data.payload);
+        ipc.server.broadcast(data.event, data.payload);
     });
 
     ipc.server.on('subscribeEvent', function subscribeEvent(data, socket){
