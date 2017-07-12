@@ -78,7 +78,7 @@ module.exports = function(bot){
                                 if (message.match(reply.regex) && (!reply.timeout || !timeouts[channelID] || !timeouts[channelID][i] || new Date().getTime() - timeouts[channelID][i] > reply.timeout)) {
                                     bot.database.getServer(server)
                                         .then(function(result){
-                                            var serverSettings = result[0];
+                                            var serverSettings = result[0] || {enableAutoReplies: 1, enableAutoReactions: 1};
                                             var happened = false;
                                             if (reply.type === types.EMBED && serverSettings.enableAutoReplies) {
                                                 receiver.sendMessage({
