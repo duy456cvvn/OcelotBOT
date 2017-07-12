@@ -20,6 +20,7 @@ module.exports = {
                         message: `:bangbang: ${type === "user" ? "You" : "This "+type} has been banned from using OcelotBOT. Reason: **${reason}**\nIf you believe this is an error, add __Big P#1843__.`
                     });
                 }
+                bot.ipc.emit("broadcast", {event: "clearBanCache"});
             })
             .catch(function(err){
                 recv.sendMessage({
