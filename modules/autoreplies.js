@@ -10,7 +10,7 @@ const types = {
 
 module.exports = function(bot){
     return {
-        name: "Autoreplies  Module",
+        name: "Autoreplies Module",
         enabled: true,
         init: function init(cb) {
             bot.autoReplies = [
@@ -124,7 +124,7 @@ module.exports = function(bot){
 
                                                 bot.database.logCommand(userID, channelID, `${message} [AUTOREPLY MATCH ${i} ${reply.regex}]`)
                                                     .then(function logAutoreply() {
-                                                        bot.log(`${user} (${userID}) matched autoreply ${message}`);
+                                                        bot.log(`${user} (${userID}) in ${server} matched autoreply ${message}`);
                                                     })
                                                     .catch(function (err) {
                                                         bot.error(`Error logging autoreply: ${err.stack}`);
