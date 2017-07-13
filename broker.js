@@ -20,7 +20,8 @@ bot.busyInstances = [];
 
 bot.receiveMessage = function(user, userID, channelID, message, event){
     if(bot.availableInstances.length){
-        ipc.server.emit(bot.availableInstances[bot.totalMessages++ % bot.availableInstances.length], "receiveMessage", Array.from(arguments));
+        bot.totalMessages++;
+        ipc.server.emit(bot.availableInstances[Math.abs((channelID >> 22) % bot.availableInstances.length)], "receiveMessage", Array.from(arguments));
     }
 };
 
