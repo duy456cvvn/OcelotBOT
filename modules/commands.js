@@ -85,7 +85,7 @@ module.exports = function(bot){
                             command(user, userID, channelID, message, args, event, bot, receiver, message.indexOf("-DEBUG") > -1, server);
                             bot.database.logCommand(userID, channelID, message)
                                 .then(function(){
-                                    bot.log(`${user} (${userID}) performed command ${message}`);
+                                    bot.log(`${user} (${userID}) in ${server} performed command ${message}`);
                                 })
                                 .catch(function(err){
                                     bot.error(`Error logging command: ${err.stack}`);
