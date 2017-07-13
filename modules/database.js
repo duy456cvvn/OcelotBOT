@@ -25,6 +25,7 @@ module.exports = function(bot){
                         server: serverID,
                         owner: addedBy,
                         name: name,
+                        prefix: "!",
                         timestamp: knex.raw(`FROM_UNIXTIME(${(timestamp ? new Date(timestamp).getTime() : new Date().getTime())/1000})`)
                     }).into(SERVERS_TABLE);
                 },
