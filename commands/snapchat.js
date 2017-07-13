@@ -16,7 +16,7 @@ module.exports = {
                 message: ":bangbang: You must enter a snapchat username. i.e !snapchat unacceptableuse"
             });
         }else{
-            bot.simulateTyping(channel);
+            recv.simulateTyping(channel);
             request(`https://snapcodes.herokuapp.com/snapcode.php?username=${args[1]}&size=400`, function(err, resp, body){
                 if(!err){
                     svg2png(new Buffer(body), {width: 400, height: 400})
