@@ -99,7 +99,7 @@ module.exports = function(bot){
                         var server = data[0];
                         bot.database.addServer(server.id, server.owner_id, server.name, server.joined_at)
                             .then(function(){
-                                bot.log(`Joined server ${server.name}`)
+                                bot.log(`Joined server ${server.name} (${server.id})`)
                             })
                             .catch(function(err){
                                 if(err.message.indexOf("Duplicate") === -1){
@@ -109,7 +109,7 @@ module.exports = function(bot){
                     });
 
                     bot.ipc.on("guildDelete", function(data){
-                       bot.log(`Left Server ${data[0].name}`);
+                       bot.log(`Left Server ${data[0].name} (${data[0].id})`);
                     });
                 }
 
