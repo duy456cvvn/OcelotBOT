@@ -29,10 +29,17 @@ module.exports = {
                 }else{
                     try{
                         const names = JSON.parse(body);
-                        recv.sendMessage({
-                            to: channel,
-                            message: `Feeling horny? Try *${bot.util.arrayRand(names).keyword}*`
-                        });
+                        if(names.length === 0){
+                            recv.sendMessage({
+                                to: channel,
+                                message: ":warning: No terms available for this feed. If you entered a country, try a different one."
+                            });
+                        }else{
+                            recv.sendMessage({
+                                to: channel,
+                                message: `Feeling horny? Try *${bot.util.arrayRand(names).keyword}*`
+                            });
+                        }
                     }catch(e){
                         recv.sendMessage({
                             to: channel,
