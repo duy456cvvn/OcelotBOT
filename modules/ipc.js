@@ -151,8 +151,13 @@ module.exports = function(bot){
                             command: "getChannelInfo",
                         }, function(err, channelInfo){
                             bot.log(`Populating channelCache for channel ${channel}`);
-                            channelCache[channel] = channelInfo;
-                            cb(null, channelInfo.guild_id);
+                            if(channelInfo) {
+                                channelCache[channel] = channelInfo;
+                                cb(null, channelInfo.guild_id);
+                            }else{
+                                bot.warn(`Tried to get server from channel that does not exist!!! ${channel}`);
+                                cb("Channel Does Not Exist", null);
+                            }
                         });
                     }
                 },
