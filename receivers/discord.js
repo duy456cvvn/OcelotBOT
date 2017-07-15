@@ -1,6 +1,7 @@
 
 const   config = require('config'),
-        Discord = require('discord.io');
+        Discord = require('discord.io'),
+        request = require('request');
 /** @namespace bot.receivers.discord */
 /**
  * @param {bot} bot
@@ -55,6 +56,28 @@ module.exports = function(bot){
                         }
                     });
                     lastPresenceUpdate = now;
+
+                    request.post({
+                        headers: {
+                            "Authorization": config.get("Discord.discordBotsKey"),
+                            "Content-Type": "application/json"
+                        },
+                        url: "https://bots.discord.pw/api/bots/146293573422284800/stats",
+                        body: `\{"server_count": ${Object.keys(namespace.client.servers).length}}`
+                    }, function(err, resp, body){
+                        console.log(body);
+                    });
+                    request.post({
+                        headers: {
+                            "Authorization": config.get("Discord.discordBotsOrgKey"),
+                            "Content-Type": "application/json"
+                        },
+                        url: "https://discordbots.org/api/bots/146293573422284800/stats",
+                        body: `\{"server_count": ${Object.keys(namespace.client.servers).length}}`
+                    }, function(err, resp, body){
+                        console.log(body);
+                    });
+
                 }
 
             });
