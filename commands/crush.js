@@ -11,7 +11,7 @@ module.exports = {
     usage: "crush <user/url>",
     accessLevel: 0,
     commands: ["crush"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         if(!args[1]){
             recv.sendMessage({
                 to: channel,
@@ -21,49 +21,72 @@ module.exports = {
             const target = args[1].replace(/[!@<>]/g, "");
             const isUrl = target.startsWith("http");
             recv.getUser(target, function(err, targetUser){
-                if(!isUrl && !targetUser){
+                if(!isUrl && !targetUser && target !== "everyone"){
                     recv.sendMessage({
                         to: channel,
                         message: ":bangbang: Couldn't find that user, did you make sure to @mention them?"
                     });
                 }else{
                     recv.simulateTyping(channel);
-                    const fileName = `${config.get("dir")}avatar-${encodeURIComponent(target)}.png`;
-                    const outputFile = `${config.get("dir")}crush-${encodeURIComponent(target)}.png`;
-                    if(fs.existsSync(outputFile)){
-                        bot.log("Using cached crush file");
-                        recv.uploadFile({
-                            to: channel,
-                            file: outputFile,
-                            filename: config.get("filename"),
-                            filetype: "png"
-                        }, function uploadFileCB(err){
-                            if(err){
-                                fs.unlink(outputFile, function deleteFileCB(err){
-                                    if(err){
-                                        bot.error(`There was an error trying to delete ${outputFile}: ${err}`);
-                                    }else{
-                                        bot.log(`Deleted ${outputFile}`);
-                                    }
-                                });
+                    if(target === "everyone"){
+                        recv.getServerInfo(server, function(err, serverInfo){
+                            console.log(serverInfo.icon);
+                            if(serverInfo.icon){
+                                const fileName = `${config.get("dir")}icon-${encodeURIComponent(serverInfo.icon)}.png`;
+                                const outputFile = `${config.get("dir")}crush-${encodeURIComponent(serverInfo.icon)}.png`;
+                                downloadOrGet(`https://cdn.discordapp.com/icons/${server}/${serverInfo.icon}.webp`, fileName, outputFile);
+                            }else{
                                 recv.sendMessage({
                                     to: channel,
-                                    message: ":bangbang: Something went wrong. Try again later."
+                                    message: ":bangbang: This server doesn't have an icon. ):"
                                 })
                             }
                         });
-                    }else if(fs.existsSync(fileName)){
-                        bot.log("Using cached avatar file");
-                        makeMeme();
-                    }else if(isUrl){
-                        request(target).on("end", makeMeme).pipe(fs.createWriteStream(fileName));
                     }else{
-                        bot.log(`Downloading avatar of ${target} (${targetUser.avatar})`);
-                        request(`https://cdn.discordapp.com/avatars/${target}/${targetUser.avatar}.png?size=256`)
-                            .on("end", makeMeme)
-                            .pipe(fs.createWriteStream(fileName));
+                        const fileName = `${config.get("dir")}avatar-${encodeURIComponent(target)}.png`;
+                        const outputFile = `${config.get("dir")}crush-${encodeURIComponent(target)}.png`;
+                        downloadOrGet(`https://cdn.discordapp.com/avatars/${target}/${targetUser.avatar}.png?size=256`, fileName, outputFile);
                     }
-                    function makeMeme(){
+
+                    function downloadOrGet(url, fileName, outputFile){
+                        if(fs.existsSync(outputFile)){
+                            bot.log("Using cached crush file");
+                            recv.uploadFile({
+                                to: channel,
+                                file: outputFile,
+                                filename: config.get("filename"),
+                                filetype: "png"
+                            }, function uploadFileCB(err){
+                                if(err){
+                                    fs.unlink(outputFile, function deleteFileCB(err){
+                                        if(err){
+                                            bot.error(`There was an error trying to delete ${outputFile}: ${err}`);
+                                        }else{
+                                            bot.log(`Deleted ${outputFile}`);
+                                        }
+                                    });
+                                    recv.sendMessage({
+                                        to: channel,
+                                        message: ":bangbang: Something went wrong. Try again later."
+                                    })
+                                }
+                            });
+                        }else if(fs.existsSync(fileName)){
+                            bot.log("Using cached avatar file");
+                            makeMeme(fileName, outputFile);
+                        }else if(isUrl){
+                            request(target).on("end", makeMeme).pipe(fs.createWriteStream(fileName));
+                        }else{
+                            bot.log(`Downloading avatar of ${target}`);
+                            request(url)
+                                .on("end", function(){
+                                    makeMeme(fileName, outputFile)
+                                })
+                                .pipe(fs.createWriteStream(fileName));
+                        }
+                    }
+
+                    function makeMeme(fileName, outputFile){
                         gm(fileName)
                             .resize(405)
                             .rotate("black", -4.7)
