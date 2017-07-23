@@ -17,6 +17,7 @@ module.exports = function(bot){
             const TRIVIA_TABLE          = "trivia";
             const COMMANDLOG_TABLE      = "commandlog";
             const BANS_TABLE            = "bans";
+            const LEFTSERVERS_TABLE     = "ocelotbot_leftservers";
 
 
             bot.database = {
@@ -35,6 +36,12 @@ module.exports = function(bot){
                         .where({
                             server: serverID
                         });
+                },
+                leaveServer: function leaveServer(serverID){
+                    return knex.insert({
+                        server: serverID
+                    })
+                    .into(LEFTSERVERS_TABLE);
                 },
                 getServer: function getServer(serverID){
                     return knex.select().from(SERVERS_TABLE).where({server: serverID}).limit(1);
