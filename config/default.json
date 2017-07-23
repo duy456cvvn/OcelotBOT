@@ -27,7 +27,8 @@
     }
   },
   "Broker": {
-    "socket": "ocelotbot"
+    "socket": "ocelotbot",
+    "debug": true
   },
   "Commands": {
     "8ball": {
