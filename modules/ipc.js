@@ -6,6 +6,17 @@ const ipc = require('node-ipc');
 const config = require('config');
 const async = require('async');
 
+
+const conflictingBots = [
+    "189702078958927872", //ErisBot
+    "256530827842813962", //Fergus
+    "290225453354975232", //LoLPromoter
+    "107256979105267712", //KupoBot
+    "81026656365453312", //Gravebot
+    "86920406476292096", //Lopez
+    "242728049131388930", //QT Bot
+];
+
 module.exports = function(bot){
     return {
         name: "Broker Communication Module",
@@ -99,7 +110,21 @@ module.exports = function(bot){
                         var server = data[0];
                         bot.database.addServer(server.id, server.owner_id, server.name, server.joined_at)
                             .then(function(){
-                                bot.log(`Joined server ${server.name} (${server.id})`)
+                                bot.log(`Joined server ${server.name} (${server.id})`);
+                                var conflicts = [];
+
+                                for(var i = 0; i < conflictingBots.length; i++){
+                                    if(server.members.indexOf(conflictingBots[i]) > -1){
+                                        conflicts.push(conflictingBots[i]);
+                                    }
+                                }
+                                if(conflicts.length > 0){
+                                    bot.log(`Detected ${conflicts.length} conflicts in ${server.id}`);
+                                    // bot.receiver.sendMessage({
+                                    //     to: server.id,
+                                    //     message: `:warning: Heads up: **${conflicts.length}** bots in this server use the same default prefix (!) as I do.\nYou can change my prefix using \`!settings set prefix whatever\` to avoid problems.`
+                                    // });
+                                }
                             })
                             .catch(function(err){
                                 if(err.message.indexOf("Duplicate") === -1){
@@ -110,6 +135,13 @@ module.exports = function(bot){
 
                     bot.ipc.on("guildDelete", function(data){
                        bot.log(`Left Server ${data[0].name} (${data[0].id})`);
+                       bot.database.leaveServer(data[0].id)
+                            .then(function(){
+                                bot.log("Logged server leave");
+                            })
+                           .catch(function(err){
+                               console.error(err);
+                           })
                     });
                 }
 
@@ -177,6 +209,7 @@ module.exports = function(bot){
                     }
                 },
                 getServerInfo: function getServerInfo(server, cb){
+
                     if(serverCache[server]){
                         cb(null, serverCache[server]);
                     }else{
@@ -184,10 +217,10 @@ module.exports = function(bot){
                             receiver: "discord",
                             args: Array.from(arguments),
                             command: "getServerInfo",
-                        }, function(err, serverCache){
+                        }, function(err, serverInfo){
                             bot.log(`Populating serverCache for channel ${server}`);
-                            serverCache[server] = serverCache;
-                            cb(null, serverCache[server]);
+                            serverCache[server] = serverInfo;
+                            cb(null, serverInfo);
                         });
                     }
                 }
