@@ -91,7 +91,6 @@ ipc.serve(function(){
 
     ipc.server.on('command', function command(data, socket){
         if(data.callbackID != undefined){
-            console.log("Callback ID "+data.callbackID);
             data.args[data.args.length-1] = function(){
                 ipc.server.emit(socket, "callback", {
                     id: data.callbackID,
@@ -122,7 +121,7 @@ ipc.serve(function(){
             }
         }
 
-        if(bot.availableInstances.length === 0){
+        if(bot.availableInstances.length === 0 && config.get("Broker.debug") == false){
             bot.receivers.discord.sendMessage({
                 to: "139871249567318017",
                 message: "[BROKER] **No bot instances available to serve requests!**"
