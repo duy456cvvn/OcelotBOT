@@ -35,11 +35,6 @@ module.exports = {
                             inline: true
                         },
                         {
-                            name: "OcelotBOT Age",
-                            value: bot.util.prettySeconds((new Date() - 1390089600000)/1000),
-                            inline: true
-                        },
-                        {
                             name: "Message Stats",
                             value: `**${bot.util.numberWithCommas(stats.messageCount)}** messages received this session. **${bot.util.numberWithCommas(stats.messagesSent)}** messages sent this session.`,
                             inline: false
