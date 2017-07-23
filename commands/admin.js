@@ -32,11 +32,11 @@ module.exports = {
         });
         cb();
     },
-    run: function run(user, userID, channel, message, args, event, bot, recv){
+    run: function run(user, userID, channel, message, args, event, bot, recv, debug, server){
         //noinspection EqualityComparisonWithCoercionJS
         if(userID == "139871249567318017"){
             if(args[1] && module.exports.functions[args[1].toLowerCase()]){
-                module.exports.functions[args[1].toLowerCase()](user, userID, channel, message, args, event, bot, recv);
+                module.exports.functions[args[1].toLowerCase()](user, userID, channel, message, args, event, bot, recv, debug, server);
             }else{
                 recv.sendMessage({
                     to: channel,
