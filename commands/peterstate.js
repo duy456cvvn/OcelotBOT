@@ -33,7 +33,7 @@ module.exports = {
                                         fallback: "...",
                                         color: "#4d41ef",
                                         title: `Peter's last state was: ${states[peter.state] || peter.state}`,
-                                        text: peter.state === "Home" ? `:musical_note: Listening to **${data.artist_name} - ${data.title}**` : `Last update: ${peter.timestamp}`,
+                                        text: peter.state === "Home" ? `:musical_note: Listening to **[${data.artist_name} - ${data.title}](https://unacceptableuse.com/petify/song/${data.song_id}/-%7C)**` : `Last update: ${peter.timestamp}`,
                                         fields: [
                                             {
                                                 title: ":heart: Heart Rate",
