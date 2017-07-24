@@ -114,7 +114,7 @@ module.exports = function(bot){
                                 var conflicts = [];
 
                                 for(var i = 0; i < conflictingBots.length; i++){
-                                    if(server.members.indexOf(conflictingBots[i]) > -1){
+                                    if(Object.keys(server.members).indexOf(conflictingBots[i]) > -1){
                                         conflicts.push(conflictingBots[i]);
                                     }
                                 }
