@@ -130,6 +130,15 @@ module.exports = function(bot){
                 },
                 getBans: function(){
                     return knex.select().from(BANS_TABLE);
+                },
+                getCommandStats: function(){
+                    return knex.select(knex.raw("SUBSTRING_INDEX(SUBSTRING_INDEX(command, ' ',  1), ' ', -1) as commandName"), knex.raw("COUNT(*) as count"))
+                        .from(COMMANDLOG_TABLE)
+                        .whereRaw("command LIKE '!%'")
+                        .andWhereRaw("server NOT LIKE 'ethanbot-%'")
+                        .orderBy("count", "DESC")
+                        .groupBy("commandName")
+                        .limit(5)
                 }
 
             };
