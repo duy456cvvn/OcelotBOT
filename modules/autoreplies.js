@@ -45,7 +45,7 @@ module.exports = function(bot){
                     timeout: 5000
                 },
                 {
-                    regex: /(xd|e(cks|x)( ?)dee)d*($| .*)/i,
+                    regex: /(xd|e(cks|x)( ?)de(e?))d*($| .*)/i,
                     type: types.REACTION,
                     content: ["🇽","🇩"],
                     timeout: 60000
