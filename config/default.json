@@ -1,5 +1,8 @@
 {
   "Bot": {
+    "cooldownInterval": 8000,
+    "softCooldown": 5,
+    "hardCooldown": 7
   },
   "Slack": {
     "token": "",

@@ -3,8 +3,20 @@
  */
 const fs = require('fs');
 const async = require('async');
+const config = require('config');
 module.exports = function(bot){
-  return {
+
+    function isBanned(server, channel, user){
+        return !(bot.banCache.server.indexOf(server) === -1 &&
+            bot.banCache.channel.indexOf(channel) === -1 &&
+            bot.banCache.user.indexOf(user) === -1);
+    }
+
+    function getPrefix(server){
+        return bot.prefixCache[server] || "!"
+    }
+
+    return {
       name: "Commands Module",
       enabled: true,
       init: function init(cb){
@@ -58,6 +70,12 @@ module.exports = function(bot){
 
         bot.prefixCache = {};
 
+        bot.commandCooldowns = {};
+
+        setInterval(function(){
+            bot.commandCooldowns = {};
+        }, parseInt(config.get("Bot.cooldownInterval")));
+
         bot.database.getPrefixes()
             .then(function(result){
                  for(var i in result){
@@ -74,27 +92,55 @@ module.exports = function(bot){
         bot.registerMessageHandler("commands", function(user, userID, channelID, message, event, _bot, receiver){
             try {
                 receiver.getServerFromChannel(channelID, function(err, server){
-                    if ((bot.prefixCache[server] && message.startsWith(bot.prefixCache[server])) || (!bot.prefixCache[server] && message.startsWith("!"))) {
+                    if (message.startsWith(getPrefix(server))) {
                         var args = message.split(" ");
-                        var command = bot.commands[args[0].substring(bot.prefixCache[server]? bot.prefixCache[server].length : 1)];
-                        if (bot.banCache.server.indexOf(server) === -1 &&
-                            bot.banCache.channel.indexOf(channelID) === -1 &&
-                            bot.banCache.user.indexOf(userID) === -1 &&
-                            command) {
+                        const commandName = args[0].substring(getPrefix(server).length).toLowerCase();
+                        var command = bot.commands[commandName];
+                        if (!isBanned() && command) {
                             bot.commandCount++;
-                            command(user, userID, channelID, message, args, event, bot, receiver, message.indexOf("-DEBUG") > -1, server);
-                            bot.database.logCommand(userID, channelID, message)
-                                .then(function(){
-                                    bot.log(`${user} (${userID}) in ${server} performed command ${message}`);
-                                })
-                                .catch(function(err){
-                                    bot.error(`Error logging command: ${err.stack}`);
-                                });
+
+                            var cooldown = bot.commandCooldowns[userID];
+                            if(cooldown){
+                                if(cooldown[commandName]){
+                                    cooldown[commandName]++;
+                                }else{
+                                    cooldown[commandName] = 1;
+                                }
+                            }else{
+                                bot.commandCooldowns[userID] = {
+                                    [commandName]: 1
+                                };
+                            }
+
+							function log(message){
+								bot.database.logCommand(userID, channelID, message)
+									.then(function(){
+										bot.log(`${user} (${userID}) in ${server} performed command ${message}`);
+									})
+									.catch(function(err){
+										bot.error(`Error logging command: ${err.stack}`);
+									});
+							}
+
+                            if(cooldown && cooldown[commandName] && cooldown[commandName] >= config.get("Bot.softCooldown")){
+                                if(cooldown[commandName] >= config.get("Bot.hardCooldown")){
+									log(message+" [HARD COOLDOWN]");
+									bot.warn(`Hard cooldown triggered by ${user} (${userID})`);
+                                }else{
+									log(message+" [SOFT COOLDOWN]");
+									bot.log(`Soft cooldown triggered by ${user} (${userID})`);
+									receiver.sendMessage({
+										to: channelID,
+										message: ":watch: Wait a while before performing this command again!"
+									});
+                                }
+                            }else{
+								log(message);
+								command(user, userID, channelID, message, args, event, bot, receiver, message.indexOf("-DEBUG") > -1, server);
+                            }
                         }
                     }
-
                 });
-
             }catch(e){
                 receiver.sendMessage({
                     to: channelID,
@@ -105,5 +151,6 @@ module.exports = function(bot){
             }
         });
       }
-  }
+    }
 };
+
