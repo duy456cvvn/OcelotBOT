@@ -4,6 +4,7 @@
 const ipc = require('node-ipc');
 const config = require('config');
 const async = require('async');
+const child_process = require('child_process');
 
 var bot = {
     receivers: {}
@@ -53,6 +54,8 @@ ipc.serve(function(){
         console.log(`Instance ${data.instance} is ready to receive messages.`);
         bot.availableInstances.push(socket);
         console.log(bot.availableInstances.length);
+        if(bot.panicTimeout)
+        	clearTimeout(bot.panicTimeout);
     });
 
     ipc.server.on('instanceDisconnect', function instanceDisconnect(data, socket){
@@ -126,6 +129,15 @@ ipc.serve(function(){
                 to: "139871249567318017",
                 message: "[BROKER] **No bot instances available to serve requests!**"
             });
+            bot.panicTimeout = setTimeout(function(){
+				bot.receivers.discord.sendMessage({
+					to: "139871249567318017",
+					message: "[BROKER] **No bot instances came back online within 1 minute!!!! Attempting deploy...**"
+				});
+				child_process.spawn("node deploy.js", function(){
+					console.log(arguments);
+				});
+            }, 60000);
         }
     });
 
