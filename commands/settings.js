@@ -104,10 +104,12 @@ module.exports = {
 
                 recv.getServerInfo(server, function(err, serverData){
                     for(var i in serverData.members[userID].roles){
-                        var role = serverData.roles[serverData.members[userID].roles[i]];
-                        if(role.name.toLowerCase() === "bot controller"){
-                            hasRole = true;
-                            break;
+                        if(serverData.members[userID].roles.hasOwnProperty(i)) {
+                            var role = serverData.roles[serverData.members[userID].roles[i]];
+                            if (role.name.toLowerCase() === "bot controller") {
+                                hasRole = true;
+                                break;
+                            }
                         }
                     }
                     //noinspection EqualityComparisonWithCoercionJS

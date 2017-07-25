@@ -39,6 +39,7 @@ module.exports = {
         bot.processSpellQueue = function processSpellQueue(){
             if(bot.processingSpellQueue)return;
             bot.processingSpellQueue = true;
+            bot.ipc.emit("instanceBusy", {instance: bot.instance});
             var reaction = bot.spellQueue.shift();
             if(reaction){
                 bot.spellQueueTotal++;
@@ -73,6 +74,7 @@ module.exports = {
                 }
             }else{
                 bot.processingSpellQueue = false;
+                bot.ipc.emit("instanceFree", {instance: bot.instance});
             }
         };
         cb();

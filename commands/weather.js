@@ -16,7 +16,7 @@ module.exports = {
             });
         }else {
             var search = message.substring(message.indexOf(args[1]));
-
+            bot.ipc.emit("instanceBusy", {instance: bot.instance});
             request(`http://api.openweathermap.org/data/2.5/weather?q=${search}&appid=${config.get("Commands.weather.key")}&units=metric`, function getWeather(err, resp, body) {
                 if (err) {
                     bot.error("Error getting weather information: " + err);
@@ -64,6 +64,7 @@ module.exports = {
                         });
 
                     }
+                    bot.ipc.emit("instanceFree", {instance: bot.instance});
                 }
             });
         }

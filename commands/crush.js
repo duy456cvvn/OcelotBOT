@@ -18,6 +18,7 @@ module.exports = {
                 message: ":bangbang: You must mention a user, or enter a URL."
             });
         }else{
+            bot.ipc.emit("instanceBusy", {instance: bot.instance});
             const target = args[1].replace(/[!@<>]/g, "");
             const isUrl = target.startsWith("http");
             recv.getUser(target, function(err, targetUser){
@@ -57,6 +58,7 @@ module.exports = {
                                 filename: config.get("filename"),
                                 filetype: "png"
                             }, function uploadFileCB(err){
+                                bot.ipc.emit("instanceFree", {instance: bot.instance});
                                 if(err){
                                     fs.unlink(outputFile, function deleteFileCB(err){
                                         if(err){
@@ -93,6 +95,7 @@ module.exports = {
                             .extent(600, 875, "-128-455")
                             .toBuffer('PNG', function avatarToBuffer(err, buffer){
                                 if(err){
+                                    bot.ipc.emit("instanceFree", {instance: bot.instance});
                                     recv.sendMessage({
                                         to: channel,
                                         message: ":bangbang: There was an error processing the image. Maybe the URL is invalid, or the user is unavailable for some reason..."
@@ -110,6 +113,7 @@ module.exports = {
                                         .composite(config.get("template"))
                                         .toBuffer('PNG', function crushToBuffer(err, buffer){
                                             if(err){
+                                                bot.ipc.emit("instanceFree", {instance: bot.instance});
                                                 recv.sendMessage({
                                                     to: channel,
                                                     message: ":bangbang: There was an error processing the image. Maybe the URL is invalid, or the user is unavailable for some reason..."
@@ -131,6 +135,7 @@ module.exports = {
                                                 }, function(err){
                                                     console.log(err);
                                                 });
+                                                bot.ipc.emit("instanceFree", {instance: bot.instance});
                                                 fs.writeFile(outputFile, buffer, function(err){
                                                     bot.warn(`Error caching crush file: ${err}`);
                                                 }, function(err){
