@@ -54,8 +54,13 @@ ipc.serve(function(){
         console.log(`Instance ${data.instance} is ready to receive messages.`);
         bot.availableInstances.push(socket);
         console.log(bot.availableInstances.length);
-        if(bot.panicTimeout)
-        	clearTimeout(bot.panicTimeout);
+        if(bot.panicTimeout){
+			bot.receivers.discord.sendMessage({
+				to: "139871249567318017",
+				message: "[BROKER] An instance became available again."
+			});
+			clearTimeout(bot.panicTimeout);
+		}
     });
 
     ipc.server.on('instanceDisconnect', function instanceDisconnect(data, socket){
@@ -124,7 +129,7 @@ ipc.serve(function(){
             }
         }
 
-        if(bot.availableInstances.length === 0 && config.get("Broker.debug") == false){
+        if(bot.availableInstances.length === 0 ){
             bot.receivers.discord.sendMessage({
                 to: "139871249567318017",
                 message: "[BROKER] **No bot instances available to serve requests!**"
@@ -134,9 +139,18 @@ ipc.serve(function(){
 					to: "139871249567318017",
 					message: "[BROKER] **No bot instances came back online within 1 minute!!!! Attempting deploy...**"
 				});
-				child_process.spawn("node deploy.js", function(){
+				child_process.exec("node deploy.js", function(){
 					console.log(arguments);
 				});
+				bot.panicTimeout = setTimeout(function(){
+					bot.receivers.discord.sendMessage({
+						to: "139871249567318017",
+						message: "[BROKER] **Deploy failed to bring any instances back online after 2 minutes. Launching emergency mode.**"
+					});
+					child_process.exec("pm2 start ob-emergency; pm2 stop ocelotbot-0 ocelotbot-1 ob-broker", function(){
+						console.log(arguments);
+					});
+				}, 12000);
             }, 60000);
         }
     });
