@@ -21,7 +21,7 @@ module.exports = {
                 if(!err){
                     svg2png(new Buffer(body), {width: 400, height: 400})
                         .then(function(image){
-                            bot.uploadFile({
+                            recv.uploadFile({
                                 to: channel,
                                 file: image,
                                 filename: "snapcode.png",
@@ -29,7 +29,7 @@ module.exports = {
                             });
                         })
                         .catch(function(err){
-                            bot.sendMessage({
+                            recv.sendMessage({
                                 to: channel,
                                 message: ":bangbang: An error occurred. Please try again later."
                             });
