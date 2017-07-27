@@ -65,6 +65,14 @@ module.exports = function(bot){
                 getLastPetermonData: function getLastPetermonData(){
                     return knex.select().from(PETERMON_TABLE).orderBy("timestamp", "DESC").limit(1);
                 },
+                getPetermonLastOutside: function getPetermonLastOutside(){
+                	return knex.select("timestamp")
+						.from(PETERMON_TABLE)
+						.where({state: 'Outside'})
+						.orWhere({state: 'Abbeys'})
+						.orderBy("timestamp", "DESC")
+						.limit(1);
+                },
                 getMemes: function getMemes(server){
                     return knex.select("name", "server").from(MEMES_TABLE).where({server: server}).orWhere({server: "global"});
                 },
