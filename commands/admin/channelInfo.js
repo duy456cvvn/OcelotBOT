@@ -38,7 +38,7 @@ module.exports = {
                     }else{
                         recv.sendMessage({
                             to: channel,
-                            message: `Channel **#${thisChannel.name}** belongs to server **${thisServer.name}** (${thisServer.id}). It has ${thisServer.member_count} members.`
+                            message: `Channel **#${thisChannel.name}** belongs to server **${thisServer.name}** (${thisServer.id}). It has ${thisServer.member_count} members.\nhttp://unacceptableuse.com:3005/#!/servers/${thisServer.id}`
                         });
                     }
                 });
