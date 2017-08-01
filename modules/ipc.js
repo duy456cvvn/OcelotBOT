@@ -15,6 +15,11 @@ const conflictingBots = [
     "81026656365453312", //Gravebot
     "86920406476292096", //Lopez
     "242728049131388930", //QT Bot
+    "324356264983527424", //MatBot
+	"265161580201771010", //MatBot
+	"172002275412279296", //Tatsumaki,
+	"204777316621090816", //RPBot
+	"292953664492929025", //UnbelievableBot
 ];
 
 module.exports = function(bot){
@@ -64,7 +69,6 @@ module.exports = function(bot){
 
                 bot.ipc.on("receiveMessage", function(data){
                     data.push(bot);
-                    data.push("discord");
                     bot.receiveMessage.apply(this, data)
                 });
 
@@ -171,6 +175,7 @@ module.exports = function(bot){
                 bot.ipc.emit(command, data);
             };
 
+
             bot.receiver = new Proxy({
                 id: "discord",
                 getServerFromChannel: function getServerFromChannel(channel, cb){
@@ -178,7 +183,7 @@ module.exports = function(bot){
                         cb(null, channelCache[channel].guild_id);
                     }else{
                         bot.emitWithCallback("command", {
-                            receiver: "discord",
+                            receiver: bot.lastRecvID,
                             args: Array.from(arguments),
                             command: "getChannelInfo",
                         }, function(err, channelInfo){
@@ -198,7 +203,7 @@ module.exports = function(bot){
                         cb(null, channelCache[channel]);
                     }else{
                         bot.emitWithCallback("command", {
-                            receiver: "discord",
+                            receiver: bot.lastRecvID,
                             args: Array.from(arguments),
                             command: "getChannelInfo",
                         }, function(err, channelInfo){
@@ -214,7 +219,7 @@ module.exports = function(bot){
                         cb(null, serverCache[server]);
                     }else{
                         bot.emitWithCallback("command", {
-                            receiver: "discord",
+                            receiver: bot.lastRecvID,
                             args: Array.from(arguments),
                             command: "getServerInfo",
                         }, function(err, serverInfo){
@@ -237,7 +242,7 @@ module.exports = function(bot){
                             delete arguments[arguments.length-1];
                         }
                         bot.ipc.emit("command", {
-                            receiver: "discord",
+                            receiver: bot.lastRecvID,
                             args: Array.from(arguments),
                             command: command,
                             callbackID: callbackNumber
