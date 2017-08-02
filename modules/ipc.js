@@ -124,10 +124,10 @@ module.exports = function(bot){
                                 }
                                 if(conflicts.length > 0){
                                     bot.log(`Detected ${conflicts.length} conflicts in ${server.id}`);
-                                    // bot.receiver.sendMessage({
-                                    //     to: server.id,
-                                    //     message: `:warning: Heads up: **${conflicts.length}** bots in this server use the same default prefix (!) as I do.\nYou can change my prefix using \`!settings set prefix whatever\` to avoid problems.`
-                                    // });
+                                    bot.receiver.sendMessage({
+                                        to: server.id,
+                                        message: `:warning: Heads up: **${conflicts.length}** bots in this server use the same default prefix (!) as I do.\nYou can change my prefix using \`!settings set prefix whatever\` to avoid problems.`
+                                    });
                                 }
                             })
                             .catch(function(err){
