@@ -67,6 +67,7 @@ module.exports = function(bot){
             var timeouts = [];
 
             bot.registerMessageHandler("autoreply", function messageHandler(user, userID, channelID, message, event, _bot, receiver){
+                if(!message)return;
                 receiver.getServerFromChannel(channelID, function(err, server){
                     if (
                         bot.banCache.server.indexOf(server) === -1 &&
