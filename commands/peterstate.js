@@ -4,6 +4,21 @@
 const request = require('request');
 const config = require('config');
 const states = config.get("Commands.peterstate.states");
+
+
+const facts = [
+	"Peter has re-ocurring dreams in which **Ed Sheeran** is his friend.",
+	"Peter's favourite genre of music is **shitty 90s/noughties love ballads**.",
+	"Peter spends over **50%** of his time on his computer.",
+	"Peter once pretended he was left handed for **4 months** because he couldn't admit his mistake.",
+	"Peter spends **1/3rd** of his time asleep. Like most humans.",
+	"If Peter doesn't have his vitamins in the morning, he turns into the weak version of **The Hulk**.",
+	"Peter is allergic to **dust** and **citrus fruit**.",
+	"Peter did try and automatically record sex using sensors, but his girlfriend wouldn't allow it.",
+	"Peter plays <:Overwatch:230070017390149632> **Overwatch**: Peter#25877",
+	"Peter once got stranded for **4 hours** in a town within walking distance of his house.",
+	"Bragging about **Reddit Karma** is not a good way to impress a girl."
+];
 module.exports = {
     name: "Peter State",
     usage: "peterstate",
@@ -33,7 +48,7 @@ module.exports = {
                                         const lastTimeOutside = new Date(outside[0].timestamp);
                                         const timeInside = now-lastTimeOutside;
 										const peter = result[0];
-										recv.sendAttachment(channel, timeInside >= 8.64e+7 ? `:information_source: **Fun Fact:** The last time peter left the house was **${bot.util.prettySeconds(parseInt(timeInside/1000))}** ago.` : "", [
+										recv.sendAttachment(channel,":information_source: **Fun Fact:** " + ( timeInside >= 8.64e+7 ? `The last time peter left the house was **${bot.util.prettySeconds(parseInt(timeInside/1000))}** ago.` : bot.util.arrayRand(facts)), [
 											{
 												fallback: "...",
 												color: "#4d41ef",
