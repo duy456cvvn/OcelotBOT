@@ -9,6 +9,36 @@ module.exports = function(bot){
 
             bot.util = {};
 
+            bot.util.WS_CLOSE_CODES = {
+				1000: "CLOSE_NORMAL",
+				1001: "CLOSE_GOING_AWAY",
+				1002: "CLOSE_PROTOCOL ERROR",
+				1003: "CLOSE_UNSUPPORTED",
+				1004: "RESERVED",
+				1005: "CLOSE_NO_STATUS",
+				1006: "CLOSE_ABNORMAL",
+				1007: "Unsupported data",
+				1008: "Policy violation",
+				1009: "CLOSE_TOO_LARGE",
+				1010: "Missing Extension",
+				1011: "Internal Error",
+				1012: "Service Restart",
+				1013: "Try Again Later",
+				1014: "RESERVED",
+				1015: "TLS Handshake failure",
+				4000: "Discord: Unknown Error",
+				4001: "Discoed: Unknown Opcode",
+				4002: "Discoed: Decode Error",
+				4003: "Discord: Not Authenticated",
+				4004: "Discord: Authentication Failed",
+				4005: "Discord: Already Authenticated",
+				4007: "Discord: Invalid Sequence",
+				4008: "Discord: Rate Limited",
+				4009: "Discord: Session Timeout",
+				4010: "Discord: Invalid Shard",
+				4011: "Discord: Sharding Required"
+			};
+
             bot.util.arrayDiff = function(first, second) {
                 return first.filter(function(i) {return second.indexOf(i) < 0;});
             };
