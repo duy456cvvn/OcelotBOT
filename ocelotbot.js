@@ -30,7 +30,10 @@ function initBot(cb){
         bot.log(`Registered message handler ${name}`);
     };
 
-    bot.receiveMessage = function receiveMessage(user, userID, channelID, message, event){
+    bot.lastRecvID = "discord";
+
+    bot.receiveMessage = function receiveMessage(user, userID, channelID, message, event, recvID){
+        bot.lastRecvID = recvID && typeof recvID == "string" ? recvID : "discord" ;
         for(var i in bot.messageHandlers){
             if(bot.messageHandlers.hasOwnProperty(i)){
                 bot.messageHandlers[i](user, userID, channelID, message, event, bot, bot.receiver);
