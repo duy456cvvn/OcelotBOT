@@ -86,7 +86,7 @@ module.exports = function(bot){
 
             namespace.client.on("message", function (user, userID, channelID, message, event) {
                 if(userID != namespace.client.id)
-                    bot.receiveMessage(user, userID, channelID, message, event);
+                    bot.receiveMessage(user, userID, channelID, message, event, obj.id);
             });
 
             cb();
