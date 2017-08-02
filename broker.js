@@ -19,7 +19,7 @@ bot.availableInstances = [];
 bot.totalMessages = 0;
 bot.busyInstances = [];
 
-bot.receiveMessage = function(user, userID, channelID, message, event){
+bot.receiveMessage = function(user, userID, channelID, message, event, recvID){
     if(bot.availableInstances.length){
         bot.totalMessages++;
         ipc.server.emit(bot.availableInstances[Math.abs((channelID >> 22) % bot.availableInstances.length)], "receiveMessage", Array.from(arguments));
@@ -108,6 +108,7 @@ ipc.serve(function(){
         }
 
         if(bot.receivers[data.receiver] && bot.receivers[data.receiver][data.command]){
+        	console.log("Received message for receiver "+data.receiver+" "+data.command);
             bot.receivers[data.receiver][data.command].apply(this, data.args);
         }else{
             console.warn(`Received unknown function/receiver: ${data.receiver}/${data.command}`);
@@ -129,7 +130,7 @@ ipc.serve(function(){
             }
         }
 
-        if(bot.availableInstances.length === 0 ){
+        if(bot.availableInstances.length === 0 && !config.get("Broker.debug")){
             bot.receivers.discord.sendMessage({
                 to: "139871249567318017",
                 message: "[BROKER] **No bot instances available to serve requests!**"

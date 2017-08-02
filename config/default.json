@@ -5,7 +5,8 @@
     "hardCooldown": 7
   },
   "Slack": {
-    "token": "",
+    "botToken": "",
+    "userToken": "",
     "clientID": ""
   },
   "Discord": {
@@ -241,6 +242,7 @@
     ]
   },
   "Receivers": [
-    "discord"
+    "discord",
+    "slack"
   ]
 }
