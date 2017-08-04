@@ -61,7 +61,19 @@ module.exports = function(bot){
                     type: types.REACTION,
                     content: ["🤔"],
                     timeout: 5000
-                }
+                },
+                {
+					regex: /emoji( ?)(movie|film)/i,
+					type: types.REACTION,
+					content: ["🙃", "🔫"],
+					timeout: 5000
+                },
+				{
+					regex: /(england i[sz] m[ya] city|jake paul)/i,
+					type: types.REACTION,
+					content: ["🇬🇧", "🏙"],
+					timeout: 5000
+				}
             ];
 
             var timeouts = [];
