@@ -159,8 +159,9 @@ module.exports = {
                                             messageID: id,
                                             reaction: reaction
                                         }, function(err, resp){
-                                            entries[reaction] = resp.map(function(a){return a.id;});
-                                            setTimeout(cb, 200);
+                                            if(resp)
+                                            	entries[reaction] = resp.map(function(a){return a.id;});
+                                            setTimeout(cb, 300);
                                         });
                                     }, function(){
                                         const correctReaction = reactions[isBoolean ? correctAnswer === "True" ? 0 : 1 : answers.indexOf(correctAnswer)];
@@ -214,7 +215,7 @@ module.exports = {
 
                                         });
                                     });
-                                }, (triviaSeconds*1000)-(reactions.length*200));
+                                }, triviaSeconds*1000);
                             }
                         }));
 
