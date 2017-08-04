@@ -31,10 +31,18 @@ module.exports = {
                                 cb();
                             }, function () {
                                 recv.getServerInfo(server, function(err, serverInfo){
-                                    recv.sendMessage({
-                                        to: channel,
-                                        message: `**Available Memes:**\n__:earth_americas: **Global** memes:__ ${globalMemes}\n__:house_with_garden:**${serverInfo.name}** memes:__ ${serverMemes}`
-                                    });
+                                    if(!serverInfo){
+										recv.sendMessage({
+											to: channel,
+											message: `**Available Memes:**\n__:earth_americas: **Global** memes:__ ${globalMemes}`
+										});
+                                    }else{
+										recv.sendMessage({
+											to: channel,
+											message: `**Available Memes:**\n__:earth_americas: **Global** memes:__ ${globalMemes}\n__:house_with_garden:**${serverInfo.name}** memes:__ ${serverMemes}`
+										});
+                                    }
+
                                 });
                             });
                         })

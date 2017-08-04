@@ -31,8 +31,12 @@ module.exports = {
                     recv.simulateTyping(channel);
                     if(target === "everyone"){
                         recv.getServerInfo(server, function(err, serverInfo){
-                            console.log(serverInfo.icon);
-                            if(serverInfo.icon){
+                            if(!serverInfo){
+                                recv.sendMessage({
+									to: channel,
+									message: ":warning: This is a DM Channel."
+								})
+                            }else if(serverInfo.icon){
                                 const fileName = `${config.get("dir")}icon-${encodeURIComponent(serverInfo.icon)}.png`;
                                 const outputFile = `${config.get("dir")}crush-${encodeURIComponent(serverInfo.icon)}.png`;
                                 downloadOrGet(`https://cdn.discordapp.com/icons/${server}/${serverInfo.icon}.webp`, fileName, outputFile);

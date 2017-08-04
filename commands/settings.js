@@ -103,30 +103,37 @@ module.exports = {
 
 
                 recv.getServerInfo(server, function(err, serverData){
-                    for(var i in serverData.members[userID].roles){
-                        if(serverData.members[userID].roles.hasOwnProperty(i)) {
-                            var role = serverData.roles[serverData.members[userID].roles[i]];
-                            if (role.name.toLowerCase() === "bot controller") {
-                                hasRole = true;
-                                break;
-                            }
-                        }
-                    }
-                    //noinspection EqualityComparisonWithCoercionJS
-                    if(userID != "139871249567318017" && serverInfo.addedby != userID && !hasRole){
+                    if(!serverData){
                         recv.sendMessage({
-                            to: channel,
-                            message: ":bangbang: You don't have permission to run this command! Only the server owner or people with the 'Bot Controller' role can do that."
-                        });
+							to: channel,
+							message: ":warning: Either this is a DM channel, or there is an issue with the database connection.\nPlease use this command in a server, or try again later."
+						})
                     }else{
-                        if(!args[1] || (args[1] === "help" && !args[2]) || !subCommands[args[1]]){
-                            recv.sendMessage({
-                                to: channel,
-                                message: `**Usage:**\n${bot.prefixCache[server]}settings help [setting] - This message or help on an individual setting\n${bot.prefixCache[server]}settings list - List the available settings and their current values\n${bot.prefixCache[server]}settings set [setting] [value] - Set a new value for a server setting`
-                            });
-                        }else{
-                            subCommands[args[1]]();
-                        }
+						for(var i in serverData.members[userID].roles){
+							if(serverData.members[userID].roles.hasOwnProperty(i)) {
+								var role = serverData.roles[serverData.members[userID].roles[i]];
+								if (role.name.toLowerCase() === "bot controller") {
+									hasRole = true;
+									break;
+								}
+							}
+						}
+						//noinspection EqualityComparisonWithCoercionJS
+						if(userID != "139871249567318017" && serverInfo.addedby != userID && !hasRole){
+							recv.sendMessage({
+								to: channel,
+								message: ":bangbang: You don't have permission to run this command! Only the server owner or people with the 'Bot Controller' role can do that."
+							});
+						}else{
+							if(!args[1] || (args[1] === "help" && !args[2]) || !subCommands[args[1]]){
+								recv.sendMessage({
+									to: channel,
+									message: `**Usage:**\n${bot.prefixCache[server]}settings help [setting] - This message or help on an individual setting\n${bot.prefixCache[server]}settings list - List the available settings and their current values\n${bot.prefixCache[server]}settings set [setting] [value] - Set a new value for a server setting`
+								});
+							}else{
+								subCommands[args[1]]();
+							}
+						}
                     }
                 });
             });
