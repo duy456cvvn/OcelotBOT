@@ -48,8 +48,8 @@ module.exports = {
                             }
                         });
                     }else{
-                        const fileName = `${config.get("dir")}avatar-${encodeURIComponent(target)}.png`;
-                        const outputFile = `${config.get("dir")}crush-${encodeURIComponent(target)}.png`;
+                        const fileName = `${config.get("dir")}avatar-${encodeURIComponent(targetUser.avatar)}.png`;
+                        const outputFile = `${config.get("dir")}crush-${encodeURIComponent(targetUser.avatar)}.png`;
                         downloadOrGet(`https://cdn.discordapp.com/avatars/${target}/${targetUser.avatar}.png?size=256`, fileName, outputFile);
                     }
 
