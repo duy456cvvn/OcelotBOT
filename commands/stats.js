@@ -9,7 +9,7 @@ module.exports = {
     accessLevel: 0,
     commands: ["stats", "statistics", "info"],
     run: function run(user, userID, channel, message, args, event, bot, recv) {
-
+        recv.simulateTyping(channel);
         recv.getStats(function(stats){
             bot.database.getCommandStats()
                 .then(function(result){
@@ -52,8 +52,6 @@ module.exports = {
                 });
 
         });
-
-
     }
 };
 
