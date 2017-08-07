@@ -88,7 +88,14 @@ module.exports = {
                     message: ":bangbang: You must enter a platform: pc/ps4/xbl"
                 });
             }else{
-                render(args[2], region, args[1].replace("#", "-"))
+                if(args[2].toLowerCase() === "pc" && args[1].indexOf("#") < 0){
+					recv.sendMessage({
+						to: channel,
+						message: `:bangbang: You must enter a valid PC username, along with the number: i.e ${args[0]} Peter#25877" pc eu`
+					});
+                }else{
+					render(args[2], region, args[1].replace("#", "-"))
+				}
             }
         }else{
             recv.sendMessage({
