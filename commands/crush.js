@@ -47,10 +47,16 @@ module.exports = {
                                 })
                             }
                         });
-                    }else{
+                    }else if(targetUser && targetUser.avatar){
+
                         const fileName = `${config.get("dir")}avatar-${encodeURIComponent(targetUser.avatar)}.png`;
                         const outputFile = `${config.get("dir")}crush-${encodeURIComponent(targetUser.avatar)}.png`;
                         downloadOrGet(`https://cdn.discordapp.com/avatars/${target}/${targetUser.avatar}.png?size=256`, fileName, outputFile);
+                    }else{
+                        recv.sendMessage({
+                            to: channel,
+                            message: ":bangbang: The target user has no avatar, somehow..."
+                        });
                     }
 
                     function downloadOrGet(url, fileName, outputFile){
