@@ -152,13 +152,21 @@ module.exports = {
         var times = 0;
         var done = true;
         var target = event.d ? event.d.id : event.ts;
-        if(args[1] === "^")
+        if(args[1] === "^" || args[1] === "[^]")
             recv.getMessages({
                 channelID: channel,
                 limit: 2
             }, function(err, resp){
-                target = resp[1].id;
-                doTheRestOfIt();
+                if(resp[1]){
+					target = resp[1].id;
+					doTheRestOfIt();
+                }else{
+                	recv.sendMessage({
+						to: channel,
+						message: ":bangbang: There is no message above this one to spell onto."
+					})
+				}
+
             });
         else doTheRestOfIt();
         function doTheRestOfIt() {

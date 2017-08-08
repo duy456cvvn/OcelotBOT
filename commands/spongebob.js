@@ -30,7 +30,14 @@ module.exports = {
                 channelID: channel,
                 limit: 2
             }, function(err, resp){
-                doSponge(err || resp[1].content);
+                if(resp[1])
+                    doSponge(err || resp[1].content);
+                else{
+                    recv.sendMessage({
+                        to: channel,
+                        message: ":bangbang: Please enter text to spongify."
+                    })
+                }
             });
         }else{
             doSponge(message.substring(10));
