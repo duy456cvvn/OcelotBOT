@@ -56,28 +56,27 @@ module.exports = {
                             message: output
                         });
                     },
-                    "set": function(){
+                    "set": async function(){
                         if(args.length < 4){
                             recv.sendMessage({
                                 to: channel,
                                 message: `:bangbang: You must supply a **setting** and a **value**:\n${bot.prefixCache[server]}settings set useServerCurrency false`
                             });
                         }else if(Object.keys(settings).indexOf(args[2]) > -1){
-                            bot.database.setServerSetting(server, args[2], args[3] === "true" || args[3] === "false" ? args[3] === "true" : args[3])
-                                .then(function(){
-                                    recv.sendMessage({
-                                        to: channel,
-                                        message: `:white_check_mark: Successfully set ${args[2]} to **${args[3]}**`
-                                    });
-                                    if(settings[args[2]].onSet)
-                                        settings[args[2]].onSet(args[3]);
-                                })
-                                .catch(function(err){
-                                    recv.sendMessage({
-                                        to: channel,
-                                        message: `Error setting value. Did you spell something wrong?:\n\`${err}\``
-                                    })
-                                });
+                        	try{
+								await bot.database.setServerSetting(server, args[2], args[3] === "true" || args[3] === "false" ? args[3] === "true" : args[3]);
+								recv.sendMessage({
+									to: channel,
+									message: `:white_check_mark: Successfully set ${args[2]} to **${args[3]}**`
+								});
+								if(settings[args[2]].onSet)
+									settings[args[2]].onSet(args[3]);
+							}catch(err){
+								recv.sendMessage({
+									to: channel,
+									message: `Error setting value. Did you spell something wrong?:\n\`${err}\``
+								})
+							}
                         }else{
                             recv.sendMessage({
                                 to: channel,

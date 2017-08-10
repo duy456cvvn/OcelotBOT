@@ -31,60 +31,43 @@ module.exports = {
     usage: "trivia leaderboard",
     accessLevel: 10,
     commands: ["trivia"],
-    run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
+    run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         if(args[1] && (args[1].toLowerCase() === "stats" || args[1].toLowerCase() === "leaderboard")) {
-            bot.database.getTriviaLeaderboard()
-                .then(function (result) {
-                    var data = [];
-                    var i = 0;
-                    var position = 69;
-                    async.eachSeries(result, function (entry, cb) {
-                        i++;
-                        if(entry.user == userID){
-                            position = i;
-                            if(i > 10){
-                                cb(true);
-                                return;
-                            }
-                        }
-                        if(i <= 10)
-                            recv.getUser(entry.user, function (err, user) {
-                                data.push({
-                                    "#": i,
-                                    "User": user ? `${user.username}#${user.discriminator}` : `Unknown User ${entry.user}`,
-                                    "Score": entry.Score,
-                                    "Correct": entry.correct,
-                                });
-                                cb();
-                            });
-                        else cb();
-                    }, function () {
-                        recv.sendMessage({
-                            to: channel,
-                            message: `You are **#${position}** out of **${result.length}** trivia players!\nTOP 10 Trivia Players:\n\`\`\`yaml\n${columnify(data)}\n\`\`\``
-                        });
-                    });
-                    if (debug)
-                        recv.sendMessage({
-                            to: channel,
-                            message: `\`\`\`json\n${JSON.stringify(result)}\n\`\`\``
-                        });
-
-
-                })
-                .catch(function (err) {
-                    bot.error(err);
-                    console.log(err);
-                    recv.sendMessage({
-                        to: channel,
-                        message: ":warning: Error getting leaderboard. Try again later."
-                    });
-                    if (debug)
-                        recv.sendMessage({
-                            to: channel,
-                            message: `\`\`\`json\n${JSON.stringify(err)}\n\`\`\``
-                        });
-                });
+            const result = await bot.database.getTriviaLeaderboard();
+			var data = [];
+			var i = 0;
+			var position = 69;
+			async.eachSeries(result, function (entry, cb) {
+				i++;
+				if(entry.user == userID){
+					position = i;
+					if(i > 10){
+						cb(true);
+						return;
+					}
+				}
+				if(i <= 10)
+					recv.getUser(entry.user, function (err, user) {
+						data.push({
+							"#": i,
+							"User": user ? `${user.username}#${user.discriminator}` : `Unknown User ${entry.user}`,
+							"Score": entry.Score,
+							"Correct": entry.correct,
+						});
+						cb();
+					});
+				else cb();
+			}, function () {
+				recv.sendMessage({
+					to: channel,
+					message: `You are **#${position}** out of **${result.length}** trivia players!\nTOP 10 Trivia Players:\n\`\`\`yaml\n${columnify(data)}\n\`\`\``
+				});
+			});
+			if (debug)
+				recv.sendMessage({
+					to: channel,
+					message: `\`\`\`json\n${JSON.stringify(result)}\n\`\`\``
+				});
             return;
         }
         bot.ipc.emit("instanceBusy", {instance: bot.instance});
@@ -181,39 +164,37 @@ module.exports = {
                                             if(allowed)
                                                 winners.push(candidate);
                                             cb();
-                                        }, function(){
-                                            console.log(winners);
-                                            var points = difficulties.indexOf(question.difficulty)+1;
-                                            if(!isBoolean)points *= 2;
-                                            var message = `:watch: Time's up! The correct answer was **${decodeURIComponent(correctAnswer)}**.`;
-                                            if(winners.length > 0){
-                                                message += " Congratulations:\n";
-                                                for(var i in winners){
-                                                    message += "<@"+winners[i]+"> "
-                                                }
-                                                message += `\n You ${winners.length > 1 ? "each " : ""}win **${points}** points! Check out **!trivia leaderboard** to see where you stand.`
-                                            }else{
-                                                message += "\nNobody won that round ):"
-                                            }
-                                            recv.sendMessage({
-                                                to: channel,
-                                                message: message
-                                            });
+                                        }, async function(){
+											console.log(winners);
+											var points = difficulties.indexOf(question.difficulty) + 1;
+											if(!isBoolean) points *= 2;
+											var message = `:watch: Time's up! The correct answer was **${decodeURIComponent(correctAnswer)}**.`;
+											if(winners.length > 0){
+												message += " Congratulations:\n";
+												for(var i in winners){
+													message += "<@" + winners[i] + "> "
+												}
+												message += `\n You ${winners.length > 1 ? "each " : ""}win **${points}** points! Check out **!trivia leaderboard** to see where you stand.`
+											}else{
+												message += "\nNobody won that round ):"
+											}
+											recv.sendMessage({
+												to: channel,
+												message: message
+											});
 
-                                            for(var i in winners){
-                                                if(winners.hasOwnProperty(i))
-                                                    bot.database.logTrivia(winners[i],1,points, server)
-                                                        .then(function logTrivia(){
-                                                            bot.log(`Logged trivia win for ${winners[i]}`);
-                                                        })
-                                                        .catch(function(err){
-                                                            bot.error(err.stack);
-                                                        });
-                                            }
-
-                                            bot.ipc.emit("instanceFree", {instance: bot.instance});
-
-                                        });
+											for(var i in winners){
+												if(winners.hasOwnProperty(i)){
+													try{
+														await bot.database.logTrivia(winners[i], 1, points, server);
+														bot.log(`Logged trivia win for ${winners[i]}`);
+													}catch(err){
+														bot.error(err.stack);
+													}
+												}
+											}
+											bot.ipc.emit("instanceFree", {instance: bot.instance});
+										});
                                     });
                                 }, triviaSeconds*1000);
                             }

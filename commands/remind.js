@@ -9,49 +9,46 @@ module.exports = {
     usage: "remind <in> \"<message>\"",
     accessLevel: 0,
     commands: ["remind", "remindme", "reminder"],
-    init: function(bot, cb){
-        if(bot.instance > 1) {
-            return;
-        }else{
-            bot.database.getReminders()
-                .then(function(result){
-                    const now = new Date();
-                    for(var i in result)
-                        if(result.hasOwnProperty(i)){
-                            let reminder = result[i];
-                            var time = reminder.at-now;
-                            if(time <= 0){
-                                bot.log(`Reminder ${reminder.id} has expired. (${time}ms difference)`);
-                                bot.database.removeReminder(reminder.id)
-                                    .then(function(){
-                                        bot.log(`Removed reminder ${reminder.id}`);
-                                    })
-                                    .catch(function(err){
-                                        bot.error(`Error removing reminder: ${err}`);
-                                    });
-                            }else{
-                                bot.util.setLongTimeout(function(){
-                                    bot.log(`Reminding ${JSON.stringify(reminder)}`);
-                                    bot.receiver.sendMessage({
-                                        to: reminder.channel,
-                                        message: `<@${reminder.user}>, at ${reminder.timestamp} you told me to remind you of this:\n${reminder.message}`
-                                    });
-                                    bot.database.removeReminder(reminder.id)
-                                        .then(function(){
-                                            bot.log(`Removed reminder ${reminder.id}`);
-                                        })
-                                        .catch(function(err){
-                                            bot.error(`Error removing reminder: ${err}`);
-                                        });
-                                }, time);
-                            }
-                        }
-                })
-                .catch(function(err){
-                    bot.error(`Error getting reminders! ${err.stack}`);
-                });
-        }
-        cb();
+    init: async function(bot, cb){
+    	try{
+			if(bot.instance < 1){
+				const result = await bot.database.getReminders();
+				const now = new Date();
+				for(var i in result)
+					if(result.hasOwnProperty(i)){
+						let reminder = result[i];
+						var time = reminder.at - now;
+						if(time <= 0){
+							bot.log(`Reminder ${reminder.id} has expired. (${time}ms difference)`);
+							try{
+								await bot.database.removeReminder(reminder.id);
+								bot.log(`Removed reminder ${reminder.id}`);
+							}catch(err){
+								bot.error(`Error removing reminder: ${err.stack}`);
+							}
+						}else{
+							bot.util.setLongTimeout(async function(){
+								bot.log(`Reminding ${JSON.stringify(reminder)}`);
+								bot.receiver.sendMessage({
+									to: reminder.channel,
+									message: `<@${reminder.user}>, at ${reminder.timestamp} you told me to remind you of this:\n${reminder.message}`
+								});
+								try{
+									await bot.database.removeReminder(reminder.id);
+									bot.log(`Removed reminder ${reminder.id}`);
+								}catch(err){
+									bot.error(`Error removing reminder: ${err.stack}`);
+								}
+							}, time);
+						}
+					}
+			}
+		}catch(err){
+    		bot.error("Error during reminder loading:");
+    		bot.error(err.stack);
+		}finally{
+			cb();
+		}
     },
     run: function run(user ,userID, channel, message, args, event, bot, recv, debug) {
         var rargs = regex.exec(message);

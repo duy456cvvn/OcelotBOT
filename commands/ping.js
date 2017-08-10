@@ -17,34 +17,26 @@ module.exports = {
             recv.sendMessage({
                 to: channel,
                 message: `:watch: Pinging ${args[1]}...`
-            }, function(err, resp){
+            }, async function(err, resp){
                 var id = resp.ts || resp.id;
-                ping.promise.probe(args[1].replace(/[<>|]/g, ""), {
+
+               const res = await ping.promise.probe(args[1].replace(/[<>|]/g, ""), {
                         timeout: args[2] ? args[2] : 1000,
                         extra: args[3] ? [" -c "+args[3]] : ""
-                    })
-                    .then(function(res){
-                        if(res.alive){
-                            recv.editMessage({
-                                channelID: channel,
-                                messageID: id,
-                                message: `:white_check_mark: Received response: \n\`\`\`${res.output}\n\`\`\``
-                            });
-                        }else{
-                            recv.editMessage({
-                                channelID: channel,
-                                messageID: id,
-                                message: ":negative_squared_cross_mark: Received no response from host."
-                            });
-                        }
-                    })
-                    .catch(function(err){
-                        recv.editMessage({
-                            channelID: channel,
-                            messageID: id,
-                            message: `:bangbang: An error occurred: ${err}`
-                        });
                     });
+				if(res.alive){
+					recv.editMessage({
+						channelID: channel,
+						messageID: id,
+						message: `:white_check_mark: Received response: \n\`\`\`${res.output}\n\`\`\``
+					});
+				}else{
+					recv.editMessage({
+						channelID: channel,
+						messageID: id,
+						message: ":negative_squared_cross_mark: Received no response from host."
+					});
+				}
             });
         }
     }

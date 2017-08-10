@@ -17,24 +17,23 @@ module.exports = {
             });
         }else{
             recv.simulateTyping(channel);
-            request(`https://snapcodes.herokuapp.com/snapcode.php?username=${args[1]}&size=400`, function(err, resp, body){
+            request(`https://snapcodes.herokuapp.com/snapcode.php?username=${args[1]}&size=400`, async function(err, resp, body){
                 if(!err){
-                    svg2png(new Buffer(body), {width: 400, height: 400})
-                        .then(function(image){
-                            recv.uploadFile({
-                                to: channel,
-                                file: image,
-                                filename: "snapcode.png",
-                                message: "Here's your snapcode:"
-                            });
-                        })
-                        .catch(function(err){
-                            recv.sendMessage({
-                                to: channel,
-                                message: ":bangbang: An error occurred. Please try again later."
-                            });
-                            bot.error(err.stack);
-                        })
+                	try{
+						recv.uploadFile({
+							to: channel,
+							file: await svg2png(new Buffer(body), {width: 400, height: 400}),
+							filename: "snapcode.png",
+							message: "Here's your snapcode:"
+						});
+					}catch(err){
+						recv.sendMessage({
+							to: channel,
+							message: ":bangbang: An error occurred. Please try again later."
+						});
+						bot.error(err.stack);
+					}
+
                 }else{
                     recv.sendMessage({
                         to: channel,
