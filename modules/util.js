@@ -39,6 +39,50 @@ module.exports = function(bot){
 				4011: "Discord: Sharding Required"
 			};
 
+            bot.util.PERMISSIONS = {
+				// General
+				createInstantInvite: 0x1,
+				kickMembers: 0x2,
+				banMembers: 0x4,
+				administrator: 0x8,
+				manageChannels: 0x10,
+				manageServer: 0x20,
+				addReactions: 0x40,
+				viewAuditLogs: 0x80,
+				manageRoles: 0x10000000,
+				changeNickname: 0x4000000,
+				manageNicknames: 0x8000000,
+				manageEmojis: 0x40000000,
+				manageWebhooks: 0x20000000,
+				// Text
+				readMessages: 0x400,
+				sendMessages: 0x800,
+				sendTTSMessages: 0x1000,
+				manageMessages: 0x2000,
+				embedLinks: 0x4000,
+				attachFiles: 0x8000,
+				readMessageHistory: 0x10000,
+				mentionEveryone: 0x20000,
+				useExternalEmojis: 0x40000,
+				// Voice
+				voiceConnect: 0x100000,
+				voiceSpeak: 0x200000,
+				voiceMuteMembers: 0x400000,
+				voiceDeafenMembers: 0x800000,
+				voiceMoveMembers: 0x1000000,
+				voiceUseVAD: 0x2000000
+			};
+
+            bot.util.hasPermission = function(server, member, permission){
+            	for(var i = 0; i < member.roles; i++){
+            		const role = server.roles[member.roles[i]];
+            		if((role.permissions & permission) == 1){
+            			return true;
+					}
+				}
+				return false;
+			};
+
             bot.util.arrayDiff = function(first, second) {
                 return first.filter(function(i) {return second.indexOf(i) < 0;});
             };
