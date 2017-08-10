@@ -108,7 +108,12 @@ module.exports = {
 							to: channel,
 							message: ":warning: Either this is a DM channel, or there is an issue with the database connection.\nPlease use this command in a server, or try again later."
 						})
-                    }else{
+                    }else if(serverData.unavailable){
+                    	recv.sendMessage({
+							to: channel,
+							message: ":warning: Discord gateway not currently connected to this server, try again later."
+						});
+					}else{
 						for(var i in serverData.members[userID].roles){
 							if(serverData.members[userID].roles.hasOwnProperty(i)) {
 								var role = serverData.roles[serverData.members[userID].roles[i]];
