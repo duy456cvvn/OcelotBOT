@@ -54,14 +54,14 @@ module.exports = {
                     receiver.addReaction(reaction, function (err) {
                         if (err) {
                             bot.log("Spell queue item failed with: " + err);
-                            console.log(err);
                             reaction.retries++;
-                            if (reaction.retries < 3 && err.response.message === "You are being rate limited.") {
+                            if (reaction.retries < 3 && err.response && err.response.message === "You are being rate limited.") {
                                 bot.spellQueueTotalRetries++;
                                 reaction.receiver = receiver;
                                 bot.log("Rate limited, trying again next turn.");
                                 bot.spellQueue.unshift(reaction);
                             } else {
+								console.log(err);
                                 if (err.response.statusCode == 403) {
                                     notAllowedChannels.push(reaction.channelID);
                                 }
