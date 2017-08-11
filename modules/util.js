@@ -1,6 +1,8 @@
 /**
  * Created by Peter on 01/07/2017.
  */
+
+const async = require('async');
 module.exports = function(bot){
     return {
         name: "Utilities  Module",
@@ -81,6 +83,26 @@ module.exports = function(bot){
 					}
 				}
 				return false;
+			};
+
+            bot.util.emojiLookup = async function(name){
+            	var name = name.toLowerCase();
+            	return new Promise(function(fulfill, reject){
+            		var output = [];
+					async.eachSeries(bot.serverCache, function(server, cb){
+						for(var emojiID in server.emojis){
+							if(server.emojis.hasOwnProperty(emojiID)){
+								var emoji = server.emojis[emojiID];
+								if(emoji.name.toLowerCase().indexOf(name) > -1){
+									output.push(`<:${emoji.name}:${emoji.id}>`);
+								}
+							}
+						}
+						cb();
+					}, function(){
+						fulfill(output);
+					});
+				});
 			};
 
             bot.util.arrayDiff = function(first, second) {
