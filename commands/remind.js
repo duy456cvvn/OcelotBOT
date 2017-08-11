@@ -11,7 +11,8 @@ module.exports = {
     commands: ["remind", "remindme", "reminder"],
     init: async function(bot, cb){
     	try{
-			if(bot.instance < 1){
+			if(parseInt(process.argv[2]) < 1){
+				bot.log("This is the reminder instance");
 				const result = await bot.database.getReminders();
 				const now = new Date();
 				for(var i in result)
@@ -42,6 +43,8 @@ module.exports = {
 							}, time);
 						}
 					}
+			}else{
+				bot.log("skipping reminders (This is ocelotbot-"+parseInt(process.argv[2])+")")
 			}
 		}catch(err){
     		bot.error("Error during reminder loading:");
