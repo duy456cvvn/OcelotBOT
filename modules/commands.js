@@ -89,63 +89,67 @@ module.exports = function(bot){
             });
 
 
-        bot.registerMessageHandler("commands", function(user, userID, channelID, message, event, _bot, receiver){
+        bot.registerMessageHandler("commands", async function(user, userID, channelID, message, event, _bot, receiver){
+        	var wasCommand = false;
             try {
-                receiver.getServerFromChannel(channelID, function(err, server){
-                    if (message.startsWith(getPrefix(server))) {
-                        var args = message.split(" ");
-                        const commandName = args[0].substring(getPrefix(server).length).toLowerCase();
-                        var command = bot.commands[commandName];
-                        if (!isBanned() && command) {
-                            bot.commandCount++;
+                var server = await receiver.getServerFromChannel(channelID);
+				if (message.startsWith(getPrefix(server))) {
+					var args = message.split(" ");
+					const commandName = args[0].substring(getPrefix(server).length).toLowerCase();
+					var command = bot.commands[commandName];
+					if (!isBanned() && command) {
+						wasCommand = true;
+						bot.commandCount++;
 
-                            var cooldown = bot.commandCooldowns[userID];
-                            if(cooldown){
-                                if(cooldown[commandName]){
-                                    cooldown[commandName]++;
-                                }else{
-                                    cooldown[commandName] = 1;
-                                }
-                            }else{
-                                bot.commandCooldowns[userID] = {
-                                    [commandName]: 1
-                                };
-                            }
-
-							function log(message){
-								bot.database.logCommand(userID, channelID, message)
-									.then(function(){
-										bot.log(`${user} (${userID}) in ${server} performed command ${message}`);
-									})
-									.catch(function(err){
-										bot.error(`Error logging command: ${err.stack}`);
-									});
+						var cooldown = bot.commandCooldowns[userID];
+						if(cooldown){
+							if(cooldown[commandName]){
+								cooldown[commandName]++;
+							}else{
+								cooldown[commandName] = 1;
 							}
+						}else{
+							bot.commandCooldowns[userID] = {
+								[commandName]: 1
+							};
+						}
 
-                            if(cooldown && cooldown[commandName] && cooldown[commandName] >= config.get("Bot.softCooldown")){
-                                if(cooldown[commandName] >= config.get("Bot.hardCooldown")){
-									log(message+" [HARD COOLDOWN]");
-									bot.warn(`Hard cooldown triggered by ${user} (${userID})`);
-                                }else{
-									log(message+" [SOFT COOLDOWN]");
-									bot.log(`Soft cooldown triggered by ${user} (${userID})`);
-									receiver.sendMessage({
-										to: channelID,
-										message: ":watch: Wait a while before performing this command again!"
-									});
-                                }
-                            }else{
-								log(message);
-								command(user, userID, channelID, message, args, event, bot, receiver, message.indexOf("-DEBUG") > -1, server);
-                            }
-                        }
-                    }
-                });
+						async function log(message){
+							try{
+								await bot.database.logCommand(userID, channelID, message)
+							}catch(err){
+								bot.error(`Error logging command: ${err.stack}`);
+							}finally{
+								bot.log(`${user} (${userID}) in ${server} performed command ${message}`);
+							}
+						}
+
+						if(cooldown && cooldown[commandName] && cooldown[commandName] >= config.get("Bot.softCooldown")){
+							if(cooldown[commandName] >= config.get("Bot.hardCooldown")){
+								log(message+" [HARD COOLDOWN]");
+								bot.warn(`Hard cooldown triggered by ${user} (${userID})`);
+							}else{
+								log(message+" [SOFT COOLDOWN]");
+								bot.log(`Soft cooldown triggered by ${user} (${userID})`);
+								receiver.sendMessage({
+									to: channelID,
+									message: ":watch: Wait a while before performing this command again!"
+								});
+							}
+						}else{
+							log(message);
+							command(user, userID, channelID, message, args, event, bot, receiver, message.indexOf("-DEBUG") > -1, server);
+						}
+					}
+				}
+
             }catch(e){
-                receiver.sendMessage({
-                    to: channelID,
-                    message: ":bangbang: Command failed: "+e
-                });
+            	if(wasCommand){
+					receiver.sendMessage({
+						to: channelID,
+						message: ":bangbang: Command failed: " + e
+					});
+				}
                 bot.error(`Command ${message} failed: ${e}`);
                 bot.error(e.stack);
             }

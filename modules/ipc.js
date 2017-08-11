@@ -179,57 +179,118 @@ module.exports = function(bot){
             bot.receiver = new Proxy({
                 id: "discord",
                 getServerFromChannel: function getServerFromChannel(channel, cb){
-                    if(channelCache[channel]){
-                        cb(null, channelCache[channel].guild_id);
-                    }else{
-                        bot.emitWithCallback("command", {
-                            receiver: bot.lastRecvID,
-                            args: Array.from(arguments),
-                            command: "getChannelInfo",
-                        }, function(err, channelInfo){
-                            bot.log(`Populating channelCache for channel ${channel}`);
-                            if(channelInfo) {
-                                channelCache[channel] = channelInfo;
-                                cb(null, channelInfo.guild_id);
-                            }else{
-                                bot.warn(`Tried to get server from channel that does not exist!!! ${channel}`);
-                                cb("Channel Does Not Exist", null);
-                            }
-                        });
-                    }
+                	if(!cb){
+                		return new Promise(function(fulfill, reject){
+							if(channelCache[channel]){
+								fulfill(channelCache[channel].guild_id);
+							}else{
+								bot.emitWithCallback("command", {
+									receiver: bot.lastRecvID,
+									args: Array.from(arguments),
+									command: "getChannelInfo",
+								}, function(err, channelInfo){
+									bot.log(`Populating channelCache for channel ${channel}`);
+									if(channelInfo && !err){
+										channelCache[channel] = channelInfo;
+										fulfill(channelInfo.guild_id);
+									}else{
+										bot.warn(`Tried to get server from channel that does not exist!!! ${channel}`);
+										reject("Channel Does Not Exist");
+									}
+								});
+							}
+						});
+					}else if(channelCache[channel]){
+						cb(null, channelCache[channel].guild_id);
+					}else{
+						bot.emitWithCallback("command", {
+							receiver: bot.lastRecvID,
+							args: Array.from(arguments),
+							command: "getChannelInfo",
+						}, function(err, channelInfo){
+							bot.log(`Populating channelCache for channel ${channel}`);
+							if(channelInfo){
+								channelCache[channel] = channelInfo;
+								cb(null, channelInfo.guild_id);
+							}else{
+								bot.warn(`Tried to get server from channel that does not exist!!! ${channel}`);
+								cb("Channel Does Not Exist", null);
+							}
+						});
+					}
                 },
                 getChannelInfo: function getChannelInfo(channel, cb){
-                    if(channelCache[channel]){
-                        cb(null, channelCache[channel]);
-                    }else{
-                        bot.emitWithCallback("command", {
-                            receiver: bot.lastRecvID,
-                            args: Array.from(arguments),
-                            command: "getChannelInfo",
-                        }, function(err, channelInfo){
-                            bot.log(`Populating channelCache for channel ${channel}`);
-                            channelCache[channel] = channelInfo;
-                            cb(null, channelInfo);
-                        });
-                    }
+                	if(!cb){
+                		return new Promise(function(fulfill, reject){
+							if(channelCache[channel]){
+								fulfill(channelCache[channel]);
+							}else{
+								bot.emitWithCallback("command", {
+									receiver: bot.lastRecvID,
+									args: Array.from(arguments),
+									command: "getChannelInfo",
+								}, function(err, channelInfo){
+									if(err){
+										bot.error(err);
+										reject(err);
+									}else{
+										bot.log(`Populating channelCache for channel ${channel}`);
+										channelCache[channel] = channelInfo;
+										fulfill(channelInfo);
+									}
+								});
+							}
+						});
+					}else if(channelCache[channel]){
+						cb(null, channelCache[channel]);
+					}else{
+						bot.emitWithCallback("command", {
+							receiver: bot.lastRecvID,
+							args: Array.from(arguments),
+							command: "getChannelInfo",
+						}, function(err, channelInfo){
+							bot.log(`Populating channelCache for channel ${channel}`);
+							channelCache[channel] = channelInfo;
+							cb(null, channelInfo);
+						});
+					}
                 },
                 getServerInfo: function getServerInfo(server, cb){
-
-                    if(serverCache[server]){
-                        cb(null, serverCache[server]);
-                    }else{
-                        bot.emitWithCallback("command", {
-                            receiver: bot.lastRecvID,
-                            args: Array.from(arguments),
-                            command: "getServerInfo",
-                        }, function(err, serverInfo){
-                            bot.log(`Populating serverCache for channel ${server}`);
-                            serverCache[server] = serverInfo;
-                            cb(null, serverInfo);
-                        });
-                    }
-                }
-
+                	if(!cb){
+                		return new Promise(function(fulfill, reject){
+							if(serverCache[server]){
+								fulfill(serverCache[server]);
+							}else{
+								bot.emitWithCallback("command", {
+									receiver: bot.lastRecvID,
+									args: Array.from(arguments),
+									command: "getServerInfo",
+								}, function(err, serverInfo){
+									if(err){
+										bot.error(err);
+										reject(err);
+									}else{
+										bot.log(`Populating serverCache for channel ${server}`);
+										serverCache[server] = serverInfo;
+										fulfill(serverInfo);
+									}
+								});
+							}
+						});
+					}else if(serverCache[server]){
+						cb(null, serverCache[server]);
+					}else{
+						bot.emitWithCallback("command", {
+							receiver: bot.lastRecvID,
+							args: Array.from(arguments),
+							command: "getServerInfo",
+						}, function(err, serverInfo){
+							bot.log(`Populating serverCache for channel ${server}`);
+							serverCache[server] = serverInfo;
+							cb(null, serverInfo);
+						});
+					}
+				}
             }, {
                 get: function proxyGet(target, command){
                     return target[command] || function proxyToBroker(){

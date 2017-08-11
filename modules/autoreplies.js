@@ -78,80 +78,72 @@ module.exports = function(bot){
 
             var timeouts = [];
 
-            bot.registerMessageHandler("autoreply", function messageHandler(user, userID, channelID, message, event, _bot, receiver){
+            bot.registerMessageHandler("autoreply", async function messageHandler(user, userID, channelID, message, event, _bot, receiver){
                 if(!message)return;
-                receiver.getServerFromChannel(channelID, function(err, server){
+                try{
+                	var serverID = await receiver.getServerFromChannel(channelID);
                     if (
-                        bot.banCache.server.indexOf(server) === -1 &&
+                        bot.banCache.server.indexOf(serverID) === -1 &&
                         bot.banCache.channel.indexOf(channelID) === -1 &&
                         bot.banCache.user.indexOf(userID) === -1) {
                         for (let i in bot.autoReplies) {
                             if (bot.autoReplies.hasOwnProperty(i)) {
                                 let reply = bot.autoReplies[i];
                                 if (message.match(reply.regex) && (!reply.timeout || !timeouts[channelID] || !timeouts[channelID][i] || new Date().getTime() - timeouts[channelID][i] > reply.timeout)) {
-                                    bot.database.getServer(server)
-                                        .then(function(result){
-                                            var serverSettings = result[0] || {enableAutoReplies: 1, enableAutoReactions: 1};
-                                            var happened = false;
-                                            if (reply.type === types.EMBED && serverSettings.enableAutoReplies) {
-                                                receiver.sendMessage({
-                                                    to: channelID,
-                                                    message: "",
-                                                    embed: {
-                                                        image: {
-                                                            url: reply.content
-                                                        }
-                                                    }
-                                                });
-                                                happened = true;
-                                            } else if (reply.type === types.MESSAGE && serverSettings.enableAutoReplies) {
-                                                receiver.sendMessage({
-                                                    to: channelID,
-                                                    message: reply.content
-                                                });
-                                                happened = true;
-                                            } else if (reply.type === types.REACTION && serverSettings.enableAutoReactions) {
-                                                for (var j in reply.content) {
-                                                    bot.spellQueue.push({
-                                                        channelID: channelID,
-                                                        messageID: event.d.id,
-                                                        reaction: reply.content[j],
-                                                        retries: 0,
-                                                        receiver: receiver,
-                                                        time: new Date()
-                                                    });
-                                                }
-                                                happened = true;
-                                                bot.processSpellQueue();
-                                            }
+                                    var serverSettings = await bot.database.getServer(serverID)[0]|| {enableAutoReplies: 1, enableAutoReactions: 1};
+									var happened = false;
+									if (reply.type === types.EMBED && serverSettings.enableAutoReplies) {
+										receiver.sendMessage({
+											to: channelID,
+											message: "",
+											embed: {
+												image: {
+													url: reply.content
+												}
+											}
+										});
+										happened = true;
+									} else if (reply.type === types.MESSAGE && serverSettings.enableAutoReplies) {
+										receiver.sendMessage({
+											to: channelID,
+											message: reply.content
+										});
+										happened = true;
+									} else if (reply.type === types.REACTION && serverSettings.enableAutoReactions) {
+										for (var j in reply.content) {
+											bot.spellQueue.push({
+												channelID: channelID,
+												messageID: event.d.id,
+												reaction: reply.content[j],
+												retries: 0,
+												receiver: receiver,
+												time: new Date()
+											});
+										}
+										happened = true;
+										bot.processSpellQueue();
+									}
 
-                                            if(happened) {
-                                                if (reply.timeout) {
-                                                    if (timeouts[channelID]) {
-                                                        timeouts[channelID][i] = new Date().getTime();
-                                                    } else {
-                                                        timeouts[channelID] = [];
-                                                        timeouts[channelID][i] = new Date().getTime();
-                                                    }
-                                                }
-
-                                                bot.database.logCommand(userID, channelID, `${message} [AUTOREPLY MATCH ${i} ${reply.regex}]`)
-                                                    .then(function logAutoreply() {
-                                                        bot.log(`${user} (${userID}) in ${server} matched autoreply ${message}`);
-                                                    })
-                                                    .catch(function (err) {
-                                                        bot.error(`Error logging autoreply: ${err.stack}`);
-                                                    });
-                                            }
-                                        })
-                                        .catch(function(err){
-                                           console.error(err);
-                                        });
+									if(happened) {
+										if (reply.timeout) {
+											if (timeouts[channelID]) {
+												timeouts[channelID][i] = new Date().getTime();
+											} else {
+												timeouts[channelID] = [];
+												timeouts[channelID][i] = new Date().getTime();
+											}
+										}
+										await bot.database.logCommand(userID, channelID, `${message} [AUTOREPLY MATCH ${i} ${reply.regex}]`);
+										bot.log(`${user} (${userID}) in ${serverID} matched autoreply ${message}`);
+									}
                                 }
                             }
                         }
                     }
-                });
+				}catch(e){
+                	bot.error("Error during autoreply match:");
+					bot.error(e.stack);
+				}
             });
             cb();
         }
