@@ -149,9 +149,13 @@ module.exports = function(bot){
 						to: channelID,
 						message: ":bangbang: Command failed: " + e
 					});
+					bot.error(`Command ${message} failed: ${e}`);
+				}else{
+            		bot.error(`Message ${message} caused error:`);
 				}
-                bot.error(`Command ${message} failed: ${e}`);
-                bot.error(e.stack);
+
+				if(e.stack)
+                	bot.error(e.stack);
             }
         });
       }
