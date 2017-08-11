@@ -141,8 +141,8 @@ module.exports = function(bot){
                         }
                     }
 				}catch(e){
-                	bot.error("Error during autoreply match:");
-					bot.error(e.stack);
+                	bot.error("Error during autoreply match: "+e);
+					bot.error(e.message+""+e.stack);
 				}
             });
             cb();
