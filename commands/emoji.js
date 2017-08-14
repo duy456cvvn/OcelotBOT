@@ -9,12 +9,12 @@ module.exports = {
 			const result = await bot.util.emojiLookup(args[1]);
 			recv.sendMessage({
 				to: channel,
-				message: result.length ? result.join(" ") : ":bangbang: No emojis found"
+				message: result.length ? result.join(" ").substring(0, 2000) : await bot.lang.getTranslation(server, "EMOJI_NOT_FOUND")
 			});
 		}else{
 			recv.sendMessage({
 				to: channel,
-				message: ":bangbang: You must enter a search term"
+				message: await bot.lang.getTranslation(server, "EMOJI_NO_TERM")
 			});
 		}
 	}

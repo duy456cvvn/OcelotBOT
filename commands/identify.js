@@ -41,7 +41,7 @@ module.exports = {
             recv.getMessages({
                 channelID: channel,
                 limit: 100
-            }, function(err, resp){
+            }, async function(err, resp){
                 for(var i = resp.length-1; i > 0; i--){
                     var message = resp[i];
                     if(message.attachments[0] && message.attachments[0].url){
@@ -51,7 +51,7 @@ module.exports = {
                 }
                 recv.sendMessage({
                     to: channel,
-                    message: ":bangbang: I don't know what image you're referring to. Need to supply a URL or attachment..."
+                    message: await bot.lang.getTranslation(server, "FACE_NO_IMAGE")
                 });
             });
         }
@@ -66,10 +66,10 @@ module.exports = {
                         message: `:eyes: ${bot.util.arrayRand(messages)}${vowels.indexOf(item[0]) > -1 ? "an" : "a"} **${item}**.`
                     });
                 },
-                function(err) {
+                async function(err) {
                     recv.sendMessage({
                         to: channel,
-                        message: `:bangbang: An error occurred.`
+                        message: await bot.lang.getTranslation(server, "GENERIC_ERROR")
                     });
                     bot.error(err);
                 }

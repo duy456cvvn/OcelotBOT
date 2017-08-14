@@ -9,14 +9,14 @@ module.exports = {
     usage: "ipinfo <ip>",
     accessLevel: 0,
     commands: ["ipinfo"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         if(args.length < 2){
             recv.sendMessage({
                 to: channel,
-                message: ":bangbang: You must enter an IP address."
+                message: await bot.lang.getTranslation(server, "IPINFO_USAGE")
             });
         }else{
-            request(`http://ipinfo.io/${args[1]}/json`, function(err, response, body){
+            request(`http://ipinfo.io/${args[1]}/json`, async function(err, response, body){
                 try{
                     var data = JSON.parse(body);
                     recv.sendMessage({
@@ -26,12 +26,12 @@ module.exports = {
                 }catch(e){
                     recv.sendMessage({
                         to: channel,
-                        message: ":bangbang: Please enter a valid IP address"
+                        message: await bot.lang.getTranslation(server, "IPINFO_USAGE")
                     });
                     bot.error(`${e.stack}, ${body}`);
                 }
             });
-            request(`https://www.abuseipdb.com/check/${args[1]}/json?key=${config.get("Commands.ipinfo.key")}&days=${config.get("Commands.ipinfo.days")}`, function(err, resp, body){
+            request(`https://www.abuseipdb.com/check/${args[1]}/json?key=${config.get("Commands.ipinfo.key")}&days=${config.get("Commands.ipinfo.days")}`,async function(err, resp, body){
                 try{
                     var data = JSON.parse(body);
                     if(data.length > 0){
@@ -42,7 +42,7 @@ module.exports = {
                         }
                         recv.sendMessage({
                             to: channel,
-                            message: `:warning: **IP Address was reported to AbuseIPDB __${data.length} times__ in the past year.**\nLast Report:\n\`\`\`\n${lastReport}\n\`\`\``
+                            message: await bot.lang.getTranslation(server, "IPINFO_REPORT", {num: data.length})+"\n"+await bot.lang.getTranslation(server, "IPINFO_LAST_REPORT")+lastReport
                         });
                     }
 

@@ -6,16 +6,16 @@ module.exports = {
     usage: "lastcrash",
     accessLevel: 0,
     commands: ["lastcrash", "uptime"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         // var now = new Date().getTime();
         //
         // var timeDiff = Math.abs(now - bot.lastCrash.getTime())/1000;
 
 
-        recv.getStats(function(stats){
+        recv.getStats(async function(stats){
             recv.sendMessage({
                 to: channel,
-                message: `The last crash was **${bot.util.prettySeconds(stats.uptime)}** ago.`
+                message: await bot.lang.getTranslation(server, "LASTCRASH", {time: bot.util.prettySeconds(stats.uptime)})
             });
         });
         // recv.sendMessage({

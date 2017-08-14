@@ -124,6 +124,7 @@ module.exports = {
                         }], bot.util.after(500, function(err, resp){
                             if(err){
                                 bot.error("Error sending trivia question: "+err);
+                                bot.error(err);
                                 recv.sendMessage({
                                     to: channel,
                                     message: ":bangbang: Something went wrong. Try Again Later."

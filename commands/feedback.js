@@ -10,7 +10,7 @@ module.exports = {
         if(args.length > 1){
             recv.sendMessage({
                 to: channel,
-                message: ":white_check_mark: Your feedback has been sent. Please note we cannot respond to all feedback."
+                message: await bot.lang.getTranslation(server, "FEEDBACK_SUCCESS")
             });
             const serverInfo = await recv.getServer(server);
 			recv.sendMessage({
@@ -20,7 +20,7 @@ module.exports = {
         }else{
             recv.sendMessage({
                 to: channel,
-                message: `:bangbang: You must enter some feedback. i.e **${bot.prefixCache[server]}feedback This bot is amazing!**`
+                message:  await bot.lang.getTranslation(server, "FEEDBACK_ERROR")
             })
         }
     }

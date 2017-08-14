@@ -9,7 +9,7 @@ module.exports = {
     run: function run(user, userID, channel, message, args, event, bot, recv) {
         recv.sendMessage({
             to: channel,
-            message:  message.replace("!expand", "").split("").join(" ")
+            message:  message.replace(args[0], "").split("").join(" ")
         });
     }
 };

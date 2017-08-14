@@ -20,7 +20,7 @@ module.exports = {
             recv.getMessages({
                 channelID: channel,
                 limit: 100
-            }, function(err, resp){
+            }, async function(err, resp){
                 for(var i = resp.length-1; i > 0; i--){
                     var message = resp[i];
                     if(message.attachments[0] && message.attachments[0].url){
@@ -30,7 +30,7 @@ module.exports = {
                 }
                 recv.sendMessage({
                     to: channel,
-                    message: ":bangbang: I don't know what image you're referring to. Need to supply a URL or attachment..."
+                    message: await bot.lang.getTranslation(server, "FACE_NO_IMAGE")
                 });
             });
         }
@@ -47,7 +47,7 @@ module.exports = {
                 body: {
                     url: url
                 }
-            }, function(err, resp, body){
+            }, async function(err, resp, body){
                 if(body.length > 0) {
                     if(body.length === 1){
                         recv.sendMessage({
@@ -57,19 +57,19 @@ module.exports = {
                     }else{
                         var output = "";
                         for(var i = 0; i < body.length; i++){
-                            output += `a **${body[i].faceAttributes.age} year old ${body[i].faceAttributes.gender}**`;
+                            output += await bot.lang.getTranslation(server, "FACE_RESPONSE", body[i].faceAttributes);
                             output += i < body.length-2 ? ", " : i === body.length-2 ? " and " : "."
                         }
                         recv.sendMessage({
                             to: channel,
-                            message: `:thinking: I see ${body.length} faces. ${output}`
+                            message: await bot.lang.getTranslation(server, "FACE_RESPONSE_MULTIPLE", {num: body.length-1})+" "+output
                         });
                     }
 
                 }else{
                     recv.sendMessage({
                         to: channel,
-                        message: ":( I couldn't find any faces in that image."
+                        message: await bot.lang.getTranslation(server, "FACE_NO_FACES")
                     });
                 }
             })

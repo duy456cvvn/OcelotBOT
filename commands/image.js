@@ -8,11 +8,11 @@ module.exports = {
     usage: "image <subreddit>",
     accessLevel: 0,
     commands: ["image"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         if(args.length < 2){
             recv.sendMessage({
                 to: channel,
-                message: ":bangbang: You must enter a subreddit. i.e. !image aww"
+                message: await bot.lang.getTranslation(server, "IMAGE_NO_SUBREDDIT")
             });
         }else{
             const subreddit = args[1].replace("r/", "");
@@ -21,11 +21,11 @@ module.exports = {
                 headers: {
                     'User-Agent': config.get("Commands.image.userAgent")
                 }
-            }, function(err, resp, body){
+            }, async function(err, resp, body){
                 if(err){
                     recv.sendMessage({
                         to: channel,
-                        message: ":bangbang: Error contacting reddit. Try again later."
+                        message:  await bot.lang.getTranslation(server, "IMAGE_ERROR")
                     });
                     bot.error(err.message);
                 }else{
@@ -35,13 +35,13 @@ module.exports = {
                             var message = "";
                             switch (data.error) {
                                 case 404:
-                                    message = ":warning: Subreddit does not exist or was banned";
+                                    message = await bot.lang.getTranslation(server, "IMAGE_BANNED");
                                     break;
                                 case 403:
-                                    message = ":warning: Subreddit is invite only or quarantined.";
+                                    message = await bot.lang.getTranslation(server, "IMAGE_QUARANTINED");
                                     break;
                                 default:
-                                    message = ":warning: Unknown error (" + data.error + ")";
+                                    message = await bot.lang.getTranslation(server, "IMAGE_ERROR");
                                     break;
 
                             }
@@ -54,7 +54,7 @@ module.exports = {
                             if (data.children.length === 0) {
                                 recv.sendMessage({
                                     to: channel,
-                                    message: ":warning: There doesn't seem to be anything there."
+                                    message: await bot.lang.getTranslation(server, "IMAGE_NO_POSTS")
                                 });
                             } else {
                                 const posts = data.children;
@@ -73,7 +73,7 @@ module.exports = {
                                 if(i === 50){
                                     recv.sendMessage({
                                         to: channel,
-                                        message: ":warning: Couldn't find a post!"
+                                        message: await bot.lang.getTranslation(server, "IMAGE_NO_IMAGES")
                                     });
                                 }else{
                                     recv.sendMessage({
@@ -92,7 +92,7 @@ module.exports = {
                     }catch(e){
                         recv.sendMessage({
                             to: channel,
-                            message: "Error parsing response from reddit. Try again later."
+                            message: await bot.lang.getTranslation(server, "IMAGE_INVALID_RESPONSE")
                         });
                         bot.error(e.stack);
                     }

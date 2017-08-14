@@ -28,11 +28,11 @@ module.exports = {
             gm("static/handicap.png")
                 .font("static/arial.ttf", 30)
                 .drawText(275, 328, wrap(text, {width: 20, indent: ''}))
-                .toBuffer('PNG', function(err, buffer){
+                .toBuffer('PNG', async function(err, buffer){
                     if(err){
                         recv.sendMessage({
                             to: channel,
-                            message: ":bangbang: An error occurred. Try again later."
+                            message:  await bot.lang.getTranslation(server, "GENERIC_ERROR")
                         });
                         console.log(err);
                     }else{

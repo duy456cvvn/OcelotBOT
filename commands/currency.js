@@ -7,21 +7,21 @@ module.exports = {
     usage: "currency <currency> <currency>",
     accessLevel: 0,
     commands: ["currency"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         if(args.length < 3){
             recv.sendMessage({
                 to: channel,
-                message: ":bangbang: You must enter two currencies i.e USD GBP"
+                message: await bot.lang.getTranslation(server,"CONVERT_INVALID_CURRENCY")
             });
         }else{
             const first = args[1].toUpperCase();
             const second = args[2].toUpperCase();
             recv.simulateTyping(channel);
-            request(`https://api.fixer.io/latest?symbols=${second}&base=${first}`, function currencyConverterCB(err, resp, body){
+            request(`https://api.fixer.io/latest?symbols=${second}&base=${first}`,async function currencyConverterCB(err, resp, body){
                 if(err){
                     recv.sendMessage({
                         to: channel,
-                        message: ":bangbang: Could not contact conversion API. Try again later."
+                        message: await bot.lang.getTranslation(server, "CONVERT_INVALID_RESPONSE")
                     });
                     bot.error(err);
                 }else{
@@ -35,13 +35,13 @@ module.exports = {
                         }else{
                             recv.sendMessage({
                                 to: channel,
-                                message: ":bangbang: Invalid currencies. You must enter currency codes i.e EUR or GBP."
+                                message: await bot.lang.getTranslation(server,"CONVERT_INVALID_CURRENCY")
                             });
                         }
                     }catch(e){
                         recv.sendMessage({
                             to: channel,
-                            message: ":bangbang: Received invalid response from conversion API. Try again later."
+                            message: await bot.lang.getTranslation(server,"CONVERT_INVALID_RESPONSE")
                         });
                         bot.error(e);
                         bot.error(body);

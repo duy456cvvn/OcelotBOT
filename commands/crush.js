@@ -15,7 +15,7 @@ module.exports = {
         if(!args[1]){
             recv.sendMessage({
                 to: channel,
-                message: ":bangbang: You must mention a user, or enter a URL."
+                message: await bot.lang.getTranslation(server,"CRUSH_NO_USER")
             });
         }else{
             bot.ipc.emit("instanceBusy", {instance: bot.instance});
@@ -25,7 +25,7 @@ module.exports = {
                 if(!isUrl && !targetUser && target !== "everyone"){
                     recv.sendMessage({
                         to: channel,
-                        message: ":bangbang: Couldn't find that user, did you make sure to @mention them?"
+                        message: await bot.lang.getTranslation(server,"CRUSH_INVALID_USER")
                     });
                 }else{
                     recv.simulateTyping(channel);
@@ -34,7 +34,7 @@ module.exports = {
 						if(!serverInfo){
 							recv.sendMessage({
 								to: channel,
-								message: ":warning: This is a DM Channel."
+								message: await bot.lang.getTranslation(server,"CRUSH_INVALID_SERVER")
 							})
 						}else if(serverInfo.icon){
 							const fileName = `${config.get("dir")}icon-${encodeURIComponent(serverInfo.icon)}.png`;
@@ -43,7 +43,7 @@ module.exports = {
 						}else{
 							recv.sendMessage({
 								to: channel,
-								message: ":bangbang: This server doesn't have an icon. ):"
+								message: await bot.lang.getTranslation(server,"CRUSH_INVALID_ICON")
 							})
 						}
                     }else if(targetUser && targetUser.avatar){
@@ -54,7 +54,7 @@ module.exports = {
                     }else{
                         recv.sendMessage({
                             to: channel,
-                            message: ":bangbang: The target user has no avatar, somehow..."
+                            message: await bot.lang.getTranslation(server,"CRUSH_INVALID_ICON")
                         });
                     }
 
@@ -66,7 +66,7 @@ module.exports = {
                                 file: outputFile,
                                 filename: config.get("filename"),
                                 filetype: "png"
-                            }, function uploadFileCB(err){
+                            }, async function uploadFileCB(err){
                                 bot.ipc.emit("instanceFree", {instance: bot.instance});
                                 if(err){
                                     fs.unlink(outputFile, function deleteFileCB(err){
@@ -78,7 +78,7 @@ module.exports = {
                                     });
                                     recv.sendMessage({
                                         to: channel,
-                                        message: ":bangbang: Something went wrong. Try again later."
+                                        message: await bot.lang.getTranslation(server,"GENERIC_ERROR")
                                     })
                                 }
                             });
@@ -102,12 +102,12 @@ module.exports = {
                             .resize(405)
                             .rotate("black", -4.7)
                             .extent(600, 875, "-128-455")
-                            .toBuffer('PNG', function avatarToBuffer(err, buffer){
+                            .toBuffer('PNG', async function avatarToBuffer(err, buffer){
                                 if(err){
                                     bot.ipc.emit("instanceFree", {instance: bot.instance});
                                     recv.sendMessage({
                                         to: channel,
-                                        message: ":bangbang: There was an error processing the image. Maybe the URL is invalid, or the user is unavailable for some reason..."
+                                        message: await bot.lang.getTranslation(server,"CRUSH_ERROR")
                                     });
                                     bot.error(`Error during avatar format stage of !crush: ${err.stack}`);
                                     fs.unlink(fileName, function(err){
@@ -120,12 +120,12 @@ module.exports = {
                                 }else{
                                     gm(buffer)
                                         .composite(config.get("template"))
-                                        .toBuffer('PNG', function crushToBuffer(err, buffer){
+                                        .toBuffer('PNG', async function crushToBuffer(err, buffer){
                                             if(err){
                                                 bot.ipc.emit("instanceFree", {instance: bot.instance});
                                                 recv.sendMessage({
                                                     to: channel,
-                                                    message: ":bangbang: There was an error processing the image. Maybe the URL is invalid, or the user is unavailable for some reason..."
+                                                    message: await bot.lang.getTranslation(server,"CRUSH_ERROR")
                                                 });
                                                 bot.error(`Error during composite stage of !crush: ${err.stack}`);
                                                 fs.unlink(fileName, function(err){

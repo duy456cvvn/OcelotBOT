@@ -12,18 +12,18 @@ module.exports = {
     usage: "pornsuggest [country]",
     accessLevel: 0,
     commands: ["pornsuggest"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         if(args[1] && args[1].length > 2){
             recv.sendMessage({
                 to: channel,
-                message: ":bangbang: Countries must be country codes. i.e !pornsuggest gb"
+                message: await bot.lang.getTranslation(server, "PORNSUGGEST_INVALID_COUNTRY")
             });
         }else{
-            request(`https://www.pornmd.com/getliveterms?country=${args[1] ? args[1] : ""}&orientation=${bot.util.arrayRand(orientations)}`, function(err, resp, body){
+            request(`https://www.pornmd.com/getliveterms?country=${args[1] ? args[1] : ""}&orientation=${bot.util.arrayRand(orientations)}`,async function(err, resp, body){
                 if(err){
                     recv.sendMessage({
                         to: channel,
-                        message: ":bangbang: Error contacting pornsuggest service. Try again later."
+                        message: await bot.lang.getTranslation(server, "PORNSUGGEST_ERROR")
                     });
                     bot.error(err.stack);
                 }else{
@@ -32,18 +32,18 @@ module.exports = {
                         if(names.length === 0){
                             recv.sendMessage({
                                 to: channel,
-                                message: ":warning: No terms available for this feed. If you entered a country, try a different one."
+                                message: await bot.lang.getTranslation(server, "PORNSUGGEST_NO_TERMS")
                             });
                         }else{
                             recv.sendMessage({
                                 to: channel,
-                                message: `Feeling horny? Try *${bot.util.arrayRand(names).keyword}*`
+                                message: await bot.lang.getTranslation(server, "PORNSUGGEST_RESPONSE", {phrase: bot.util.arrayRand(names).keyword})
                             });
                         }
                     }catch(e){
                         recv.sendMessage({
                             to: channel,
-                            message: ":bangbang: Error parsing pornsuggest service response. Try again later."
+                            message: await bot.lang.getTranslation(server, "PORNSUGGEST_INVALID_RESPONSE")
                         });
                         bot.error(e.stack);
                     }

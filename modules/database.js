@@ -49,9 +49,12 @@ module.exports = function(bot){
                 setServerSetting: function setServerSetting(server, setting, value){
                     return knex(SERVERS_TABLE).update(setting, value).where({server: server}).limit(1);
                 },
-                getServerCurrency: function getServerCurrency(server){
-                  return knex.select("serverCurrencyName", "usePluralCurrency").from(SERVERS_TABLE).where({server: server}).limit(1);
+                getServerLanguage: function getServerCurrency(server){
+                  return knex.select("language").from(SERVERS_TABLE).where({server: server}).limit(1);
                 },
+				getLanguages: function getLanguages(){
+                	return knex.select("server", "language").from(SERVERS_TABLE);
+				},
                 getServers: function getServers(){
                     return knex.select().from(SERVERS_TABLE);
                 },

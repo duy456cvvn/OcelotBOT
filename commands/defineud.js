@@ -8,14 +8,14 @@ module.exports = {
     usage: "defineud <word>",
     accessLevel: 0,
     commands: ["defineud", "ud"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         const term = encodeURIComponent(args.slice(1).join(" "));
-        request(`http://api.urbandictionary.com/v0/define?term=${term}`, function(err, resp, body){
+        request(`http://api.urbandictionary.com/v0/define?term=${term}`, async function(err, resp, body){
             if(err){
                 bot.error(err.stack);
                 recv.sendMessage({
                     to: channel,
-                    message: ":bangbang: Unable to reach Urban Dictionary right now. Try again later."
+                    message: await bot.lang.getTranslation(server, "UD_ERROR")
                 });
             }else{
                 try{
@@ -24,19 +24,19 @@ module.exports = {
                         const randEntry = bot.util.arrayRand(data.list);
                         recv.sendMessage({
                             to: channel,
-                            message: `Definition for **${randEntry.word}:**\n${randEntry.definition}\n\`\`\`${randEntry.example}\`\`\``
+                            message: `${await bot.lang.getTranslation(server, "UD_DEFINITION", {word: randEntry.word})}: **\n${randEntry.definition}\n\`\`\`${randEntry.example}\`\`\``
                         });
                     }else{
                         recv.sendMessage({
                             to: channel,
-                            message: ":warning: No definitions found."
+                            message: await bot.lang.getTranslation(server, "UD_NO_DEFINITIONS")
                         });
                     }
                 }catch(e){
                     bot.error(e.stack);
                     recv.sendMessage({
                         to: channel,
-                        message: ":bangbang: Got invalid response from Urban Dictionary. Try again later."
+                        message: await bot.lang.getTranslation(server, "UD_INVALID_RESPONSE")
                     });
                 }
             }

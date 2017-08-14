@@ -11,7 +11,7 @@ module.exports = {
         if(args.length < 2){
             recv.sendMessage({
                 to: channel,
-                message: ":bangbang: Invalid usage. !meme <meme/list/add <name> <url>/globaladd <name> <url>>"
+                message: `:bangbang: ${await bot.lang.getTranslation(server, "INVALID_USAGE")} !meme <meme/list/add <name> <url>/globaladd <name> <url>>`
             });
         }else{
             const arg = args[1].toLowerCase();
@@ -32,12 +32,12 @@ module.exports = {
 					if(!serverInfo){
 						recv.sendMessage({
 							to: channel,
-							message: `**Available Memes:**\n__:earth_americas: **Global** memes:__ ${globalMemes}`
+							message: `**${await bot.lang.getTranslation(server, "MEME_AVAILABLE_MEMES")}**\n__:earth_americas: **${await bot.lang.getTranslation(server, "meme_global_memes")}**__ ${globalMemes}`
 						});
 					}else{
 						recv.sendMessage({
 							to: channel,
-							message: `**Available Memes:**\n__:earth_americas: **Global** memes:__ ${globalMemes}\n__:house_with_garden:**${serverInfo.name}** memes:__ ${serverMemes}`
+							message: `**${await bot.lang.getTranslation(server, "MEME_AVAILABLE_MEMES")}**\n__:earth_americas: **${await bot.lang.getTranslation(server, "MEME_AVAILABLE_MEMES")}**__ ${globalMemes}\n__:house_with_garden:${await bot.lang.getTranslation(server, "MEME_SERVER", {serverName: serverInfo.name})}__ ${serverMemes}`
 						});
 					}
                 });

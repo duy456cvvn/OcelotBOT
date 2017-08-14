@@ -7,11 +7,11 @@ module.exports = {
     usage: "numberfact <number>",
     accessLevel: 0,
     commands: ["numberfact"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: async function run(user, userID, channel, message, args, event, bot, recv) {
         if(args.length < 2){
             recv.sendMessage({
                 to: channel,
-                message: ":bangbang: You must enter a number."
+                message: await bot.lang.getTranslation(server, "NUMBERFACT_USAGE")
             });
         }else{
             request(`http://numbersapi.com/${parseInt(args[1])}/`, function(err, resp, body){

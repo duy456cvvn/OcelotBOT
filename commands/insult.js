@@ -11,11 +11,11 @@ module.exports = {
     usage: "insult <user>",
     accessLevel: 0,
     commands: ["insult"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         if(!args[1]){
         	recv.sendMessage({
 				to: channel,
-				message: ":bangbang: Usage: !insult <person>"
+				message: ":bangbang: "+await bot.util.getTranslation(server, "INVALID_USAGE")+" !insult <person>"
 			})
 		}else{
 			if(args[1].toLowerCase() === "ocelotbot" || args[1].indexOf("146293573422284800") > -1){

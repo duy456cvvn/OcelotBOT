@@ -5,22 +5,22 @@
 /**
  * @type {Array}
  */
-const responses = require("config").get("Commands.8ball.responses");
+
 module.exports = {
     name: "Magic 8-ball",
     usage: "8ball <question>",
     accessLevel: 0,
     commands: ["8ball"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         if(args.length < 2){
             recv.sendMessage({
                 to: channel,
-                message: ":bangbang: You must enter a question!"
+                message: await bot.lang.getTranslation(server, "8BALL_NO_QUESTION")
             });
         }else{
             recv.sendMessage({
                 to: channel,
-                message: `:8ball: \`${bot.util.arrayRand(responses)}\``
+                message: `:8ball: \`${await bot.lang.getTranslation(server, "8BALL_RESPONSE_"+(parseInt(Math.random()*14)))}\``
             });
         }
     }

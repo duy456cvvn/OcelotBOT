@@ -37,7 +37,16 @@ module.exports = {
                 format: function format(value){
                     return !!value;
                 }
-            }
+            },
+			language: {
+            	explanation: "The language to respond to commands in. To view the available languages, type !language",
+				format: function(value){
+            		return `${bot.lang.getTranslationFor(value, "LANGUAGE_FLAG")} \`${value}\``
+				},
+				onSet: function (newVal){
+					bot.lang.languageCache[server] = newVal;
+				}
+			}
         };
         bot.database.getServer(server)
             .then(function(results){
