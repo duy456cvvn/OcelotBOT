@@ -57,7 +57,7 @@ module.exports = function(bot){
 					if(!bot.lang.languageCache[server]){
 						bot.warn("Had to populate languageCache for "+server);
 						const thisServer = await bot.database.getServerLanguage(server)[0];
-						bot.lang.languageCache[server] = thisServer.language || "default";
+						bot.lang.languageCache[server] = thisServer && thisServer.language ? thisServer.language : "default";
 					}
 					fulfill(bot.lang.languageCache[server]);
 				});
