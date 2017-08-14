@@ -227,12 +227,18 @@
     },
     "weather": {
       "key": ""
+    },
+    "sexysingle": {
+      "template": "static/sexysingle-0.png",
+      "filename": "SEXYSINGLES.png",
+      "dir": "temp/"
     }
   },
   "Modules": {
     "LoadBefore": [
       "util",
       "database",
+      "lang",
       "commands",
       "ipc",
       "autoreplies"
@@ -243,5 +249,17 @@
   },
   "Receivers": [
     "discord"
-  ]
+  ],
+  "Languages": {
+    "default": "en-GB.json",
+    "en": "en-GB.json",
+    "en-GB": "en-GB.json",
+    "en-US": "en-GB.json",
+    "fi": "fi.json",
+    "fr": "fr.json",
+    "ar": "ar.json",
+    "fil": "fil.json",
+    "gr": "el.json",
+    "el": "el.json"
+  }
 }
