@@ -194,7 +194,7 @@ module.exports = function(bot){
 										bot.channelCache[channel] = channelInfo;
 										fulfill(channelInfo.guild_id);
 									}else{
-										bot.warn(`Tried to get server from channel that does not exist!!! ${channel}`);
+										bot.warn(`Tried to get server from channel that does not exist!!! ${channel}: ${err}`);
 										fulfill(null);
 									}
 								});
