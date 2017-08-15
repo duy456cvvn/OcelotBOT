@@ -15,7 +15,7 @@ module.exports = {
         if(!args[1]){
         	recv.sendMessage({
 				to: channel,
-				message: ":bangbang: "+await bot.util.getTranslation(server, "INVALID_USAGE")+" !insult <person>"
+				message: ":bangbang: "+await bot.lang.getTranslation(server, "INVALID_USAGE")+" !insult <person>"
 			})
 		}else{
 			if(args[1].toLowerCase() === "ocelotbot" || args[1].indexOf("146293573422284800") > -1){
