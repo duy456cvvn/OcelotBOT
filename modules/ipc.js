@@ -179,6 +179,7 @@ module.exports = function(bot){
             bot.receiver = new Proxy({
                 id: "discord",
                 getServerFromChannel: function getServerFromChannel(channel, cb){
+                	var args = Array.from(arguments);
                 	if(!cb){
                 		return new Promise(function(fulfill, reject){
 							if(bot.channelCache[channel]){
@@ -186,7 +187,7 @@ module.exports = function(bot){
 							}else{
 								bot.emitWithCallback("command", {
 									receiver: bot.lastRecvID,
-									args: Array.from(arguments),
+									args: args,
 									command: "getChannelInfo",
 								}, function(err, channelInfo){
 									bot.log(`Populating bot.channelCache for channel ${channel}`);
@@ -205,7 +206,7 @@ module.exports = function(bot){
 					}else{
 						bot.emitWithCallback("command", {
 							receiver: bot.lastRecvID,
-							args: Array.from(arguments),
+							args: args,
 							command: "getChannelInfo",
 						}, function(err, channelInfo){
 							bot.log(`Populating bot.channelCache for channel ${channel}`);
@@ -220,6 +221,7 @@ module.exports = function(bot){
 					}
                 },
                 getChannelInfo: function getChannelInfo(channel, cb){
+					var args = Array.from(arguments);
                 	if(!cb){
                 		return new Promise(function(fulfill, reject){
 							if(bot.channelCache[channel]){
@@ -227,7 +229,7 @@ module.exports = function(bot){
 							}else{
 								bot.emitWithCallback("command", {
 									receiver: bot.lastRecvID,
-									args: Array.from(arguments),
+									args: args,
 									command: "getChannelInfo",
 								}, function(err, channelInfo){
 									if(err){
@@ -246,7 +248,7 @@ module.exports = function(bot){
 					}else{
 						bot.emitWithCallback("command", {
 							receiver: bot.lastRecvID,
-							args: Array.from(arguments),
+							args: args,
 							command: "getChannelInfo",
 						}, function(err, channelInfo){
 							bot.log(`Populating bot.channelCache for channel ${channel}`);
@@ -256,6 +258,7 @@ module.exports = function(bot){
 					}
                 },
                 getServerInfo: function getServerInfo(server, cb){
+					var args = Array.from(arguments);
                 	if(!cb){
                 		return new Promise(function(fulfill, reject){
 							if(bot.serverCache[server]){
@@ -263,7 +266,7 @@ module.exports = function(bot){
 							}else{
 								bot.emitWithCallback("command", {
 									receiver: bot.lastRecvID,
-									args: Array.from(arguments),
+									args: args,
 									command: "getServerInfo",
 								}, function(err, serverInfo){
 									if(err){
@@ -282,7 +285,7 @@ module.exports = function(bot){
 					}else{
 						bot.emitWithCallback("command", {
 							receiver: bot.lastRecvID,
-							args: Array.from(arguments),
+							args: args,
 							command: "getServerInfo",
 						}, function(err, serverInfo){
 							bot.log(`Populating bot.serverCache for channel ${server}`);
