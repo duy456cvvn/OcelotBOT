@@ -90,11 +90,13 @@ module.exports = function(bot){
             	return new Promise(function(fulfill, reject){
             		var output = [];
 					async.eachSeries(bot.serverCache, function(server, cb){
-						for(var emojiID in server.emojis){
-							if(server.emojis.hasOwnProperty(emojiID)){
-								var emoji = server.emojis[emojiID];
-								if(emoji.name.toLowerCase().indexOf(name) > -1){
-									output.push(`<:${emoji.name}:${emoji.id}>`);
+						if(server && server.emojis){
+							for(var emojiID in server.emojis){
+								if(server.emojis.hasOwnProperty(emojiID)){
+									var emoji = server.emojis[emojiID];
+									if(emoji.name.toLowerCase().indexOf(name) > -1){
+										output.push(`<:${emoji.name}:${emoji.id}>`);
+									}
 								}
 							}
 						}
