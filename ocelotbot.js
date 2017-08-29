@@ -3,8 +3,6 @@
  */
 const   config      = require('config'),
         async       = require('async'),
-        path        = require('path'),
-        ipc         = require('node-ipc'),
         logger      = require('ocelot-logger');
 
 var bot = {};
