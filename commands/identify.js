@@ -2,12 +2,10 @@
  * Created by Peter on 13/07/2017.
  */
 
-const clarifai = require('clarifai');
-const config = require('config');
 
-var identifier = new clarifai.App({
-    apiKey: config.get("Commands.identify.key")
-});
+const config = require('config');
+const request = require('request');
+
 
 
 const messages = [
@@ -29,7 +27,7 @@ module.exports = {
     usage: "identify [URL]",
     accessLevel: 0,
     commands: ["identify", "ident"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
 
         recv.simulateTyping(channel);
 
@@ -42,7 +40,7 @@ module.exports = {
                 channelID: channel,
                 limit: 100
             }, async function(err, resp){
-                for(var i = resp.length-1; i > 0; i--){
+                for(var i = resp.length-1; i >= 0; i--){
                     var message = resp[i];
                     if(message.attachments[0] && message.attachments[0].url){
                         identify(message.attachments[0].url);
@@ -57,23 +55,36 @@ module.exports = {
         }
 
         function identify(url){
-            identifier.models.predict(Clarifai.GENERAL_MODEL, url).then(
-                function(response) {
-                    var item = response.outputs[0].data.concepts[0].name;
-
-                    recv.sendMessage({
-                        to: channel,
-                        message: `:eyes: ${bot.util.arrayRand(messages)}${vowels.indexOf(item[0]) > -1 ? "an" : "a"} **${item}**.`
-                    });
-                },
-                async function(err) {
-                    recv.sendMessage({
-                        to: channel,
-                        message: await bot.lang.getTranslation(server, "GENERIC_ERROR")
-                    });
-                    bot.error(err);
-                }
-            );
+			request({
+				method: 'POST',
+				json: true,
+				url: "https://westeurope.api.cognitive.microsoft.com/vision/v1.0/analyze?visualFeatures=Description&details=Celebrities&language=en",
+				headers: {
+					"Content-Type": "application/json",
+					"Ocp-Apim-Subscription-Key": config.get("Commands.identify.key")
+				},
+				body: {
+					url: url
+				}
+			}, async function(err, resp, body){
+				if(debug){
+					recv.sendMessage({
+						to: channel,
+						message: `\`\`\`json\n${JSON.stringify(body, null, 1)}\n\`\`\``
+					});
+				}
+				if(body.description.captions && body.description.captions.length > 0) {
+					recv.sendMessage({
+						to: channel,
+						message: `:eyes: ${bot.util.arrayRand(messages)}**${body.description.captions[0].text}**.`
+					});
+				}else{
+					recv.sendMessage({
+						to: channel,
+						message: await bot.lang.getTranslation(server, "FACE_NO_FACES")
+					});
+				}
+			})
         }
 
     }
