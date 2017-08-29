@@ -12,14 +12,16 @@ const conflictingBots = [
     "256530827842813962", //Fergus
     "290225453354975232", //LoLPromoter
     "107256979105267712", //KupoBot
-    "81026656365453312", //Gravebot
-    "86920406476292096", //Lopez
+    "81026656365453312",  //Gravebot
+    "86920406476292096",  //Lopez
     "242728049131388930", //QT Bot
     "324356264983527424", //MatBot
 	"265161580201771010", //MatBot
 	"172002275412279296", //Tatsumaki,
 	"204777316621090816", //RPBot
-	"292953664492929025", //UnbelievableBot
+	"292953664492929025", //UnbelievableBot,
+	"159985870458322944", //Mee6
+	"170903342199865344", //NoSoBot
 ];
 
 module.exports = function(bot){
@@ -46,7 +48,7 @@ module.exports = function(bot){
                 bot.log(`Connecting to ${socket}`);
                 bot.ipc.on("connect", function ipcConnected(){
                     bot.log(`Connected to IPC on ${socket}`);
-                    bot.ipc.emit('instanceReady', {instance: bot.instance});
+
 
 
                     bot.emitWithCallback("command", {
@@ -55,6 +57,7 @@ module.exports = function(bot){
                         command: "eval",
                     }, function(err, result){
                         bot.serverCache = result;
+						bot.ipc.emit('instanceReady', {instance: bot.instance});
                     });
 
                     bot.emitWithCallback("command", {
@@ -181,6 +184,7 @@ module.exports = function(bot){
                 getServerFromChannel: function getServerFromChannel(channel, cb){
                 	var args = Array.from(arguments);
                 	if(!cb){
+						args.push(undefined);
                 		return new Promise(function(fulfill, reject){
 							if(bot.channelCache[channel]){
 								fulfill(bot.channelCache[channel].guild_id);
@@ -223,6 +227,7 @@ module.exports = function(bot){
                 getChannelInfo: function getChannelInfo(channel, cb){
 					var args = Array.from(arguments);
                 	if(!cb){
+                		args.push(undefined);
                 		return new Promise(function(fulfill, reject){
 							if(bot.channelCache[channel]){
 								fulfill(bot.channelCache[channel]);
@@ -260,6 +265,7 @@ module.exports = function(bot){
                 getServerInfo: function getServerInfo(server, cb){
 					var args = Array.from(arguments);
                 	if(!cb){
+						args.push(undefined);
                 		return new Promise(function(fulfill, reject){
 							if(bot.serverCache[server]){
 								fulfill(bot.serverCache[server]);
