@@ -60,7 +60,7 @@ module.exports = {
 			}, function () {
 				recv.sendMessage({
 					to: channel,
-					message: `You are **#${position}** out of **${result.length}** trivia players!\nTOP 10 Trivia Players:\n\`\`\`yaml\n${columnify(data)}\n\`\`\``
+					message: `<@${userID}>, you are **#${position}** out of **${result.length}** trivia players!\nTOP 10 Trivia Players:\n\`\`\`yaml\n${columnify(data)}\n\`\`\``
 				});
 			});
 			if (debug)
