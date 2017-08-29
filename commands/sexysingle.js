@@ -47,6 +47,11 @@ module.exports = {
 						const fileName = `${config.get("dir")}avatar-${encodeURIComponent(targetUser.avatar)}.png`;
 						const outputFile = `${config.get("dir")}sexysingle-${encodeURIComponent(targetUser.avatar)}.png`;
 						downloadOrGet(`https://cdn.discordapp.com/avatars/${target}/${targetUser.avatar}.png?size=256`, fileName, outputFile);
+					}else if(isUrl){
+						const fileName = `${config.get("dir")}avatar-${encodeURIComponent(target)}.png`;
+						const outputFile = `${config.get("dir")}sexysingle-${encodeURIComponent(target)}.png`;
+						downloadOrGet(target, fileName, outputFile);
+
 					}else{
 						recv.sendMessage({
 							to: channel,
