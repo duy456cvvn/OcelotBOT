@@ -21,7 +21,7 @@ module.exports = {
                 channelID: channel,
                 limit: 100
             }, async function(err, resp){
-                for(var i = resp.length-1; i > 0; i--){
+                for(var i = resp.length-1; i >= 0; i--){
                     var message = resp[i];
                     if(message.attachments[0] && message.attachments[0].url){
                         identify(message.attachments[0].url);
