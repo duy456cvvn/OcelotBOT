@@ -10,7 +10,8 @@ var fs              = require('fs'),
     colors          = require('colors'),
     dateFormat      = require('dateformat'),
     websocket       = require('websocket').w3cwebsocket,
-    request         = require('request');
+    request         = require('request'),
+    os              = require('os');
 
 
 var isDiscord = process.argv.indexOf("discord") > -1;
@@ -261,6 +262,8 @@ function startBot(){
         bot.log("Initialisation finished");
     });
 
+
+
 }
 
 function botInit(cb){
@@ -280,6 +283,9 @@ function botInit(cb){
         bot.rtm = new RtmClient(bot.config.slack.token_b);
         bot.web = new WebClient(bot.config.slack.token_b);
         bot.web_p = new WebClient(bot.config.slack.token_p);
+
+
+        bot.simulateTyping = function(){};
 
         bot.sendMessage = function (data, cb) {
             var caller = caller_id.getData();
@@ -343,7 +349,8 @@ function botInit(cb){
                 opts.content = data.file;
             }
             opts.channels = data.to;
-            opts.filetype = data.filetype || filename.split(".")[1];
+            opts.filetype = data.filetype;
+            opts.title = data.message;
 
             bot.web_p.files.upload(data.filename, opts, cb);
         };
@@ -406,10 +413,10 @@ function botInit(cb){
 
         bot.rtm.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, function rtmOpenEvent(data){
             if(bot.failedModules > 0){
-                bot.sendMessage({
-                    to: bot.config.misc.mainChannel,
-                    message: "WARNING: *"+bot.failedModules+"* modules failed to load. Consult the log for more details."
-                });
+                // bot.sendMessage({
+                //     to: bot.config.misc.mainChannel,
+                //     message: "WARNING: *"+bot.failedModules+"* modules failed to load. Consult the log for more details."
+                // });
             }
         });
 
