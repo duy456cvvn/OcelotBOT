@@ -40,7 +40,7 @@ module.exports = {
                 channelID: channel,
                 limit: 100
             }, async function(err, resp){
-                for(var i = resp.length-1; i >= 0; i--){
+                for(var i = 0; i < resp.length; i++){
                     var message = resp[i];
                     if(message.attachments[0] && message.attachments[0].url){
                         identify(message.attachments[0].url);
@@ -73,7 +73,7 @@ module.exports = {
 						message: `\`\`\`json\n${JSON.stringify(body, null, 1)}\n\`\`\``
 					});
 				}
-				if(body.description.captions && body.description.captions.length > 0) {
+				if(body && body.description && body.description.captions && body.description.captions.length > 0) {
 					recv.sendMessage({
 						to: channel,
 						message: `:eyes: ${bot.util.arrayRand(messages)}**${body.description.captions[0].text}**.`
