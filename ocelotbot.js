@@ -61,3 +61,18 @@ function initModules(modules, cb){
 initBot(function(){
     bot.log("Ready");
 });
+
+
+process.on("uncaughtException", function uncaughtException(err){
+	console.error(err);
+	if(bot.receiver){
+		bot.receiver.sendMessage({
+			to: "139871249567318017",
+			message: `Instance ${bot.instance} crashed with:\n\`\`\`javascript\n${err.stack}\n\`\`\``
+		}, function(){
+			process.exit(1);
+		});
+	}else{
+		process.exit(1);
+	}
+});
