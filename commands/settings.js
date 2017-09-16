@@ -48,6 +48,7 @@ module.exports = {
 				}
 			}
         };
+
         bot.database.getServer(server)
             .then(function(results){
                 var serverInfo = results[0];
@@ -110,29 +111,44 @@ module.exports = {
                 };
 
 
-                recv.getServerInfo(server, function(err, serverData){
-                    if(!serverData){
-                        recv.sendMessage({
+                recv.getServerInfo(server, async function(err, serverData){
+					if(!serverData){
+						recv.sendMessage({
 							to: channel,
 							message: ":warning: Either this is a DM channel, or there is an issue with the database connection.\nPlease use this command in a server, or try again later."
 						})
-                    }else if(serverData.unavailable){
-                    	recv.sendMessage({
+					}else if(serverData.unavailable){
+						recv.sendMessage({
 							to: channel,
 							message: ":warning: Discord gateway not currently connected to this server, try again later."
 						});
 					}else{
+						if(debug){
+							recv.sendMessage({
+								to: channel,
+								message: `\`\`\`json\n${JSON.stringify(serverData.members[userID].roles)}\n\`\`\``
+							});
+						}
 						for(var i in serverData.members[userID].roles){
-							if(serverData.members[userID].roles.hasOwnProperty(i)) {
+							if(serverData.members[userID].roles.hasOwnProperty(i)){
 								var role = serverData.roles[serverData.members[userID].roles[i]];
-								if (role.name.toLowerCase() === "bot controller") {
+								if(role.name.toLowerCase() === "bot controller"){
 									hasRole = true;
 									break;
 								}
 							}
 						}
+
+						if(!serverInfo){
+							bot.log("Creating server super-quick because it doesn't exist.");
+							try{
+								await bot.database.addServer(serverData.id, serverData.owner_id, serverData.name, serverData.joined_at);
+							}catch(e){
+								bot.error(e.stack);
+							}
+						}
 						//noinspection EqualityComparisonWithCoercionJS
-						if(userID != "139871249567318017" && serverInfo.addedby != userID && !hasRole){
+						if(userID != "139871249567318017" && serverData.owner_id != userID && !hasRole){
 							recv.sendMessage({
 								to: channel,
 								message: ":bangbang: You don't have permission to run this command! Only the server owner or people with the 'Bot Controller' role can do that."
@@ -147,8 +163,8 @@ module.exports = {
 								subCommands[args[1]]();
 							}
 						}
-                    }
-                });
+					}
+				});
             });
     }
 };
