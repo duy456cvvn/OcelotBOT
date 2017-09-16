@@ -104,6 +104,7 @@ module.exports = function(bot){
             var messageParams = obj.messageQueue.pop();
             if(messageParams){
                 obj.isProcessingMessageQueue = true;
+                console.log("-> "+messageParams[0].message);
                 bot.receivers.discord.internal.client.sendMessage(messageParams[0], messageParams[1]);
                 obj.messageCount++;
                 obj.totalMessageTime += new Date() - messageParams.sentAt;
