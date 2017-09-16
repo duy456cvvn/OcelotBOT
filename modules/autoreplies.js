@@ -8,6 +8,8 @@ const types = {
     REACTION: 2
 };
 
+const fs = require('fs');
+
 module.exports = function(bot){
     return {
         name: "Autoreplies Module",
@@ -81,6 +83,23 @@ module.exports = function(bot){
             bot.registerMessageHandler("autoreply", async function messageHandler(user, userID, channelID, message, event, _bot, receiver){
                 if(!message)return;
                 try{
+                	if(userID == "97322624866070528" && message.indexOf("sad") > -1){
+                		fs.readFile("./lamados.txt", function(err, data){
+                			var num = data.toString();
+                			if(!err && parseInt(num) != undefined){
+                				var amt = parseInt(num);
+                				amt++;
+								fs.writeFile("./lamados.txt", amt, function(err){
+									bot.log("Incremented lamados counter "+amt);
+								});
+							}else{
+                				bot.error(err ? err.stack : "Invalid number in lamados.txt "+data);
+							}
+						});
+
+
+
+					}
                 	var serverID = await receiver.getServerFromChannel(channelID);
                     if (
                         bot.banCache.server.indexOf(serverID) === -1 &&
@@ -90,7 +109,7 @@ module.exports = function(bot){
                             if (bot.autoReplies.hasOwnProperty(i)) {
                                 let reply = bot.autoReplies[i];
                                 if (message.match(reply.regex) && (!reply.timeout || !timeouts[channelID] || !timeouts[channelID][i] || new Date().getTime() - timeouts[channelID][i] > reply.timeout)) {
-                                    var serverSettings = await bot.database.getServer(serverID)[0]|| {enableAutoReplies: 1, enableAutoReactions: 1};
+                                    var serverSettings = await bot.database.getServer(serverID)[0] || {enableAutoReplies: 0, enableAutoReactions: 0};
 									var happened = false;
 									if (reply.type === types.EMBED && serverSettings.enableAutoReplies) {
 										receiver.sendMessage({
