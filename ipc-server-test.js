@@ -3,6 +3,7 @@
  */
 
 const ipc = require('node-ipc');
+const jsonpack = require('jsonpack');
 
 /***************************************\
  *
@@ -13,22 +14,29 @@ const ipc = require('node-ipc');
 
 ipc.config.id = 'world';
 ipc.config.retry= 1500;
+ipc.config.silent = true;
+ipc.config.rawBuffer = false;
+
+const pack = false;
 
 ipc.serve(
     function(){
-        ipc.server.on(
-            'app.message',
-            function(data,socket){
-                ipc.server.emit(
-                    socket,
-                    'app.message',
-                    {
-                        id      : ipc.config.id,
-                        message : data.message+' world!'
-                    }
-                );
-            }
-        );
+    	if(ipc.config.rawBuffer){
+			ipc.server.on('data', function(buffer){
+				var now = new Date().getTime();
+				var receivedData = pack ? jsonpack.unpack(buffer.toString()) : JSON.parse(buffer.toString());
+				var time = now-receivedData.timestamp;
+				console.log("Took "+time+"ms to retrieve "+Object.keys(receivedData.payload).length+" objects.")
+			});
+		}else{
+			ipc.server.on('test', function(data){
+				var now = new Date().getTime();
+				var receivedData = data;
+				var time = now-receivedData.timestamp;
+				console.log("Took "+time+"ms to retrieve "+Object.keys(receivedData.payload).length+" objects.")
+			});
+		}
+
     }
 );
 

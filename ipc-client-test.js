@@ -3,6 +3,8 @@
  */
 
 const ipc = require('node-ipc');
+const jsonpack = require('jsonpack');
+const crypto = require('crypto');
 
 /***************************************\
  *
@@ -13,36 +15,40 @@ const ipc = require('node-ipc');
 
 ipc.config.id = 'hello';
 ipc.config.retry = 1000;
+ipc.config.silent = true;
+ipc.config.rawBuffer = false;
 
-ipc.connectTo(
-    'world',
-    function(){
-        ipc.of.world.on(
-            'connect',
-            function(){
+const pack = false;
+
+ipc.connectTo('world', function(){
+        ipc.of.world.on('connect', function(){
                 ipc.log('## connected to world ##', ipc.config.delay);
-                ipc.of.world.emit(
-                    'app.message',
-                    {
-                        id      : ipc.config.id,
-                        message : 'hello'
-                    }
-                );
-            }
-        );
-        ipc.of.world.on(
-            'disconnect',
-            function(){
-                ipc.log('disconnected from world');
-            }
-        );
-        ipc.of.world.on(
-            'app.message',
-            function(data){
-                ipc.log('got a message from world : ', data);
-            }
-        );
 
-        console.log(ipc.of.world.destroy);
+				setInterval(function(){
+					var payload = require('./ipctest.json');
+
+					if(ipc.config.rawBuffer){
+						const obj = {
+							timestamp: new Date().getTime(),
+							payload: payload
+						};
+						ipc.of.world.emit(pack ? jsonpack.pack(obj) : new Buffer(JSON.stringify(obj)));
+
+					}else{
+						ipc.of.world.emit("test", {
+							timestamp: new Date().getTime(),
+							payload: payload
+						});
+					}
+
+				}, 1000);
+
+            });
+        ipc.of.world.on('disconnect', function(){
+            ipc.log('disconnected from world');
+        });
+        ipc.of.world.on('app.message', function(data){
+            ipc.log('got a message from world : ', data);
+        });
     }
 );
