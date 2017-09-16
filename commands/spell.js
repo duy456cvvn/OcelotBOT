@@ -201,7 +201,7 @@ module.exports = {
                 },
                 function () {
                     console.log("Run times:" + times);
-                    return done || times > 30;
+                    return done || times > 18;
                 },
                 function () {
                     var reacts = str.replace(/[A-z]/g, "").split(" ");
