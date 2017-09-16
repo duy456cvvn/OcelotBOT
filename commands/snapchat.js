@@ -23,15 +23,16 @@ exports.command = {
                            to: channel,
                            file: image,
                            filename: "snapcode.png",
+                           filetype: "png",
                            message: "Here's your snapcode:"
                        });
                    })
                    .catch(function(err){
                        bot.sendMessage({
                            to: channel,
-                           message: err
+                           message: "Error: "+err
                        });
-                   })
+                   });
            }else{
                bot.sendMessage({
                    to: channel,
