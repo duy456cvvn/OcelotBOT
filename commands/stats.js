@@ -11,7 +11,6 @@ module.exports = {
     run: function run(user, userID, channel, message, args, event, bot, recv) {
         recv.simulateTyping(channel);
         recv.getStats(async function(stats){
-            const result = await bot.database.getCommandStats();
 			recv.sendMessage({
 				to: channel,
 				message: "",
@@ -38,11 +37,6 @@ module.exports = {
 						{
 							name: "Message Stats",
 							value: `**${bot.util.numberWithCommas(stats.messageCount)}** messages received this session. **${bot.util.numberWithCommas(stats.messagesSent)}** messages sent this session.`,
-							inline: false
-						},
-						{
-							name: "Command Stats",
-							value: `\`\`\`lua\n${columnify(result)}\n\`\`\``,
 							inline: false
 						}
 					]
