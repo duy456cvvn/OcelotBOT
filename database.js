@@ -77,20 +77,8 @@ module.exports = function database(bot){
         name: "Database Manager",
         init: function databaseInit(cb) {
             databaseObject.mysqlConnect(function(){
-                rethinkdb.connect(bot.config.rethinkdb,
-                    function rethinkDbConnect(err, connection){
-                        if(err){
-                            bot.error("Error connecting to rethinkdb: "+err);
-                            bot.failedModules++;
-                        }else{
-                            bot.log("Connected to rethinkdb");
-                            bot.rconnection = connection;
-                            connection.addListener('error', databaseObject.rethinkErrorHandler);
-                            connection.addListener('close', databaseObject.rethinkDisconnectHandler);
-                            if(cb)
-                                cb();
-                        }
-                    });
+                if(cb)
+                    cb();
             });
         }
     };
