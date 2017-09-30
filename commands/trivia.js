@@ -33,7 +33,8 @@ module.exports = {
     commands: ["trivia"],
     run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         if(args[1] && (args[1].toLowerCase() === "stats" || args[1].toLowerCase() === "leaderboard")) {
-            const result = await bot.database.getTriviaLeaderboard();
+        	const isMonthly = (args[2] && args[2].indexOf("month") > -1);
+            const result = isMonthly ? await bot.database.getMonthlyTriviaLeaderboard() : await bot.database.getTriviaLeaderboard();
 			var data = [];
 			var i = 0;
 			var position = 69;
@@ -60,7 +61,7 @@ module.exports = {
 			}, function () {
 				recv.sendMessage({
 					to: channel,
-					message: `<@${userID}>, you are **#${position}** out of **${result.length}** trivia players!\nTOP 10 Trivia Players:\n\`\`\`yaml\n${columnify(data)}\n\`\`\``
+					message: `<@${userID}>, you are **#${position}** out of **${result.length}** trivia players${isMonthly ? " this month!" : "! **To see monthly scores, type !trivia leaderboard monthly**."}\nTOP 10 Trivia Players:\n\`\`\`yaml\n${columnify(data)}\n\`\`\``
 				});
 			});
 			if (debug)
