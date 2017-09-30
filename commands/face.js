@@ -9,7 +9,7 @@ module.exports = {
     usage: "face [url] or embed",
     accessLevel: 0,
     commands: ["face", "age"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         recv.simulateTyping(channel);
 
         if(event.d.attachments[0]){
