@@ -29,8 +29,9 @@ module.exports = function(bot){
 
         bot.database.getBans()
             .then(function(result){
-                async.eachSeries(result, function(ban){
+                async.eachSeries(result, function(ban, cb){
                     bot.banCache[ban.type].push(ban.id);
+                    cb();
                 });
             });
 
@@ -71,6 +72,7 @@ module.exports = function(bot){
         bot.prefixCache = {};
 
         bot.commandCooldowns = {};
+        bot.cooldownCounts = {};
 
         setInterval(function(){
             bot.commandCooldowns = {};
@@ -97,7 +99,7 @@ module.exports = function(bot){
 					var args = message.split(" ");
 					const commandName = args[0].substring(getPrefix(server).length).toLowerCase();
 					var command = bot.commands[commandName];
-					if (!isBanned() && command) {
+					if (!isBanned(server, channelID, userID) && command) {
 						wasCommand = true;
 						bot.commandCount++;
 
@@ -127,7 +129,27 @@ module.exports = function(bot){
 						if(cooldown && cooldown[commandName] && cooldown[commandName] >= config.get("Bot.softCooldown")){
 							if(cooldown[commandName] >= config.get("Bot.hardCooldown")){
 								log(message+" [HARD COOLDOWN]");
-								bot.warn(`Hard cooldown triggered by ${user} (${userID})`);
+
+								var cooldownCount = bot.cooldownCounts[userID];
+								if(cooldownCount){
+									bot.cooldownCounts[userID]++;
+									if(bot.cooldownCounts[userID] == 5){
+										receiver.sendMessage({
+											to: channelID,
+											message: ":warning: **If you trigger more cooldowns within the next hour you will be banned from using OcelotBOT.**"
+										});
+									}else if(bot.cooldownCounts[userID] > 5){
+										receiver.sendMessage({
+											to: channelID,
+											message: ":wave: **<@"+userID+">, you have been banned from using OcelotBOT.**"
+										});
+										await bot.database.ban(userID, "USER", `Auto: ${bot.cooldownCounts[userID]} hard cooldowns on command ${commandName}`);
+										bot.banCache["user"].push(userID);
+									}
+								}else{
+									bot.cooldownCounts[userID] = 1;
+								}
+								bot.warn(`Hard cooldown #${bot.cooldownCounts[userID]} triggered by ${user} (${userID})`);
 							}else{
 								log(message+" [SOFT COOLDOWN]");
 								bot.log(`Soft cooldown triggered by ${user} (${userID})`);
