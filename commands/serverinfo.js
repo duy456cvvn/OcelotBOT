@@ -10,7 +10,7 @@ module.exports = {
     accessLevel: 0,
     commands: ["serverinfo"],
     run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
-        if(server == "318432654880014347")return;
+        if(channel == "318432654880014347")return;
         if(args.length < 2){
             recv.sendMessage({
                 to: channel,
