@@ -8,6 +8,7 @@ module.exports = {
     accessLevel: 0,
     commands: ["meme"],
     run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
+    	if(channel == "318432654880014347")return;
         if(args.length < 2){
             recv.sendMessage({
                 to: channel,
@@ -41,6 +42,25 @@ module.exports = {
 						});
 					}
                 });
+			}else if(arg === "list-all" && userID == "139871249567318017"){
+				var result = await bot.database.getAllMemes();
+				var output = "";
+				for(var i in result){
+					var name = result[i].name;
+					if(output.length +name.length+1 >= 1000){
+						recv.sendMessage({
+							to: channel,
+							message: output
+						});
+						output = name;
+					}else{
+						output += " "+name;
+					}
+				}
+				recv.sendMessage({
+					to: channel,
+					message: output
+				});
             }else if(arg === "remove"){
             	try{
 					const result = await bot.database.removeMeme(args[2].toLowerCase(), server, userID);
