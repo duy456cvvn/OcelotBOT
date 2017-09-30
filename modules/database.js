@@ -79,6 +79,9 @@ module.exports = function(bot){
                 getMemes: function getMemes(server){
                     return knex.select("name", "server").from(MEMES_TABLE).where({server: server}).orWhere({server: "global"});
                 },
+                getAllMemes: function getAllMemes(){
+                    return knex.select("name").from(MEMES_TABLE);
+                },
                 removeMeme: function removeMeme(meme, server, user){
                     return knex.raw(knex.delete().from(MEMES_TABLE).where({name: meme, addedby: user}).whereIn("server", [server, "global"]).toString()+" LIMIT 1");
                 },
@@ -93,6 +96,9 @@ module.exports = function(bot){
                 getMeme: function getMeme(meme, server){
                     return knex.select("meme").from(MEMES_TABLE).where({name: meme}).whereIn("server", [server, "global"]).orderBy("server");
                 },
+				forceGetMeme: function forceGetMeme(meme){
+					return knex.select("meme", "server").from(MEMES_TABLE).where({name: meme});
+				},
                 addReminder: function addReminder(receiver, user, server, channel, at, message){
                     return knex.insert({
                         receiver: receiver,
@@ -116,6 +122,14 @@ module.exports = function(bot){
                         .orderBy("Score", "DESC")
                         .groupBy("user");
                 },
+				getMonthlyTriviaLeaderboard: function getMonthlyTriviaLeaderboard(){
+					return knex.select("user", knex.raw("SUM(difficulty) as 'Score'"), knex.raw("COUNT(*) as 'correct'"))
+						.from(TRIVIA_TABLE)
+						.where("correct", 1)
+						.andWhereRaw("MONTH(timestamp) = MONTH(CURRENT_TIMESTAMP)")
+						.orderBy("Score", "DESC")
+						.groupBy("user");
+				},
                 logTrivia: function logTrivia(user, correct, difficulty, server){
                     return knex.insert({
                         user: user,
