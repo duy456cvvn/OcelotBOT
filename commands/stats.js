@@ -7,7 +7,7 @@ module.exports = {
     name: "Stats Command",
     usage: "stats",
     accessLevel: 0,
-    commands: ["stats", "statistics", "info"],
+    commands: ["stats", "statistics", "info", "about", "privacy"],
     run: function run(user, userID, channel, message, args, event, bot, recv) {
         recv.simulateTyping(channel);
         recv.getStats(async function(stats){
@@ -38,6 +38,10 @@ module.exports = {
 							name: "Message Stats",
 							value: `**${bot.util.numberWithCommas(stats.messageCount)}** messages received this session. **${bot.util.numberWithCommas(stats.messagesSent)}** messages sent this session.`,
 							inline: false
+						},
+						{
+							name: "Privacy:",
+							value: "The following data is collected and stored securely when you use OcelotBOT:\n**When you type a command**:\nThe full text of the message, your user, channel and server IDs, but not your username.\nWhen you use !crush or !sexysingle your avatar or server image is temporarily stored on our servers for caching purposes.\nWhen using !identify or !face the image is sent to Microsoft Cognitive Services inline with their [Terms Of Use](https://azure.microsoft.com/en-gb/support/legal/cognitive-services-terms/)"
 						}
 					]
 				}

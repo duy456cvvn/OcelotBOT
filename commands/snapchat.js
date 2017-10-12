@@ -27,6 +27,7 @@ module.exports = {
 							message: "Here's your snapcode:"
 						});
 					}catch(err){
+						bot.raven.captureException(err);
 						recv.sendMessage({
 							to: channel,
 							message: ":bangbang: An error occurred. Please try again later."
@@ -35,6 +36,7 @@ module.exports = {
 					}
 
                 }else{
+					bot.raven.captureException(err);
                     recv.sendMessage({
                         to: channel,
                         message: ":bangbang: An error occurred. Please try again later."

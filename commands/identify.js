@@ -73,7 +73,9 @@ module.exports = {
 						message: `\`\`\`json\n${JSON.stringify(body, null, 1)}\n\`\`\``
 					});
 				}
-				if(body && body.description && body.description.captions && body.description.captions.length > 0) {
+				if(err){
+					bot.raven.captureException(err);
+				}else if(body && body.description && body.description.captions && body.description.captions.length > 0) {
 					recv.sendMessage({
 						to: channel,
 						message: `:eyes: ${bot.util.arrayRand(messages)}**${body.description.captions[0].text}**.`

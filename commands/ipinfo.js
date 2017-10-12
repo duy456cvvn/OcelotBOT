@@ -28,6 +28,7 @@ module.exports = {
                         to: channel,
                         message: await bot.lang.getTranslation(server, "IPINFO_USAGE")
                     });
+					bot.raven.captureException(e);
                     bot.error(`${e.stack}, ${body}`);
                 }
             });
@@ -47,6 +48,7 @@ module.exports = {
                     }
 
                 }catch(e){
+					bot.raven.captureException(e);
                     bot.log(`${e.stack}, ${body}`);
                 }
             });

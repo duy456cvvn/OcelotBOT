@@ -21,6 +21,7 @@ module.exports = {
         }else{
             request(`https://www.pornmd.com/getliveterms?country=${args[1] ? args[1] : ""}&orientation=${bot.util.arrayRand(orientations)}`,async function(err, resp, body){
                 if(err){
+					bot.raven.captureException(err);
                     recv.sendMessage({
                         to: channel,
                         message: await bot.lang.getTranslation(server, "PORNSUGGEST_ERROR")
@@ -41,6 +42,7 @@ module.exports = {
                             });
                         }
                     }catch(e){
+						bot.raven.captureException(e);
                         recv.sendMessage({
                             to: channel,
                             message: await bot.lang.getTranslation(server, "PORNSUGGEST_INVALID_RESPONSE")

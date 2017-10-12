@@ -28,6 +28,7 @@ module.exports = {
             sq.getInfo(function sourceQueryInfo(err, info){
                 bot.log("Retrieved server info for "+args[1]);
                 if(err){
+					bot.raven.captureException(err);
                     recv.sendMessage({
                         to: channel,
                         message: ":warning: Error retrieving server information: "+err

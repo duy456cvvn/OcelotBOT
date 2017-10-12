@@ -25,6 +25,7 @@ module.exports = {
 								await bot.database.removeReminder(reminder.id);
 								bot.log(`Removed reminder ${reminder.id}`);
 							}catch(err){
+								bot.raven.captureException(err);
 								bot.error(`Error removing reminder: ${err.stack}`);
 							}
 						}else{
@@ -47,6 +48,7 @@ module.exports = {
 				bot.log("skipping reminders (This is ocelotbot-"+parseInt(process.argv[2])+")")
 			}
 		}catch(err){
+			bot.raven.captureException(err);
     		bot.error("Error during reminder loading:");
     		bot.error(err.stack);
 		}finally{

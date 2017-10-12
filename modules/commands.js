@@ -41,6 +41,7 @@ module.exports = function(bot){
             if(err){
                 bot.error("Error reading from commands directory");
                 bot.error(err);
+                bot.raven.captureException(err);
                 cb(err);
             }else{
                 async.eachSeries(files, function loadCommands(command, callback){
@@ -87,98 +88,119 @@ module.exports = function(bot){
             })
             .catch(function(err){
                 bot.error("Error loading prefix cache: ");
+                bot.raven.captureException(err);
                 console.error(err);
             });
 
 
         bot.registerMessageHandler("commands", async function(user, userID, channelID, message, event, _bot, receiver){
-        	var wasCommand = false;
-            try {
-                var server = await receiver.getServerFromChannel(channelID);
-				if (message.startsWith(getPrefix(server))) {
-					var args = message.split(" ");
-					const commandName = args[0].substring(getPrefix(server).length).toLowerCase();
-					var command = bot.commands[commandName];
-					if (!isBanned(server, channelID, userID) && command) {
-						wasCommand = true;
-						bot.commandCount++;
+            bot.raven.context(async function(){
+                bot.raven.setContext({
+                    tags: {
+                        module: "Commands"
+                    },
+                    extra: {
+                        channelID: channelID,
+                        message: message,
+                        event: event
+                    },
+                
+                    user: {
+                        username: user,
+                        id: userID
+                    },
+                });
+                var wasCommand = false;
+                try {
+                    var server = await receiver.getServerFromChannel(channelID);
+                    if (message.startsWith(getPrefix(server))) {
+                        var args = message.split(" ");
+                        const commandName = args[0].substring(getPrefix(server).length).toLowerCase();
+                        var command = bot.commands[commandName];
+                        if (!isBanned(server, channelID, userID) && command) {
+                            wasCommand = true;
+                            bot.commandCount++;
 
-						var cooldown = bot.commandCooldowns[userID];
-						if(cooldown){
-							if(cooldown[commandName]){
-								cooldown[commandName]++;
-							}else{
-								cooldown[commandName] = 1;
-							}
-						}else{
-							bot.commandCooldowns[userID] = {
-								[commandName]: 1
-							};
-						}
+                            var cooldown = bot.commandCooldowns[userID];
+                            if(cooldown){
+                                if(cooldown[commandName]){
+                                    cooldown[commandName]++;
+                                }else{
+                                    cooldown[commandName] = 1;
+                                }
+                            }else{
+                                bot.commandCooldowns[userID] = {
+                                    [commandName]: 1
+                                };
+                            }
 
-						async function log(message){
-							try{
-								await bot.database.logCommand(userID, channelID, message)
-							}catch(err){
-								bot.error(`Error logging command: ${err.stack}`);
-							}finally{
-								bot.log(`${user} (${userID}) in ${server} performed command ${message}`);
-							}
-						}
+                            async function log(message){
+                                try{
+                                    await bot.database.logCommand(userID, channelID, message)
+                                }catch(err){
+                                    bot.error(`Error logging command: ${err.stack}`);
+                                    bot.raven.captureException(err);
+                                }finally{
+                                    bot.log(`${user} (${userID}) in ${server} performed command ${message}`);
+                                }
+                            }
 
-						if(cooldown && cooldown[commandName] && cooldown[commandName] >= config.get("Bot.softCooldown")){
-							if(cooldown[commandName] >= config.get("Bot.hardCooldown")){
-								log(message+" [HARD COOLDOWN]");
+                            if(cooldown && cooldown[commandName] && cooldown[commandName] >= config.get("Bot.softCooldown")){
+                                if(cooldown[commandName] >= config.get("Bot.hardCooldown")){
+                                    log(message+" [HARD COOLDOWN]");
 
-								var cooldownCount = bot.cooldownCounts[userID];
-								if(cooldownCount){
-									bot.cooldownCounts[userID]++;
-									if(bot.cooldownCounts[userID] == 5){
-										receiver.sendMessage({
-											to: channelID,
-											message: ":warning: **If you trigger more cooldowns within the next hour you will be banned from using OcelotBOT.**"
-										});
-									}else if(bot.cooldownCounts[userID] > 5){
-										receiver.sendMessage({
-											to: channelID,
-											message: ":wave: **<@"+userID+">, you have been banned from using OcelotBOT.**"
-										});
-										await bot.database.ban(userID, "USER", `Auto: ${bot.cooldownCounts[userID]} hard cooldowns on command ${commandName}`);
-										bot.banCache["user"].push(userID);
-									}
-								}else{
-									bot.cooldownCounts[userID] = 1;
-								}
-								bot.warn(`Hard cooldown #${bot.cooldownCounts[userID]} triggered by ${user} (${userID})`);
-							}else{
-								log(message+" [SOFT COOLDOWN]");
-								bot.log(`Soft cooldown triggered by ${user} (${userID})`);
-								receiver.sendMessage({
-									to: channelID,
-									message: ":watch: Wait a while before performing this command again!"
-								});
-							}
-						}else{
-							log(message);
-							command(user, userID, channelID, message, args, event, bot, receiver, message.indexOf("-DEBUG") > -1, server);
-						}
-					}
-				}
+                                    var cooldownCount = bot.cooldownCounts[userID];
+                                    if(cooldownCount){
+                                        bot.cooldownCounts[userID]++;
+                                        if(bot.cooldownCounts[userID] == 5){
+                                            receiver.sendMessage({
+                                                to: channelID,
+                                                message: ":warning: **If you trigger more cooldowns within the next hour you will be banned from using OcelotBOT.**"
+                                            });
+                                        }else if(bot.cooldownCounts[userID] > 5){
+                                            receiver.sendMessage({
+                                                to: channelID,
+                                                message: ":wave: **<@"+userID+">, you have been banned from using OcelotBOT.**"
+                                            });
+                                            await bot.database.ban(userID, "USER", `Auto: ${bot.cooldownCounts[userID]} hard cooldowns on command ${commandName}`);
+                                            bot.banCache["user"].push(userID);
+                                        }
+                                    }else{
+                                        bot.cooldownCounts[userID] = 1;
+                                    }
+                                    bot.warn(`Hard cooldown #${bot.cooldownCounts[userID]} triggered by ${user} (${userID})`);
+                                }else{
+                                    log(message+" [SOFT COOLDOWN]");
+                                    bot.log(`Soft cooldown triggered by ${user} (${userID})`);
+                                    receiver.sendMessage({
+                                        to: channelID,
+                                        message: ":watch: Wait a while before performing this command again!"
+                                    });
+                                }
+                            }else{
+                                log(message);
+                                command(user, userID, channelID, message, args, event, bot, receiver, message.indexOf("-DEBUG") > -1, server);
+                            }
+                        }
+                    }
 
-            }catch(e){
-            	if(wasCommand){
-					receiver.sendMessage({
-						to: channelID,
-						message: ":bangbang: Command failed: " + e
-					});
-					bot.error(`Command ${message} failed: ${e}`);
-				}else{
-            		bot.error(`Message ${message} caused error:`);
-				}
+                }catch(e){
+                    bot.raven.captureException(e);
+                    if(wasCommand){
+                        receiver.sendMessage({
+                            to: channelID,
+                            message: ":bangbang: Command failed: " + e
+                        });
+                        bot.error(`Command ${message} failed: ${e}`);
+                    }else{
+                        bot.error(`Message ${message} caused error:`);
+                    }
 
-				if(e.stack)
-                	bot.error(e.stack);
-            }
+                    if(e.stack)
+                        bot.error(e.stack);
+                }
+            });
+
         });
       }
     }

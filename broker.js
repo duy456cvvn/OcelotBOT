@@ -148,7 +148,7 @@ ipc.serve(function(){
 						to: "139871249567318017",
 						message: "[BROKER] **Deploy failed to bring any instances back online after 2 minutes. Launching emergency mode.**"
 					});
-					child_process.exec("pm2 start ob-emergency; pm2 stop ocelotbot-0 ocelotbot-1 ob-broker", function(){
+					child_process.exec("pm2 start ob-emergency && pm2 stop ocelotbot-0 ocelotbot-1 ob-broker", function(){
 						console.log(arguments);
 					});
 				}, 12000);

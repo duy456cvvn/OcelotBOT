@@ -42,6 +42,7 @@ module.exports = {
     	var result = await bot.database.getLastPetermonData();
 		request(`https://unacceptableuse.com/petify/api/${config.get("Commands.peterstate.petifyKey")}/nowPlaying/${config.get("Commands.peterstate.petifyUser")}`, async function (err, resp, body){
 			if(err){
+				bot.raven.captureException(err);
 				recv.sendMessage({
 					to: channel,
 					message: err
@@ -50,6 +51,7 @@ module.exports = {
 				try {
 					var data = JSON.parse(body);
 					if (data.err) {
+						bot.raven.captureException(err);
 						recv.sendMessage({
 							to: channel,
 							message: ":bangbang: Error getting data from Petify:\n```\n"+JSON.stringify(data.err)+"\n```"
@@ -102,6 +104,7 @@ module.exports = {
 						]);
 					}
 				}catch(e){
+					bot.raven.captureException(e);
 					recv.sendMessage({
 						to: channel,
 						message: ":bangbang: Error parsing Petify data. Try again later."

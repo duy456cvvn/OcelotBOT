@@ -34,6 +34,9 @@
     "socket": "ocelotbot",
     "debug": true
   },
+  "Sentry": {
+  	"key": ""
+  },
   "Commands": {
     "8ball": {
       "responses": [
@@ -160,7 +163,8 @@
         "your makeup has more depth than your personality",
         "you look like you smell like cum.",
         "it looks like your face caught fire, and someone put it out with a fork.",
-        "i bet your mother left you as a child and you had to survive alone sad and lonely when you grew up everyday you came home from work you cried in bed cuz you had no one until one day someone wanted to be your friend and you were happy. and then you came home from work one day and was like im go suicide bye, faggot"
+        "i bet your mother left you as a child and you had to survive alone sad and lonely when you grew up everyday you came home from work you cried in bed cuz you had no one until one day someone wanted to be your friend and you were happy. and then you came home from work one day and was like im go suicide bye, faggot",
+        "to say you're surface level would be an insult to the ground floor."
       ]
     },
     "ipinfo": {

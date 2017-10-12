@@ -94,6 +94,7 @@ module.exports = function(bot){
 								});
 							}else{
                 				bot.error(err ? err.stack : "Invalid number in lamados.txt "+data);
+                                bot.raven.captureException(err);
 							}
 						});
 
@@ -160,6 +161,7 @@ module.exports = function(bot){
                         }
                     }
 				}catch(e){
+                    bot.raven.captureException(e);
                 	bot.error("Error during autoreply match: "+e);
 					bot.error(e.message+""+e.stack);
 				}

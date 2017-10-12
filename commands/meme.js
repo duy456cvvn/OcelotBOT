@@ -76,6 +76,7 @@ module.exports = {
 						});
 					}
 				}catch(e){
+					bot.raven.captureException(e);
             		bot.error(e.stack);
 					recv.sendMessage({
 						to: channel,
@@ -134,6 +135,7 @@ module.exports = {
 						message: "Meme added."
 					});
 				}catch(err){
+					bot.raven.captureException(err);
 					if(err.message.indexOf("duplicate")){
 						recv.sendMessage({
 							to: channel,
@@ -161,6 +163,7 @@ module.exports = {
 						});
 					}
 				}catch(e){
+					bot.raven.captureException(e);
 					recv.sendMessage({
 						to: channel,
 						message: ":bangbang: Error getting meme. Try Again later."

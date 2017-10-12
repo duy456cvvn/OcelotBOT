@@ -98,67 +98,82 @@ module.exports = {
                     }
 
                     function makeMeme(fileName, outputFile){
-                        gm(fileName)
-                            .resize(405)
-                            .rotate("black", -4.7)
-                            .extent(600, 875, "-128-455")
-                            .toBuffer('PNG', async function avatarToBuffer(err, buffer){
-                                if(err){
-                                    bot.ipc.emit("instanceFree", {instance: bot.instance});
-                                    recv.sendMessage({
-                                        to: channel,
-                                        message: await bot.lang.getTranslation(server,"CRUSH_ERROR")
-                                    });
-                                    bot.error(`Error during avatar format stage of !crush: ${err.stack}`);
-                                    fs.unlink(fileName, function(err){
-                                        if(err){
-                                            bot.error("There was an error trying to delete "+fileName+": "+err);
-                                        }else{
-                                            bot.log("Deleted "+fileName);
-                                        }
-                                    });
-                                }else{
-                                    gm(buffer)
-                                        .composite(config.get("template"))
-                                        .toBuffer('PNG', async function crushToBuffer(err, buffer){
-                                            if(err){
-                                                bot.ipc.emit("instanceFree", {instance: bot.instance});
-                                                recv.sendMessage({
-                                                    to: channel,
-                                                    message: await bot.lang.getTranslation(server,"CRUSH_ERROR")
-                                                });
-                                                bot.error(`Error during composite stage of !crush: ${err.stack}`);
-                                                fs.unlink(fileName, function(err){
-                                                    if(err){
-                                                        bot.error(`There was an error trying to delete ${fileName}: ${err}`);
-                                                    }else{
-                                                        bot.log(`Deleted ${fileName}`);
-                                                    }
-                                                });
-                                            }else{
-                                                recv.uploadFile({
-                                                    to: channel,
-                                                    file: buffer,
-                                                    filename: config.get("filename"),
-                                                    filetype: "png"
-                                                }, function(err){
-                                                    console.log(err);
-                                                });
-                                                bot.ipc.emit("instanceFree", {instance: bot.instance});
-                                                fs.writeFile(outputFile, buffer, function(err){
-                                                    bot.warn(`Error caching crush file: ${err}`);
-                                                }, function(err){
-                                                    if(err){
-                                                        recv.sendMessage({
-            /*--sorry guys--*/                              to: channel,
-            /*--sorry guys--*/                              message: err
-            /*--sorry guys--*/                          });
-            /*--sorry guys--*/                      }
-                                                });
-                                            }
-                                        });
-                                }
-                            });
+                        bot.raven.context(function(){
+                        	bot.raven.setContext({
+								user: {
+									id: userID,
+									username: user
+								},
+								tags: {
+									command: "crush"
+								},
+								extra: {
+									fileName: fileName,
+									outputFile: outputFile
+								}
+							});
+							gm(fileName)
+								.resize(405)
+								.rotate("black", -4.7)
+								.extent(600, 875, "-128-455")
+								.toBuffer('PNG', async function avatarToBuffer(err, buffer){
+									if(err){
+										bot.raven.captureException(err);
+										bot.ipc.emit("instanceFree", {instance: bot.instance});
+										recv.sendMessage({
+											to: channel,
+											message: await bot.lang.getTranslation(server,"CRUSH_ERROR")
+										});
+										bot.error(`Error during avatar format stage of !crush: ${err.stack}`);
+										fs.unlink(fileName, function(err){
+											if(err){
+												bot.raven.captureException(err);
+												bot.error("There was an error trying to delete "+fileName+": "+err);
+											}else{
+												bot.log("Deleted "+fileName);
+											}
+										});
+									}else{
+										gm(buffer)
+											.composite(config.get("template"))
+											.toBuffer('PNG', async function crushToBuffer(err, buffer){
+												if(err){
+													bot.raven.captureException(err);
+													bot.ipc.emit("instanceFree", {instance: bot.instance});
+													recv.sendMessage({
+														to: channel,
+														message: await bot.lang.getTranslation(server,"CRUSH_ERROR")
+													});
+													bot.error(`Error during composite stage of !crush: ${err.stack}`);
+													fs.unlink(fileName, function(err){
+														if(err){
+															bot.raven.captureException(e);
+															bot.error(`There was an error trying to delete ${fileName}: ${err}`);
+														}else{
+															bot.log(`Deleted ${fileName}`);
+														}
+													});
+												}else{
+													recv.uploadFile({
+														to: channel,
+														file: buffer,
+														filename: config.get("filename"),
+														filetype: "png"
+													}, function(err){
+														bot.raven.captureException(err);
+														console.log(err);
+													});
+													bot.ipc.emit("instanceFree", {instance: bot.instance});
+													fs.writeFile(outputFile, buffer, function(err){
+														bot.raven.captureException(err);
+														bot.warn(`Error caching crush file: ${err}`);
+													});
+												}
+											});
+									}
+								});
+						});
+
                     }
                 }
 

@@ -90,6 +90,7 @@ module.exports = {
                             }
                         }
                     }catch(e){
+						bot.raven.captureException(e);
                         recv.sendMessage({
                             to: channel,
                             message: await bot.lang.getTranslation(server, "IMAGE_INVALID_RESPONSE")

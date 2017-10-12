@@ -64,7 +64,9 @@ module.exports = {
 								console.log(err);
                                 if (err.response.statusCode == 403) {
                                     notAllowedChannels.push(reaction.channelID);
-                                }
+                                }else{
+									bot.raven.captureException(err);
+								}
                                 bot.spellQueueTotalFailed++;
                             }
                         }
@@ -157,6 +159,7 @@ module.exports = {
                 channelID: channel,
                 limit: 2
             }, function(err, resp){
+        		if(err)bot.raven.captureException(err);
                 if(resp[1]){
 					target = resp[1].id;
 					doTheRestOfIt();

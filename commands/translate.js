@@ -19,6 +19,7 @@ module.exports = {
 
             request(`https://translate.yandex.net/api/v1.5/tr.json/detect?key=${config.get("Commands.translate.key")}&text=${encodeURIComponent(sentence)}`, function getTranslationLanguage(err, response, body) {
                 if (err) {
+					bot.raven.captureException(err);
                     bot.sendMessage({
                         to: channel,
                         message: ":warning: There was an error contacting the translation server."
@@ -30,6 +31,7 @@ module.exports = {
 						if(langResult.code === 200){
 							request(`https://translate.yandex.net/api/v1.5/tr.json/translate?key=${config.get("Commands.translate.key")}&lang=${langResult.lang}-${args[1]}&text=${encodeURIComponent(sentence)}`, function getTranslation(err, response, body){
 								if(err){
+									bot.raven.captureException(err);
 									recv.sendMessage({
 										to: channel,
 										message: ":warning: There was an error contacting the translation server."
@@ -51,6 +53,7 @@ module.exports = {
 											});
 										}
 									}catch(e){
+										bot.raven.captureException(e);
 										recv.sendMessage({
 											to: channel,
 											message: ":bangbang: Received a bad response from the translate server. Try again later."
@@ -66,6 +69,7 @@ module.exports = {
 							bot.error(body);
 						}
 					}catch(e){
+						bot.raven.captureException(e);
 						recv.sendMessage({
 							to: channel,
 							message: ":bangbang: Received a bad response from the translate server. Try again later."

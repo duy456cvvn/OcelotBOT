@@ -23,6 +23,7 @@ module.exports = {
                         to: channel,
                         message: await bot.lang.getTranslation(server, "CONVERT_INVALID_RESPONSE")
                     });
+					bot.raven.captureException(err);
                     bot.error(err);
                 }else{
                     try{
@@ -39,6 +40,7 @@ module.exports = {
                             });
                         }
                     }catch(e){
+						bot.raven.captureException(e);
                         recv.sendMessage({
                             to: channel,
                             message: await bot.lang.getTranslation(server,"CONVERT_INVALID_RESPONSE")

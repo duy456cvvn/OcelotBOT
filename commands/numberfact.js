@@ -15,6 +15,7 @@ module.exports = {
             });
         }else{
             request(`http://numbersapi.com/${parseInt(args[1])}/`, function(err, resp, body){
+                if(err)bot.raven.captureException(err);
                 recv.sendMessage({
                     to: channel,
                     message: err || body

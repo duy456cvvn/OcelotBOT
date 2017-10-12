@@ -22,18 +22,23 @@ module.exports = {
             output += "--Services--\n";
             pm2.connect(function(){
                 pm2.list(function(err, processes){
-                    async.eachSeries(processes, function(process, cb){
-                        output += `${process.pm2_env.status === 'online' ? ":white_check_mark:" : ":no_entry:"} **${process.name}** Uptime: ${bot.util.prettySeconds((new Date().getTime() - process.pm2_env.pm_uptime)/1000)}\n`;
+                    if(err){
+						bot.raven.captureException(err);
+                    }else{
+						async.eachSeries(processes, function(process, cb){
+							output += `${process.pm2_env.status === 'online' ? ":white_check_mark:" : ":no_entry:"} **${process.name}** Uptime: ${bot.util.prettySeconds((new Date().getTime() - process.pm2_env.pm_uptime) / 1000)}\n`;
 
-                        cb();
-                    }, function(){
-                        recv.sendMessage({
-                            to: channel,
-                            message: output
-                        });
-                        pm2.disconnect();
-                    });
+							cb();
+						}, function(){
+							recv.sendMessage({
+								to: channel,
+								message: output
+							});
+							pm2.disconnect();
+						});
+					}
                 });
+
             });
         });
 

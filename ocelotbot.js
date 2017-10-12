@@ -3,7 +3,11 @@
  */
 const   config      = require('config'),
         async       = require('async'),
-        logger      = require('ocelot-logger');
+        logger      = require('ocelot-logger'),
+        Raven 		= require('raven');
+
+
+Raven.config(config.get("Sentry.key")).install();
 
 var bot = {};
 
@@ -18,6 +22,7 @@ function initBot(cb){
     bot.log = logger.log;
     bot.error = logger.error;
     bot.warn = logger.warn;
+    bot.raven = Raven;
 
     bot.log("OcelotBOT Loading...");
 
@@ -65,6 +70,7 @@ initBot(function(){
 
 process.on("uncaughtException", function uncaughtException(err){
 	console.error(err);
+	Raven.captureException(err)
 	if(bot.receiver){
 		bot.receiver.sendMessage({
 			to: "139871249567318017",

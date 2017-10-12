@@ -21,7 +21,7 @@ module.exports = {
             recv.sendMessage({
                 to: channel,
                 message:  await bot.lang.getTranslation(server, "FEEDBACK_ERROR")
-            })
+            });
         }
     }
 };

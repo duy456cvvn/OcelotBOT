@@ -12,6 +12,7 @@ module.exports = {
         const term = encodeURIComponent(args.slice(1).join(" "));
         request(`http://api.urbandictionary.com/v0/define?term=${term}`, async function(err, resp, body){
             if(err){
+				bot.raven.captureException(err);
                 bot.error(err.stack);
                 recv.sendMessage({
                     to: channel,
@@ -33,6 +34,7 @@ module.exports = {
                         });
                     }
                 }catch(e){
+					bot.raven.captureException(e);
                     bot.error(e.stack);
                     recv.sendMessage({
                         to: channel,

@@ -105,6 +105,7 @@ module.exports = function(bot){
                         .catch(function(err){
                             bot.error("Error loading prefix cache: ");
                             console.error(err);
+                            bot.raven.captureException(err);
                         });
                 });
 
@@ -136,6 +137,7 @@ module.exports = function(bot){
                             .catch(function(err){
                                 if(err.message.indexOf("Duplicate") === -1){
                                     bot.error(err.message);
+                                    bot.raven.captureException(err);
                                 }
                             });
                     });
@@ -147,6 +149,7 @@ module.exports = function(bot){
                                 bot.log("Logged server leave");
                             })
                            .catch(function(err){
+                                bot.raven.captureException(err);
                                console.error(err);
                            })
                     });
@@ -239,6 +242,7 @@ module.exports = function(bot){
 								}, function(err, channelInfo){
 									if(err){
 										bot.error(err);
+                                        bot.raven.captureException(err);
 										reject(err);
 									}else{
 										bot.log(`Populating bot.channelCache for channel ${channel}`);
@@ -277,6 +281,7 @@ module.exports = function(bot){
 								}, function(err, serverInfo){
 									if(err){
 										bot.error(err);
+                                        bot.raven.captureException(err);
 										reject(err);
 									}else{
 										bot.log(`Populating bot.serverCache for channel ${server}`);

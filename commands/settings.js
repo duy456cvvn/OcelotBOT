@@ -82,6 +82,7 @@ module.exports = {
 								if(settings[args[2]].onSet)
 									settings[args[2]].onSet(args[3]);
 							}catch(err){
+								bot.raven.captureException(err);
 								recv.sendMessage({
 									to: channel,
 									message: `Error setting value. Did you spell something wrong?:\n\`${err}\``
@@ -112,7 +113,9 @@ module.exports = {
 
 
                 recv.getServerInfo(server, async function(err, serverData){
-					if(!serverData){
+                	if(err){
+						bot.raven.captureException(err);
+					}else if(!serverData){
 						recv.sendMessage({
 							to: channel,
 							message: ":warning: Either this is a DM channel, or there is an issue with the database connection.\nPlease use this command in a server, or try again later."
@@ -144,6 +147,7 @@ module.exports = {
 							try{
 								await bot.database.addServer(serverData.id, serverData.owner_id, serverData.name, serverData.joined_at);
 							}catch(e){
+								bot.raven.captureException(e);
 								bot.error(e.stack);
 							}
 						}

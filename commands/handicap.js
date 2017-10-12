@@ -10,9 +10,7 @@ module.exports = {
     accessLevel: 0,
     commands: ["handicap", "handicapped"],
     run: function run(user, userID, channel, message, args, event, bot, recv) {
-
         recv.simulateTyping(channel);
-
         if(args[1]) {
            draw(message.substring(args[0].length));
         }else{
@@ -20,6 +18,7 @@ module.exports = {
                 channelID: channel,
                 limit: 2
             }, function(err, resp){
+                if(err)bot.raven.captureException(err);
                 draw(err || resp[1].content);
             });
         }
@@ -34,6 +33,7 @@ module.exports = {
                             to: channel,
                             message:  await bot.lang.getTranslation(server, "GENERIC_ERROR")
                         });
+						bot.raven.captureException(err);
                         console.log(err);
                     }else{
                         recv.uploadFile({

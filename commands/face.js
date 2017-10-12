@@ -48,7 +48,9 @@ module.exports = {
                     url: url
                 }
             }, async function(err, resp, body){
-                if(body.length > 0) {
+                if(err){
+					bot.raven.captureException(err);
+                }else if(body.length > 0) {
                     if(body.length === 1){
                         recv.sendMessage({
                             to: channel,

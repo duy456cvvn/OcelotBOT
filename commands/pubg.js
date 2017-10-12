@@ -24,6 +24,7 @@ module.exports = {
                     "TRN-Api-Key": config.get("Commands.pubg.key")
                 }
             }, function(err, resp, body){
+                if(err)bot.raven.captureException(err);
                 try{
                     var data = JSON.parse(body);
                     if(data.error){
@@ -63,6 +64,7 @@ module.exports = {
                         })
                     }
                 }catch(e){
+					bot.raven.captureException(e);
                     recv.sendMessage({
                         to: channel,
                         message: ":bangbang: There was an error contacting the stats server. Try again later."

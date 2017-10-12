@@ -7,6 +7,7 @@ module.exports = {
 	run: function run(user, userID, channel, message, args, event, bot, recv) {
 		fs.readFile("./lamados.txt", function(err, data){
 			if(err){
+				bot.raven.captureException(err);
 				recv.sendMessage({
 					to: channel,
 					message: "Error opening lamados file."

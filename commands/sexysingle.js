@@ -70,8 +70,10 @@ module.exports = {
 							}, async function uploadFileCB(err){
 								bot.ipc.emit("instanceFree", {instance: bot.instance});
 								if(err){
+									bot.raven.captureException(err);
 									fs.unlink(outputFile, function deleteFileCB(err){
 										if(err){
+											bot.raven.captureException(err);
 											bot.error(`There was an error trying to delete ${outputFile}: ${err}`);
 										}else{
 											bot.log(`Deleted ${outputFile}`);

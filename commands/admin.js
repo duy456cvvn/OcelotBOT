@@ -15,7 +15,8 @@ module.exports = {
         bot.log("Loading admin commands...");
         fs.readdir("commands/admin", function(err, files){
            if(err){
-               bot.error(`Error loading admin commands: ${err.stack}`);
+                bot.raven.captureException(err);
+                bot.error(`Error loading admin commands: ${err.stack}`);
            } else{
                async.eachSeries(files, function(file, cb2){
                    try {
@@ -23,7 +24,8 @@ module.exports = {
                         module.exports.functions[command.id.toLowerCase()] = command.run;
                         bot.log(`Loaded Admin Command ${command.id}`);
                    }catch(e){
-                       bot.error(e.stack);
+                        bot.raven.captureException(e);
+                        bot.error(e.stack);
                    }finally{
                        cb2();
                    }
@@ -41,7 +43,7 @@ module.exports = {
                 recv.sendMessage({
                     to: channel,
                     message: `:bangbang: Invalid usage. !admin ${Object.keys(module.exports.functions).join("/")}`
-                })
+                });
             }
         }
 

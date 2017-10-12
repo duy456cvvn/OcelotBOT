@@ -3,7 +3,7 @@ module.exports = {
 	usage: "emoji <term>",
 	accessLevel: 0,
 	commands: ["emoji", "emojilookup", "lookupemoji"],
-	run: async function run(user, userID, channel, message, args, event, bot, recv) {
+	run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
 		if(args[1]){
 			recv.simulateTyping(channel);
 			const result = await bot.util.emojiLookup(args[1]);

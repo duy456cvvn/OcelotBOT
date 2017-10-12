@@ -25,6 +25,7 @@ module.exports = {
         function render(platform, region, user){
             request(`http://ow-api.herokuapp.com/profile/${platform}/${region}/${user}`, async function(err, resp, body){
                 if(err){
+					bot.raven.captureException(err);
                     recv.sendMessage({
                         to: channel,
                         message: await bot.lang.getTranslation(server, "OVERWATCH_ERROR")
@@ -68,6 +69,7 @@ module.exports = {
                            }
                        });
                     }catch(e){
+						bot.raven.captureException(e);
                         recv.sendMessage({
                             to: channel,
                             message: `:bangbang: Error parsing Overwatch data. Try again later. ${body}`
