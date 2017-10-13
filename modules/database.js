@@ -164,7 +164,10 @@ module.exports = function(bot){
                         .orderBy("count", "DESC")
                         .groupBy("commandName")
                         .limit(5)
-                }
+                },
+                getUserStats: function(user){
+                    return knex.select(knex.raw("COUNT(*) AS commandCount")).from(COMMANDLOG_TABLE).where({userID: user})
+                },
 
             };
 
