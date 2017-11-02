@@ -75,18 +75,62 @@ module.exports = function(bot){
 				voiceUseVAD: 0x2000000
 			};
 
-            bot.util.hasPermission = function(server, member, permission){
-            	for(var i = 0; i < member.roles; i++){
-            		const role = server.roles[member.roles[i]];
-            		if((role.permissions & permission) == 1){
-            			return true;
+            bot.util.hasPermission = async function(channelID, memberID, permission){
+            	return new Promise(async function(fulfill, reject){
+            		try{
+            			bot.channelCache[channelID] = null;
+            			var channel = await bot.receiver.getChannelInfo(channelID);
+            			if(channel.permissions.user[memberID]){
+							if((channel.permissions.user[memberID].allow & permission) != 0){
+								fulfill(true);
+								return;
+							}else if((channel.permissions.user[memberID].deny & permission) != 0){
+								fulfill(false);
+								return;
+							}
+						}
+						bot.serverCache[channel.guild_id] = null;
+						var server = await bot.receiver.getServerInfo(channel.guild_id);
+						async.each(server.members, function(member, cb){
+							if(member.id == memberID){
+								cb(member);
+							}
+						}, function(member){
+							console.log(channel.permissions.role);
+							async.eachSeries(member.roles, function(roleID, cb){
+								const role = server.roles[roleID];
+								console.log(roleID);
+								console.log(channel.permissions.role[roleID]);
+								if((role._permissions & permission) != 0){
+									console.log("Permission found");
+									if(channel.permissions.role[roleID] && (channel.permissions.role[roleID].deny & permission) != 0){
+										console.log("Permission override");
+										cb();
+									}else{
+										cb(true);
+									}
+								}else{
+									console.log(`${role._permissions} & ${permission} = ${role._permissions & permission}`);
+									if(channel.permissions.role[roleID] && (channel.permissions.role[roleID].allow & permission) != 0){
+										cb(true);
+									}else{
+										console.log("Permission denied");
+										cb();
+									}
+								}
+							}, function(hasPermission){
+								fulfill(hasPermission || false);
+							});
+						});
+					}catch(e){
+            			reject(e);
+            			bot.raven.captureException(e);
 					}
-				}
-				return false;
+				});
 			};
 
             bot.util.emojiLookup = async function(name){
-            	var name = name.toLowerCase();
+            	name = name.toLowerCase();
             	return new Promise(function(fulfill, reject){
             		var output = [];
 					async.eachSeries(bot.serverCache, function(server, cb){
