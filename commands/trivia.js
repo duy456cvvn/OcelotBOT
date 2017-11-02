@@ -72,7 +72,15 @@ module.exports = {
             return;
         }
         bot.ipc.emit("instanceBusy", {instance: bot.instance});
-        recv.simulateTyping(channel);
+        if(!await bot.util.hasPermission(channel, "146293573422284800", bot.util.PERMISSIONS.addReactions | bot.util.PERMISSIONS.embedLinks)){
+        	console.log("No permissions");
+        	recv.sendMessage({
+				to: channel,
+				message: ":warning: This command requires the permissions **Add Reactions** and **Embed Links**"
+			});
+        	return;
+		}
+		recv.simulateTyping(channel);
         request("https://opentdb.com/api.php?amount=1&encode=url3986", function(err, resp, body){
             if(err){
                 recv.sendMessage({

@@ -8,7 +8,15 @@ module.exports = {
     usage: "weather <place>",
     accessLevel: 0,
     commands: ["weather", "forecast"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: async function run(user, userID, channel, message, args, event, bot, recv) {
+		if(!await bot.util.hasPermission(channel, "146293573422284800", bot.util.PERMISSIONS.embedLinks)){
+			console.log("No permissions");
+			recv.sendMessage({
+				to: channel,
+				message: ":warning: This command requires the permission **Embed Links**"
+			});
+			return;
+		}
         if(args.length < 2){
             recv.sendMessage({
                 to: channel,

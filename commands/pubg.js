@@ -10,8 +10,15 @@ module.exports = {
     usage: "pubg <username> [solo/duo/squad]",
     accessLevel: 0,
     commands: ["pubg", "battlegrounds"],
-    run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
-
+    run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
+		if(!await bot.util.hasPermission(channel, "146293573422284800", bot.util.PERMISSIONS.embedLinks)){
+			console.log("No permissions");
+			recv.sendMessage({
+				to: channel,
+				message: ":warning: This command requires the permission **Embed Links**"
+			});
+			return;
+		}
         if(!args[1]){
             recv.sendMessage({
                 to: channel,

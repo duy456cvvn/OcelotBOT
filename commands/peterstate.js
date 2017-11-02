@@ -39,6 +39,14 @@ module.exports = {
     accessLevel: 0,
     commands: ["peterstate"],
     run: async function run(user, userID, channel, message, args, event, bot, recv) {
+		if(!await bot.util.hasPermission(channel, "146293573422284800", bot.util.PERMISSIONS.embedLinks)){
+			console.log("No permissions");
+			recv.sendMessage({
+				to: channel,
+				message: ":warning: This command requires the permission **Embed Links**"
+			});
+			return;
+		}
     	var result = await bot.database.getLastPetermonData();
 		request(`https://unacceptableuse.com/petify/api/${config.get("Commands.peterstate.petifyKey")}/nowPlaying/${config.get("Commands.peterstate.petifyUser")}`, async function (err, resp, body){
 			if(err){

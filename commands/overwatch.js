@@ -20,7 +20,15 @@ module.exports = {
     usage: "overwatch <profile> [platform] [region]",
     accessLevel: 0,
     commands: ["overwatch", "ow"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: async function run(user, userID, channel, message, args, event, bot, recv) {
+		if(!await bot.util.hasPermission(channel, "146293573422284800", bot.util.PERMISSIONS.embedLinks)){
+			console.log("No permissions");
+			recv.sendMessage({
+				to: channel,
+				message: ":warning: This command requires the permission **Embed Links**"
+			});
+			return;
+		}
         recv.simulateTyping(channel);
         function render(platform, region, user){
             request(`http://ow-api.herokuapp.com/profile/${platform}/${region}/${user}`, async function(err, resp, body){

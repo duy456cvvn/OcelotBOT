@@ -9,7 +9,15 @@ module.exports = {
     usage: "handicap [text]",
     accessLevel: 0,
     commands: ["handicap", "handicapped"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
+		if(!await bot.util.hasPermission(channel, "146293573422284800", bot.util.PERMISSIONS.attachFiles)){
+			console.log("No permissions");
+			recv.sendMessage({
+				to: channel,
+				message: ":warning: This command requires the permission **Attach Files**"
+			});
+			return;
+		}
         recv.simulateTyping(channel);
         if(args[1]) {
            draw(message.substring(args[0].length));
