@@ -5,6 +5,9 @@ const ipc = require('node-ipc');
 const config = require('config');
 const async = require('async');
 const child_process = require('child_process');
+const Raven = require('raven');
+
+Raven.config(config.get("Sentry.key")).install();
 
 var bot = {
     receivers: {}
