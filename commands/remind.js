@@ -3,7 +3,7 @@
  */
 const fs = require('fs');
 const parseDuration = require("parse-duration");
-const regex = new RegExp("!.*?( .* )\"(.*)\"");
+const regex = new RegExp("!.*?( .* )[\“\”\"\‘\’\'\‘\‚«»«»‹›「」『』﹃﹁﹄﹂《》〈〉](.*)[\“\”\"\‘\’\'\‘\‚«»«»‹›「」『』﹃﹁﹄﹂《》〈〉]");
 module.exports = {
     name: "Reminders",
     usage: "remind <in> \"<message>\"",
