@@ -160,13 +160,18 @@ module.exports = {
 														filename: config.get("filename"),
 														filetype: "png"
 													}, function(err){
-														bot.raven.captureException(err);
-														console.log(err);
+														if(err){
+															bot.raven.captureException(err);
+															console.log(err);
+														}
+
 													});
 													bot.ipc.emit("instanceFree", {instance: bot.instance});
 													fs.writeFile(outputFile, buffer, function(err){
-														bot.raven.captureException(err);
-														bot.warn(`Error caching crush file: ${err}`);
+														if(err){
+															bot.raven.captureException(err);
+															bot.warn(`Error caching crush file: ${err}`);
+														}
 													});
 												}
 											});
