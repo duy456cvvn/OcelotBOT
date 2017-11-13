@@ -143,15 +143,19 @@ module.exports = function(bot){
                     });
 
                     bot.ipc.on("guildDelete", function(data){
-                       bot.log(`Left Server ${data[0].name} (${data[0].id})`);
-                       bot.database.leaveServer(data[0].id)
-                            .then(function(){
-                                bot.log("Logged server leave");
-                            })
-                           .catch(function(err){
-                                bot.raven.captureException(err);
-                               console.error(err);
-                           })
+                    	if(data && data[0] && data[0].id){
+							bot.log(`Left Server ${data[0].name} (${data[0].id})`);
+							bot.database.leaveServer(data[0].id)
+								.then(function(){
+									bot.log("Logged server leave");
+								})
+								.catch(function(err){
+									bot.raven.captureException(err);
+									console.error(err);
+								})
+						}else{
+                    		bot.warn("Guild deleted with no/invalid data");
+						}
                     });
                 }
 
