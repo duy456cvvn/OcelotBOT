@@ -156,8 +156,12 @@ module.exports = function(bot){
                 }
 
                 bot.ipc.on("callback", function(data){
-                    bot.waitingCallbacks[data.id].apply(this, data.args);
-                    delete bot.waitingCallbacks[data.id];
+                	if(bot.waitingCallbacks[data.id]){
+						bot.waitingCallbacks[data.id].apply(this, data.args);
+						delete bot.waitingCallbacks[data.id];
+					}else{
+                		bot.warn("Received callback for callback that no longer exists! ("+data.id+")");
+					}
                 });
 
 
