@@ -62,27 +62,35 @@ module.exports = {
 					message: output
 				});
             }else if(arg === "remove"){
-            	try{
-					const result = await bot.database.removeMeme(args[2].toLowerCase(), server, userID);
-					if(result.affectedRows == 0){
-						recv.sendMessage({
-							to: channel,
-							message: ":warning: Meme doesn't exist or you didn't add it. Only the person who added it can remove it.\nIf you still want it removed, do !meme report "+args[2]
-						});
-					}else{
-						recv.sendMessage({
-							to: channel,
-							message: ":white_check_mark: Meme removed."
-						});
-					}
-				}catch(e){
-					bot.raven.captureException(e);
-            		bot.error(e.stack);
+				if(!args[2]){
 					recv.sendMessage({
 						to: channel,
-						message: ":bangbang: Error removing meme. Try Again Later."
+						message: ":bangbang: Usage: !meme remove <meme>"
 					});
+				}else{
+					try{
+						const result = await bot.database.removeMeme(args[2].toLowerCase(), server, userID);
+						if(result.affectedRows == 0){
+							recv.sendMessage({
+								to: channel,
+								message: ":warning: Meme doesn't exist or you didn't add it. Only the person who added it can remove it.\nIf you still want it removed, do !meme report "+args[2]
+							});
+						}else{
+							recv.sendMessage({
+								to: channel,
+								message: ":white_check_mark: Meme removed."
+							});
+						}
+					}catch(e){
+						bot.raven.captureException(e);
+						bot.error(e.stack);
+						recv.sendMessage({
+							to: channel,
+							message: ":bangbang: Error removing meme. Try Again Later."
+						});
+					}
 				}
+
             }else if(arg === "report") {
                 recv.sendMessage({
                     to: "139871249567318017",
