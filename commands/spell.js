@@ -62,9 +62,9 @@ module.exports = {
                                 bot.spellQueue.unshift(reaction);
                             } else {
 								console.log(err);
-                                if (err.response.statusCode == 403) {
+                                if (err && err.response && err.response.statusCode == 403) {
                                     notAllowedChannels.push(reaction.channelID);
-                                }else{
+                                }else if(err){
 									bot.raven.captureException(err);
 								}
                                 bot.spellQueueTotalFailed++;
