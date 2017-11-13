@@ -80,7 +80,7 @@ module.exports = function(bot){
             		try{
             			bot.channelCache[channelID] = null;
             			var channel = await bot.receiver.getChannelInfo(channelID);
-            			if(channel.permissions.user[memberID]){
+            			if(channel && channel.permissions.user[memberID]){
 							if((channel.permissions.user[memberID].allow & permission) != 0){
 								fulfill(true);
 								return;
@@ -96,14 +96,11 @@ module.exports = function(bot){
 								cb(member);
 							}
 						}, function(member){
-							console.log(channel.permissions.role);
 							async.eachSeries(member.roles, function(roleID, cb){
 								const role = server.roles[roleID];
-								console.log(roleID);
-								console.log(channel.permissions.role[roleID]);
 								if((role._permissions & permission) != 0){
 									console.log("Permission found");
-									if(channel.permissions.role[roleID] && (channel.permissions.role[roleID].deny & permission) != 0){
+									if(channel && channel.permissions.role[roleID] && (channel.permissions.role[roleID].deny & permission) != 0){
 										console.log("Permission override");
 										cb();
 									}else{
@@ -111,7 +108,7 @@ module.exports = function(bot){
 									}
 								}else{
 									console.log(`${role._permissions} & ${permission} = ${role._permissions & permission}`);
-									if(channel.permissions.role[roleID] && (channel.permissions.role[roleID].allow & permission) != 0){
+									if(channel && channel.permissions.role[roleID] && (channel.permissions.role[roleID].allow & permission) != 0){
 										cb(true);
 									}else{
 										console.log("Permission denied");
