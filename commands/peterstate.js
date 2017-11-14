@@ -78,8 +78,8 @@ module.exports = {
 								text: peter.state === "Home" ? `:musical_note: Listening to **[${data.artist_name} - ${data.title}](https://unacceptableuse.com/petify/song/${data.song_id}/-%7C)**` : `Last update: ${peter.timestamp}`,
 								fields: [
 									{
-										title: ":heart: Heart Rate",
-										value: peter.peter_heartrate + " BPM",
+										title: ":santa: Feeling Christmassy?",
+										value: "No.",
 										short: true
 									},
 									{
