@@ -37,7 +37,7 @@ module.exports = {
             const result = isMonthly ? await bot.database.getMonthlyTriviaLeaderboard() : await bot.database.getTriviaLeaderboard();
 			var data = [];
 			var i = 0;
-			var position = 69;
+			var position = -1;
 			async.eachSeries(result, function (entry, cb) {
 				i++;
 				if(entry.user == userID){
@@ -46,6 +46,10 @@ module.exports = {
 						cb(true);
 						return;
 					}
+				}else if (i > 100){
+					position = "over 100";
+					cb(true);
+					return;
 				}
 				if(i <= 10)
 					recv.getUser(entry.user, function (err, user) {
