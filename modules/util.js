@@ -88,6 +88,10 @@ module.exports = function(bot){
 								fulfill(false);
 								return;
 							}
+						}else if(!channel){
+            				bot.warn("Permissions requested in channel that doesn't exist... "+channelID);
+            				fulfill(true);
+            				return;
 						}
 						bot.serverCache[channel.guild_id] = null;
 						var server = await bot.receiver.getServerInfo(channel.guild_id);
