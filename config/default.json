@@ -9,6 +9,9 @@
     "userToken": "",
     "clientID": ""
   },
+  "Lang": {
+    "key": ""
+  },
   "Discord": {
     "token": "",
     "messageDelay": 300,
