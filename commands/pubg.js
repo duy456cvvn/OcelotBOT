@@ -15,14 +15,14 @@ module.exports = {
 			console.log("No permissions");
 			recv.sendMessage({
 				to: channel,
-				message: ":warning: This command requires the permission **Embed Links**"
+				message: await bot.lang.getTranslation(server, "ERROR_NEEDS_PERMISSION", "Embed Links")
 			});
 			return;
 		}
         if(!args[1]){
             recv.sendMessage({
                 to: channel,
-                message: `:bangbang: You must enter a PUBG username. Example: ${args[0]} unacceptableuse`
+                message: await bot.lang.getTranslation(server, "PUBG_NO_USERNAME", args[0])
             });
         }else{
             request({
@@ -30,14 +30,14 @@ module.exports = {
                 headers: {
                     "TRN-Api-Key": config.get("Commands.pubg.key")
                 }
-            }, function(err, resp, body){
+            }, async function(err, resp, body){
                 if(err)bot.raven.captureException(err);
                 try{
                     var data = JSON.parse(body);
                     if(data.error){
                         recv.sendMessage({
                             to: channel,
-                            message: ":warning: That user does not exist or PUBG is down. Try a different user or try again later."
+                            message: await bot.lang.getTranslation(server, "PUBG_INVALID_USER")
                         })
                     }else{
                         const section = args[2] ? args[2] : "solo";
@@ -49,7 +49,7 @@ module.exports = {
                                     var stat = data.Stats[i].Stats[j];
                                     fields.push({
                                         name: stat.label,
-                                        value: `${stat.displayValue} (Top ${stat.percentile}%)`,
+                                        value: await bot.lang.getTranslation(server, "PUBG_STAT", stat),
                                         inline: true
                                     });
                                 }
@@ -58,11 +58,12 @@ module.exports = {
                         }
                         recv.sendMessage({
                             to: channel,
-                            message: !args[2] ? `:information_source: Showing **solo** stats. Do ${args[0]} ${args[1]} duo or squad to get further details.` : `:information_source: Showing **${section}** stats.`,
+
+                            message: !args[2] ? await bot.lang.getTranslation(server, "PUBG_SOLO", {command: args[0], username: args[1]}) : await bot.lang.getTranslation(server, "PUBG_SECTION", section),
                             color: 0xf7f733,
                             embed: {
-                                title: `PUBG Stats for ${data.PlayerName}`,
-                                description: `Last updated: ${updated.toLocaleDateString()} ${updated.toLocaleTimeString()}`,
+								title: await bot.lang.getTranslation(server, "PUBG_STATS", data.PlayerName),
+								description: await bot.lang.getTranslation(server, "PUBG_LAST_UPDATED", {date: updated.toLocaleDateString(), time: updated.toLocaleTimeString()}),
                                 thumbnail: {
                                     "url": data.Avatar
                                 },
@@ -74,7 +75,7 @@ module.exports = {
 					bot.raven.captureException(e);
                     recv.sendMessage({
                         to: channel,
-                        message: ":bangbang: There was an error contacting the stats server. Try again later."
+                        message: await bot.lang.getTranslation(server, "PUBG_INVALID_RESPONSE")
                     });
                     bot.error(e.stack);
                 }

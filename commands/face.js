@@ -54,7 +54,7 @@ module.exports = {
                     if(body.length === 1){
                         recv.sendMessage({
                             to: channel,
-                            message: `:thinking: Looks like a **${body[0].faceAttributes.age} year old ${body[0].faceAttributes.gender}**.`
+                            message: await bot.lang.getTranslation(server, "FACE_RESPONSE", {age: body[0].faceAttributes.age, gender: body[0].faceAttributes.gender})
                         });
                     }else{
                         var output = "";

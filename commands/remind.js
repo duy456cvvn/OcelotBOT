@@ -33,7 +33,11 @@ module.exports = {
 								bot.log(`Reminding ${JSON.stringify(reminder)}`);
 								bot.receiver.sendMessage({
 									to: reminder.channel,
-									message: `<@${reminder.user}>, at ${reminder.timestamp} you told me to remind you of this:\n${reminder.message}`
+									message: await bot.lang.getTranslation(reminder.server, "REMIND_REMINDER", {
+										username: reminder.user,
+										date: reminder.timestamp,
+										message: reminder.message
+									})
 								});
 								try{
 									await bot.database.removeReminder(reminder.id);
@@ -55,31 +59,31 @@ module.exports = {
 			cb();
 		}
     },
-    run: function run(user ,userID, channel, message, args, event, bot, recv, debug) {
+    run: async function run(user ,userID, channel, message, args, event, bot, recv, debug) {
         var rargs = regex.exec(message);
         if(!rargs || rargs.length < 3){
             recv.sendMessage({
                 to: channel,
-                message: ":bangbang: You must surround your message with speech marks. i.e !remind in 10 minutes \"fix reminders\""
+                message: await bot.lang.getTranslation(server, "REMIND_INVALID_MESSAGE")
             })
         }else{
             const offset = parseDuration(rargs[1]);
             if(offset === 0){
                 recv.sendMessage({
                     to: channel,
-                    message: ":bangbang: Couldn't parse time. Enter something like 'in 5 minutes'"
+                    message: await bot.lang.getTranslation(server, "REMIND_INVALID_TIME")
                 });
             }else{
                 if(offset < 1000){
                     recv.sendMessage({
                         to: channel,
-                        message: ":tropical_fish: Do you have the memory of a goldfish? You can't enter a time shorter than **1 second**."
+                        message: await bot.lang.getTranslation(server, "REMIND_SHORT_TIME")
                     });
                 }else {
                     const at = new Date(new Date().getTime() + offset);
                     recv.sendMessage({
                         to: channel,
-                        message: `:watch: Reminding you in **${bot.util.prettySeconds(offset / 1000)}**. (At ${at})`
+						message: await bot.lang.getTranslation(server, "REMIND_SUCCESS", {time: bot.util.prettySeconds(offset / 1000), date: at})
                     });
                     if (debug)
                         recv.sendMessage({
@@ -89,10 +93,14 @@ module.exports = {
                     recv.getServerFromChannel(channel, function (err, server) {
                         bot.database.addReminder(recv.id, userID, server, channel, at.getTime(), rargs[2])
                             .then(function (resp) {
-                                bot.util.setLongTimeout(function () {
+                                bot.util.setLongTimeout(async function () {
                                     recv.sendMessage({
                                         to: channel,
-                                        message: `<@${userID}>, you told me to remind you of this:\n${rargs[2]}`
+										message: await bot.lang.getTranslation(server, "REMIND_REMINDER", {
+											username: userID,
+											date: at.getTime(),
+											message: rargs[2]
+										})
                                     });
                                     bot.database.removeReminder(resp[0])
                                         .then(function () {
@@ -100,15 +108,17 @@ module.exports = {
                                         })
                                         .catch(function (err) {
                                             bot.error(err.stack);
+                                            bot.raven.captureException(err);
                                         });
                                 }, offset);
                             })
-                            .catch(function (err) {
+                            .catch(async function (err) {
                                 recv.sendMessage({
                                     to: channel,
-                                    message: ":bangbang: There was an error setting your reminder. Try again later."
+                                    message: await bot.lang.getTranslation(server, "REMIND_ERROR")
                                 });
                                 bot.error(err.stack);
+                                bot.raven.captureException(err);
                             });
                     });
                 }

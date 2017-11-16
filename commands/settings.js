@@ -7,11 +7,11 @@ module.exports = {
     usage: "settings [set/help/list]",
     accessLevel: 1,
     commands: ["settings", "serversettings"],
-    run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
+    run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
 
         const settings = {
             prefix: {
-                explanation: "The prefix that goes before commands i.e !spongebob or !settings",
+                explanation: await bot.lang.getTranslation(server, "SETTINGS_PREFIX"),
                 format: function format(value){
                     return "`"+value+"`";
                 },
@@ -21,25 +21,26 @@ module.exports = {
                 },
             },
             enableAutoReactions: {
-                explanation: "Enables the bot reacting to things like xD and 'the more you know'",
+                explanation: await bot.lang.getTranslation(server, "SETTINGS_REACTIONS"),
                 format: function format(value){
                     return !!value;
                 }
             },
             enableAutoReplies: {
-                explanation: "Enables the bot replying to things like 'alot'",
+                explanation: await bot.lang.getTranslation(server, "SETTINGS_REPLIES"),
                 format: function format(value){
                     return !!value;
                 }
             },
             allowNSFW: {
-                explanation: "Enable NSFW results in commands such as !image",
+                explanation: await bot.lang.getTranslation(server, "SETTINGS_NSFW"),
                 format: function format(value){
                     return !!value;
                 }
             },
 			language: {
-            	explanation: "The language to respond to commands in. To view the available languages, type !language",
+            	//explanation: "The language to respond to commands in. To view the available languages, type !language",
+				explanation: await bot.lang.getTranslation(server, "SETTINGS_LANGUAGE"),
 				format: function(value){
             		return `${bot.lang.getTranslationFor(value, "LANGUAGE_FLAG")} \`${value}\``
 				},
@@ -54,8 +55,8 @@ module.exports = {
                 var serverInfo = results[0];
                 var hasRole = false;
                 var subCommands = {
-                    "list": function(){
-                        var output = "**Available Settings:**\n";
+                    "list": async function(){
+                        var output = await bot.lang.getTranslation(server, "SETTINGS_AVAILABLE");
                         for(var i in serverInfo){
                             if(serverInfo.hasOwnProperty(i) && settings[i]){
                                 output += `**${i}** - ${settings[i].format(serverInfo[i])}\n`

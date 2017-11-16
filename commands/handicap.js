@@ -14,7 +14,7 @@ module.exports = {
 			console.log("No permissions");
 			recv.sendMessage({
 				to: channel,
-				message: ":warning: This command requires the permission **Attach Files**"
+				message: await bot.lang.getTranslation(server, "ERROR_NEEDS_PERMISSION", "Attach Files")
 			});
 			return;
 		}

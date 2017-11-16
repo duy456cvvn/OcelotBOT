@@ -15,7 +15,7 @@ module.exports = {
 			console.log("No permissions");
 			recv.sendMessage({
 				to: channel,
-				message: ":warning: This command requires the permission **Embed Links**"
+				message: await bot.lang.getTranslation(server, "ERROR_NEEDS_PERMISSION", "Embed Links")
 			});
 			return;
 		}

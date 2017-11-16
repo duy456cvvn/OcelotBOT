@@ -25,7 +25,7 @@ module.exports = {
                         const randEntry = bot.util.arrayRand(data.list);
                         recv.sendMessage({
                             to: channel,
-                            message: `${await bot.lang.getTranslation(server, "UD_DEFINITION", {word: randEntry.word})}: **\n${randEntry.definition}\n\`\`\`${randEntry.example}\`\`\``
+                            message: await bot.lang.getTranslation(server, "UD_DEFINITION", {word: randEntry.word, definition: randEntry.definition, example: randEntry.example})
                         });
                     }else{
                         recv.sendMessage({

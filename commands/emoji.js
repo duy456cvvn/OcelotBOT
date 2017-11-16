@@ -8,7 +8,7 @@ module.exports = {
 			console.log("No permissions");
 			recv.sendMessage({
 				to: channel,
-				message: ":warning: This command requires the permission **Use External Emojis**"
+				message: await bot.lang.getTranslation(server, "ERROR_NEEDS_PERMISSION", "Use External Emojis")
 			});
 			return;
 		}

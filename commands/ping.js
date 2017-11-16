@@ -7,16 +7,16 @@ module.exports = {
     usage: "ping <address> [timeout] [times]",
     accessLevel: 0,
     commands: ["ping"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: async function run(user, userID, channel, message, args, event, bot, recv) {
         if(args.length < 2){
             recv.sendMessage({
                 to: channel,
-                message: ":bangbang: You must enter an address to ping. i.e. !ping google.com"
+                message: await bot.lang.getTranslation(server, "PING_NO_ADDRESS")
             });
         }else{
             recv.sendMessage({
                 to: channel,
-                message: `:watch: Pinging ${args[1]}...`
+                message: await bot.lang.getTranslation(server, "PING_PINGING", args[1])
             }, async function(err, resp){
                 var id = resp.ts || resp.id;
 
@@ -28,13 +28,13 @@ module.exports = {
 					recv.editMessage({
 						channelID: channel,
 						messageID: id,
-						message: `:white_check_mark: Received response: \n\`\`\`${res.output}\n\`\`\``
+						message: await bot.lang.getTranslation(server, "PING_RESPONSE", res.output)
 					});
 				}else{
 					recv.editMessage({
 						channelID: channel,
 						messageID: id,
-						message: ":negative_squared_cross_mark: Received no response from host."
+						message: await bot.lang.getTranslation(server, "PING_NO_RESPONSE")
 					});
 				}
             });

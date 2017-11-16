@@ -25,7 +25,7 @@ module.exports = {
 			console.log("No permissions");
 			recv.sendMessage({
 				to: channel,
-				message: ":warning: This command requires the permission **Embed Links**"
+				message: await bot.lang.getTranslation(server, "ERROR_NEEDS_PERMISSION", "Embed Links")
 			});
 			return;
 		}
@@ -47,7 +47,7 @@ module.exports = {
                            message: "",
                            embed: {
                                color: 0xF59503,
-                               title: `Overwatch profile for ${data.username}:`,
+                               title: await bot.lang.getTranslation(server, "OVERWATCH_PROFILE_NAME", data.username),
                                description: "",
                                author: {
                                    name: "Overwatch Profile",
@@ -80,7 +80,7 @@ module.exports = {
 						bot.raven.captureException(e);
                         recv.sendMessage({
                             to: channel,
-                            message: `:bangbang: Error parsing Overwatch data. Try again later. ${body}`
+                            message: await bot.lang.getTranslation(server, "OVERWATCH_INVALID_RESPONSE", body)
                         });
                         bot.error(e.stack);
                     }
@@ -95,13 +95,13 @@ module.exports = {
             }else if(!args[2] || platforms.indexOf(args[2]) === -1){
                 recv.sendMessage({
                     to: channel,
-                    message: ":bangbang: You must enter a platform: pc/ps4/xbl"
+                    message: await bot.lang.getTranslation(server, "OVERWATCH_NO_PLATFORM")
                 });
             }else{
                 if(args[2].toLowerCase() === "pc" && args[1].indexOf("#") < 0){
 					recv.sendMessage({
 						to: channel,
-						message: `:bangbang: You must enter a valid PC username, along with the number: i.e ${args[0]} Peter#25877 pc eu`
+						message: await bot.lang.getTranslation(server, "OVERWATCH_INVALID_USERNAME", args[0])
 					});
                 }else{
 					render(args[2], region, args[1].replace("#", "-"))
@@ -110,7 +110,7 @@ module.exports = {
         }else{
             recv.sendMessage({
                 to: channel,
-                message: ":bangbang: You must enter a battletag i.e: !overwatch Peter#25877"
+                message: await bot.lang.getTranslation(server, "OVERWATCH_NO_BATTLETAG", args[0])
             });
         }
 

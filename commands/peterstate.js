@@ -43,7 +43,7 @@ module.exports = {
 			console.log("No permissions");
 			recv.sendMessage({
 				to: channel,
-				message: ":warning: This command requires the permission **Embed Links**"
+				message: await bot.lang.getTranslation(server, "ERROR_NEEDS_PERMISSION", "Embed Links")
 			});
 			return;
 		}
@@ -62,7 +62,7 @@ module.exports = {
 						bot.raven.captureException(err);
 						recv.sendMessage({
 							to: channel,
-							message: ":bangbang: Error getting data from Petify:\n```\n"+JSON.stringify(data.err)+"\n```"
+							message: await bot.lang.getTranslation(server, "PETERSTATE_GENERIC_ERROR", {source: "Petify", error: JSON.stringify(data.err)})
 						});
 					} else {
 						var outside = await bot.database.getPetermonLastOutside();
@@ -70,7 +70,9 @@ module.exports = {
 						const lastTimeOutside = new Date(outside[0].timestamp);
 						const timeInside = now - lastTimeOutside;
 						const peter = result[0];
-						recv.sendAttachment(channel, ":information_source: **Fun Fact:** " + ( timeInside >= 8.64e+7 ? `The last time peter left the house was **${bot.util.prettySeconds(parseInt(timeInside / 1000))}** ago.` : bot.util.arrayRand(facts)), [
+						recv.sendAttachment(channel,
+							await bot.lang.getTranslation(server, "PETERSTATE_FUN_FACT", (timeInside >= 8.64e+7 ? await bot.lang.getTranslation(server, "PETERSTATE_HOUSE_STATS", bot.util.prettySeconds(parseInt(timeInside / 1000))) : bot.util.arrayRand(facts))),
+						[
 							{
 								fallback: "...",
 								color: "#4d41ef",
@@ -83,28 +85,28 @@ module.exports = {
 										short: true
 									},
 									{
-										title: ":thermometer: Room Temperature",
+										title: await bot.lang.getTranslation(server, "PETERSTATE_ROOM_TEMP"),
 										value: peter.inside_temp + " C",
 										short: true
 									},
 									{
-										title: ":battery: Phone Battery",
+										title: await bot.lang.getTranslation(server, "PETERSTATE_PHONE_BATTERY"),
 										value: peter.jimmy_battery + "%",
 										short: true
 									},
 									{
-										title: ":iphone: Phone Temperature",
+										title: await bot.lang.getTranslation(server, "PETERSTATE_PHONE_TEMP"),
 										value: peter.jimmy_light + " C",
 										short: true
 									},
 									{
-										title: ":blue_car: Speed",
+										title: await bot.lang.getTranslation(server, "PETERSTATE_SPEED"),
 										value: peter.jimmy_speed + " m/s",
 										short: true
 									},
 									{
-										title: ":airplane: Altitude",
-										value: peter.jimmy_altitude + " m above sealevel.",
+										title: await bot.lang.getTranslation(server, "PETERSTATE_ALTITUDE"),
+										value: await bot.lang.getTranslation(server, "PETERSTATE_ABOVE_SEALEVEL", peter.jimmy_altitude),
 										short: true
 									}
 								]
@@ -115,7 +117,7 @@ module.exports = {
 					bot.raven.captureException(e);
 					recv.sendMessage({
 						to: channel,
-						message: ":bangbang: Error parsing Petify data. Try again later."
+						message: await bot.lang.getTranslation(server, "PETERSTATE_GENERIC_ERROR", {source: "Petify", error: JSON.stringify(e)})
 					});
 					bot.error(e.stack);
 				}
