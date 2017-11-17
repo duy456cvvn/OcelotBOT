@@ -344,7 +344,7 @@ module.exports = function(bot){
 							: arguments[0];
 
 						for (key in args) {
-							str = str.replace(new RegExp("\\{" + key + "\\}", "gi"), args[key]);
+							str = str.replace(new RegExp("\\{{" + key + "\\}}", "gi"), args[key]);
 						}
 					}
 
