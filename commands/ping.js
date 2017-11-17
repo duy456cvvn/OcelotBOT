@@ -7,7 +7,7 @@ module.exports = {
     usage: "ping <address> [timeout] [times]",
     accessLevel: 0,
     commands: ["ping"],
-    run: async function run(user, userID, channel, message, args, event, bot, recv) {
+    run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         if(args.length < 2){
             recv.sendMessage({
                 to: channel,

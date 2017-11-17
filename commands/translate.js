@@ -8,7 +8,7 @@ module.exports = {
     usage: "translate <to> <sentence>",
     accessLevel: 0,
     commands: ["translate"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         if(args.length < 3){
             recv.sendMessage({
                 to: channel,

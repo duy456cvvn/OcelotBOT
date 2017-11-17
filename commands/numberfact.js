@@ -7,7 +7,7 @@ module.exports = {
     usage: "numberfact <number>",
     accessLevel: 0,
     commands: ["numberfact"],
-    run: async function run(user, userID, channel, message, args, event, bot, recv) {
+    run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         if(args.length < 2){
             recv.sendMessage({
                 to: channel,

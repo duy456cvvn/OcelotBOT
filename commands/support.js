@@ -6,7 +6,7 @@ module.exports = {
     usage: "support",
     accessLevel: 0,
     commands: ["support", "donate"],
-    run: async function run(user, userID, channel, message, args, event, bot, recv) {
+    run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
 		if(!await bot.util.hasPermission(channel, "146293573422284800", bot.util.PERMISSIONS.embedLinks)){
 			console.log("No permissions");
 			recv.sendMessage({

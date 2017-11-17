@@ -9,7 +9,7 @@ module.exports = {
     usage: "snapchat <username>",
     accessLevel: 0,
     commands: ["snapchat", "snapcode"],
-    run: async function run(user, userID, channel, message, args, event, bot, recv) {
+    run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
 		if(!await bot.util.hasPermission(channel, "146293573422284800", bot.util.PERMISSIONS.attachFiles)){
 			console.log("No permissions");
 			recv.sendMessage({

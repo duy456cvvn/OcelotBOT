@@ -81,7 +81,7 @@ module.exports = {
         };
         cb();
     },
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         var letters = {
             abc: ["🔤"],
             ab: ["🆎"],

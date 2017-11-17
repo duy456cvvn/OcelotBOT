@@ -10,7 +10,7 @@ module.exports = {
     usage: "status",
     accessLevel: 0,
     commands: ["status"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         var output = "**Service Status:**\n--Servers:--\n";
 
         async.eachSeries(hosts, function(host, cb){

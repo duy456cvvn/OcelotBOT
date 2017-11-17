@@ -7,7 +7,7 @@ module.exports = {
 	usage: "ai <question>",
 	accessLevel: 0,
 	commands: ["ai", "askai", "reply"],
-	run: function run(user, userID, channel, message, args, event, bot, recv){
+	run: function run(user, userID, channel, message, args, event, bot, recv, debug, server){
 		if(!args[1]){
 			recv.sendMessage({
 				to: channel,

@@ -7,7 +7,7 @@ module.exports = {
     usage: "time [timezone]",
     accessLevel: 0,
     commands: ["time", "thetime"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         var m = moment(),
             timezone = args[1],
             now = timezone ? m.tz(timezone) : m,

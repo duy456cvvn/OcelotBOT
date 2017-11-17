@@ -7,7 +7,7 @@ module.exports = {
 	usage: "xkcd [comic]",
 	accessLevel: 0,
 	commands: ["xkcd", "xckd"],
-	run: function run(user, userID, channel, message, args, event, bot, recv){
+	run: function run(user, userID, channel, message, args, event, bot, recv, debug, server){
 		request(args[1] && parseInt(args[1]) ? `https://xkcd.com/${args[1]}/info.0.json` : "https://xkcd.com/info.0.json", function(err, resp, body){
 			if(err){
 				recv.sendMessage({

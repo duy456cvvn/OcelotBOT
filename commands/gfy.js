@@ -9,7 +9,7 @@ module.exports = {
     accessLevel: 0,
     commands: ["gfy", "gfycat", "gif"],
     hidden: true,
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         return false;
         request({
             url: `https://api.gfycat.com/v1/gfycats/search?search_text=${encodeURIComponent(message.substring(args[0].length))}`,

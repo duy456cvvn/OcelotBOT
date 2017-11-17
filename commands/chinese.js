@@ -39,7 +39,7 @@ module.exports = {
     usage: "chinese <text>",
     accessLevel: 0,
     commands: ["chinese", "chin"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         const sentence = message.substring(message.indexOf(args[1]));
         const letters = sentence.split("");
         var output = "";

@@ -6,7 +6,7 @@ module.exports = {
     usage: "expand <word>",
     accessLevel: 0,
     commands: ["expand"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         recv.sendMessage({
             to: channel,
             message:  message.replace(args[0], "").split("").join(" ")

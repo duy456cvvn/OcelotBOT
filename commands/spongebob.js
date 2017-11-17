@@ -6,7 +6,7 @@ module.exports = {
     usage: "spongebob [text]",
     accessLevel: 0,
     commands: ["spongebob"],
-    run: function run(user, userID, channel, message, args, event, bot, recv) {
+    run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
         var doSponge = function doSponge(input){
             var output = "";
             for(var i in input){

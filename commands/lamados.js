@@ -4,7 +4,7 @@ module.exports = {
 	usage: "lamados",
 	accessLevel: 0,
 	commands: ["lamados", "sad"],
-	run: function run(user, userID, channel, message, args, event, bot, recv) {
+	run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
 		fs.readFile("./lamados.txt", function(err, data){
 			if(err){
 				bot.raven.captureException(err);
