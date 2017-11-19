@@ -220,6 +220,7 @@ module.exports = function(bot){
         eval: function(text, cb){
             if(cb){
                 try {
+					//console.log(`TRACE,4,eval start ${text},${(new Date()).getTime()}`);
                     cb(null, eval(text));
                 }catch(e){
                     cb(e);

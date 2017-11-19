@@ -101,8 +101,10 @@ ipc.serve(function(){
     });
 
     ipc.server.on('command', function command(data, socket){
+		//console.log(`TRACE,3,broker ipc command receive ${data.callbackID},${(new Date()).getTime()}`);
         if(data.callbackID != undefined){
             data.args[data.args.length-1] = function(){
+				//console.log(`TRACE,5,broker ipc command callback ${data.callbackID},${(new Date()).getTime()}`);
                 ipc.server.emit(socket, "callback", {
                     id: data.callbackID,
                     args: Array.from(arguments)

@@ -50,12 +50,13 @@ module.exports = function(bot){
                     bot.log(`Connected to IPC on ${socket}`);
 
 
-
+					//console.log("TRACE,1,emitWithCallback,"+(new Date()).getTime());
                     bot.emitWithCallback("command", {
                         receiver: "discord",
                         args: ["bot.receivers.discord.internal.client.servers", undefined],
                         command: "eval",
                     }, function(err, result){
+						//console.log("TRACE,7,callback received,"+(new Date()).getTime());
                         bot.serverCache = result;
 						bot.ipc.emit('instanceReady', {instance: bot.instance});
                     });
@@ -160,6 +161,7 @@ module.exports = function(bot){
                 }
 
                 bot.ipc.on("callback", function(data){
+					//console.log(`TRACE,6,ipc callback receive ${data.id},${(new Date()).getTime()}`);
                 	if(bot.waitingCallbacks[data.id]){
 						bot.waitingCallbacks[data.id].apply(this, data.args);
 						delete bot.waitingCallbacks[data.id];
@@ -183,6 +185,7 @@ module.exports = function(bot){
 
 
             bot.emitWithCallback = function emitWithCallback(command, data, callback){
+				//console.log("TRACE,2,emitWithCallback start,"+(new Date()).getTime());
                 var callbackNumber = callbackIDs++;
                 bot.waitingCallbacks[callbackNumber] = callback;
                 data.callbackID = callbackNumber;
