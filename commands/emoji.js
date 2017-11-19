@@ -15,10 +15,21 @@ module.exports = {
 		if(args[1]){
 			recv.simulateTyping(channel);
 			const result = await bot.util.emojiLookup(args[1]);
-			recv.sendMessage({
-				to: channel,
-				message: result.length ? result.join(" ").substring(0, 2000) : await bot.lang.getTranslation(server, "EMOJI_NOT_FOUND")
-			});
+			if(result.length < 1){
+				recv.sendMessage({
+					to: channel,
+					message: await bot.lang.getTranslation(server, "EMOJI_NOT_FOUND")
+				});
+			}else{
+				var output = bot.util.chunkify(result, 15);
+				for(var i = 0; i < output.length; i++){
+					recv.sendMessage({
+						to: channel,
+						message: output[i].join(" ")
+					});
+				}
+			}
+
 		}else{
 			recv.sendMessage({
 				to: channel,
