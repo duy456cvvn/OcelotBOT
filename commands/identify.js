@@ -78,7 +78,7 @@ module.exports = {
 				}else if(body && body.description && body.description.captions && body.description.captions.length > 0) {
 					recv.sendMessage({
 						to: channel,
-						message: `:eyes: ${await bot.lang.getTranslation(server, "IDENTIFY_RESPONSE_"+(parseInt(Math.random()*9)))}**${body.description.captions[0].text}**.`
+						message: await bot.lang.getTranslation(server, "IDENTIFY_RESPONSE_"+(parseInt(Math.random()*8)), body.description.captions[0].text)
 					});
 				}else{
 					recv.sendMessage({
