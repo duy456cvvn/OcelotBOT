@@ -9,6 +9,7 @@ exports.command = {
     func: function(user, userID, channel, args, message, bot){
         var m = moment(),
             timezone = args[1],
+            timeFormat = 'MMMM Do, YYYY HH:mm:ss ZZ',
             now = timezone ? m.tz(timezone) : m,
             emoji = `:clock${now.format("h")}${(now.get("m") >= 30) ? "30" : ""}:`;
 
@@ -17,17 +18,17 @@ exports.command = {
         if(now.format("hh:mm") == "05:05") {
             bot.sendMessage({
                 to: channel,
-                message: `${emoji} I'm going back to *${now.format("hh:mm:ss YYYY-MM-DD z")}* whether it's a 7 hour flight or a 45 minute drive.`
+                message: `${emoji} I'm going back to *${now.format(timeFormat)}* whether it's a 7 hour flight or a 45 minute drive.`
             });
         }else if(now.format("hh:mm") == "09:11"){
             bot.sendMessage({
                 to: channel,
-                message: `:airplane_arriving: :office: :office: The time is *${now.format("hh:mm:ss YYYY-MM-DD z")}*`
+                message: `:airplane_arriving: :office: :office: The time is *${now.format(timeFormat)}*`
             });
         }else{
             bot.sendMessage({
                 to: channel,
-                message: `${emoji} The time is *${now.format("hh:mm:ss YYYY-MM-DD z")}*`
+                message: `${emoji} The time is *${now.format(timeFormat)}*`
             });
         }
 
