@@ -13,7 +13,7 @@ module.exports = {
     accessLevel: 0,
     commands: ["pornsuggest"],
     run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
-        if(args[1] && args[1].length > 2){
+        if(args[1] && args[1].length > 3){
             recv.sendMessage({
                 to: channel,
                 message: await bot.lang.getTranslation(server, "PORNSUGGEST_INVALID_COUNTRY")
