@@ -141,7 +141,7 @@ module.exports = function(bot){
                                     bot.error(`Error logging command: ${err.stack}`);
                                     bot.raven.captureException(err);
                                 }finally{
-                                    bot.log(`${user} (${userID}) in ${server} performed command ${message}`);
+                                    bot.log(`${user} (${userID}) in ${channelID} (${server}) performed command ${message}`);
                                 }
                             }
 
