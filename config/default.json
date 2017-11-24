@@ -310,14 +310,20 @@
   "Languages": {
     "default": "en-GB.json",
     "en": "en-GB.json",
-    "en-GB": "en-GB.json",
-    "en-US": "en-GB.json",
+    "en-gb": "en-GB.json",
+    "en-us": "en-us.json",
     "fi": "fi.json",
     "fr": "fr.json",
     "ar": "ar.json",
     "fil": "fil.json",
     "gr": "el.json",
-    "el": "el.json"
+    "el": "el.json",
+    "zh-cn": "zh-CN.json",
+    "zh": "zh-CN.json",
+    "nl-be": "nl-be.json",
+    "nl": "nl-be.json",
+    "eo": "eo.json",
+    "es": "es.json"
   },
   "ConflictingBots": [
     "189702078958927872",
