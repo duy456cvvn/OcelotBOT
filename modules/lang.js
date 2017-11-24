@@ -1,5 +1,5 @@
 const config = require('config');
-
+const fs = require('fs');
 module.exports = function(bot){
 	return {
 		name: "Language Module",
@@ -7,19 +7,32 @@ module.exports = function(bot){
 		init: async function init(cb){
 			bot.lang = {};
 
-			bot.log("Loading language packs...");
-			const languages = config.get("Languages");
-			bot.lang.strings = {};
-			for(var i in languages){
-				if(languages.hasOwnProperty(i)){
-					try{
-						bot.lang.strings[i] =  require("../lang/"+languages[i]);
-						bot.log(`Loaded language ${bot.lang.strings[i].LANGUAGE_NAME} as ${i}`);
-					}catch(e){
-						bot.error("Failed to load language: "+e.message);
+			bot.lang.loadLanguages = function(){
+				bot.log("Loading language packs...");
+				const languages = config.get("Languages");
+				bot.lang.strings = {};
+				for(let i in languages){
+					if(languages.hasOwnProperty(i)){
+						fs.readFile(__dirname+"/../lang/"+languages[i], function(err, data){
+							if(err){
+								bot.raven.captureException(err);
+								bot.error(`Error loading language ${languages[i]}: ${err}`);
+							}else{
+								try{
+									bot.lang.strings[i] = JSON.parse(data);
+									bot.log(`Loaded language ${bot.lang.strings[i].LANGUAGE_NAME} as ${i}`);
+								}catch(e){
+									bot.raven.captureException(e);
+									bot.error(`Language ${languages[i]} is malformed: ${e}`);
+								}
+							}
+						});
 					}
 				}
-			}
+			};
+
+			bot.lang.loadLanguages();
+
 
 			bot.log("Populating Language Cache...");
 			bot.lang.languageCache = {};
