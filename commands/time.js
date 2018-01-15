@@ -9,11 +9,11 @@ exports.command = {
     func: function(user, userID, channel, args, message, bot){
         var m = moment(),
             timezone = args[1],
-            timeFormat = 'MMMM Do, YYYY HH:mm:ss ZZ',
-            now = timezone ? m.tz(timezone) : m,
+            timeFormat = 'MMMM Do, YYYY HH:mm:ss [GMT]ZZ',
+            now = m.tz((timezone && moment.tz.zone(timezone)) ? timezone : 'UTC'),
             emoji = `:clock${now.format("h")}${(now.get("m") >= 30) ? "30" : ""}:`;
 
-            if(now.format("hh:mm") == "04:20")emoji = ":weed:";
+            if(now.format("hh:mm") == "04:20") emoji = ":weed:";
 
         if(now.format("hh:mm") == "05:05") {
             bot.sendMessage({
