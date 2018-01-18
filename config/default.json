@@ -14,7 +14,7 @@
   },
   "Discord": {
     "token": "",
-    "messageDelay": 300,
+    "messageDelay": 500,
     "totalShards": 0,
     "shard": 0
   },
