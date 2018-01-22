@@ -64,7 +64,7 @@ module.exports = {
                         }
                         recv.sendMessage({
                             to: channel,
-                            message: await bot.lang.getTranslation(server, "FACE_RESPONSE_MULTIPLE", {num: body.length-1})+" "+output
+                            message: await bot.lang.getTranslation(server, "FACE_RESPONSE_MULTIPLE", {num: body.length})+" "+output
                         });
                     }
 
