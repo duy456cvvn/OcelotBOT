@@ -31,7 +31,7 @@ module.exports = {
                         if(data.base && data.rates[second]){
                             recv.sendMessage({
                                 to: channel,
-                                message: `:dollar: 1 ${data.base} = ${data.rates[second]} ${second}`
+                                message: await bot.lang.getTranslation(server, "CONVERT_CURRENCY", {base: data.base, rate: data.rates[second], currency: second})
                             });
                         }else{
                             recv.sendMessage({
