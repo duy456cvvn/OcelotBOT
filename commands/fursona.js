@@ -73,10 +73,10 @@ module.exports = {
 	usage: "fursona",
 	accessLevel: 0,
 	commands: ["fursona"],
-	run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
+	run: async function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
 		recv.sendMessage({
 			to: channel,
-			message: `:dog: **Your new fursona is:**\n${bot.util.arrayRand(randomNames)} the ${bot.util.arrayRand(randomDescs)} ${bot.util.arrayRand(randomAnimals)}`
+			message: await bot.lang.getTranslation(server, "FURSONA_MESSAGE", `${bot.util.arrayRand(randomNames)} the ${bot.util.arrayRand(randomDescs)} ${bot.util.arrayRand(randomAnimals)}`)
 		});
 	}
 };
