@@ -40,7 +40,7 @@ module.exports = {
     accessLevel: 0,
     commands: ["chinese", "chin"],
     run: function run(user, userID, channel, message, args, event, bot, recv, debug, server) {
-        const sentence = message.substring(message.indexOf(args[1]));
+        const sentence = message.substring(message.indexOf(args[1])).toLowerCase();
         const letters = sentence.split("");
         var output = "";
         for(var i in letters){
