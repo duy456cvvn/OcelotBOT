@@ -1,3 +1,7 @@
+##If you are looking for OcelotBOT on Discord: go here: https://ocelot.xyz/
+
+
+
 Slack BOT
 
 #Command List:
