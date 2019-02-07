@@ -1,4 +1,6 @@
-##If you are looking for OcelotBOT on Discord: go here: https://ocelot.xyz/
+# **If you are looking for OcelotBOT on Discord: go here: https://ocelot.xyz/**
+  
+  
 
 
 
